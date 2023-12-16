@@ -1,0 +1,71 @@
+[{
+    "doctype": "Custom Field",
+    "dt": "Material Request",
+    "fieldname": "reason_code",
+    "fieldtype": "Link",
+    "options":"Material Issue Reason Code",
+    "insert_after": "schedule_date",
+    "label": "Material Issue Reason Code",
+    "depends_on": "eval:doc.material_request_type ==='Material Issue'",    
+    "modified": "2023-12-10 22:12:02.049023",
+    "name": "Material Request-reason_code"
+   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Stock Entry",
+    "fieldname": "reason_code",
+    "fieldtype": "Link",
+    "options":"Material Issue Reason Code",
+    "insert_after": "stock_entry_type",
+    "label": "Material Issue Reason Code",
+    "depends_on": "eval:doc.stock_entry_type ==='Material Issue'", 
+    "mandatory_depends_on": "eval:doc.stock_entry_type ==='Material Issue'",    
+    "modified": "2023-12-10 22:12:02.049023",
+    "name": "Stock Entry-reason_code"
+   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Stock Entry",
+    "fieldname": "expense_account",
+    "fieldtype": "Link",
+    "options":"Account",
+    "insert_after": "reason_code",
+    "label": "Expense Account",
+    "depends_on": "eval:doc.reason_code",    
+    "modified": "2023-12-10 22:12:02.049023",
+    "name": "Stock Entry-expense_account"
+   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Account",
+    "fieldname": "cash_flow_code",
+    "fieldtype": "Link",
+    "options":"Cash Flow Code",
+    "insert_after": "balance_must_be",
+    "label": "Default Cash Flow Code",
+    "modified": "2023-12-10 22:15:02.049023",
+    "name": "Account-cash_flow_code"
+   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Customer",
+    "fieldname": "cash_flow_code",
+    "fieldtype": "Link",
+    "options":"Cash Flow Code",
+    "insert_after": "default_bank_account",
+    "label": "Default Cash Flow Code",
+    "modified": "2023-12-16 22:15:02.049023",
+    "name": "Customer-cash_flow_code"
+   },
+   {
+    "doctype": "Custom Field",
+    "dt": "Supplier",
+    "fieldname": "cash_flow_code",
+    "fieldtype": "Link",
+    "options":"Cash Flow Code",
+    "insert_after": "default_bank_account",
+    "label": "Default Cash Flow Code",
+    "modified": "2023-12-16 22:15:02.049023",
+    "name": "Supplier-cash_flow_code"
+   }
+]

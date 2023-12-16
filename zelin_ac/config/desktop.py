@@ -3,8 +3,8 @@ from frappe import _
 def get_data():
 	return [
 		{
-			"module_name": "Zelin Accounting",
+			"module_name": "Financial Statement",
 			"type": "module",
-			"label": _("Zelin Accounting")
+			"label": _("Financial Statement")
 		}
 	]

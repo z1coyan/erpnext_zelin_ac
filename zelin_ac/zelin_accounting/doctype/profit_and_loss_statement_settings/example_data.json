@@ -1,0 +1,123 @@
+{
+  "items": [
+    {
+      "idx": 2,
+      "label": "减：主营业务成本",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6401"
+    },
+    {
+      "idx": 10,
+      "label": "其他业务支出",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6402"
+    },
+    {
+      "idx": 12,
+      "label": "加：投资收益（损失以“－”号填列）",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6111"
+    },
+    {
+      "idx": 7,
+      "label": "营业费用",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6601"
+    },
+    {
+      "idx": 17,
+      "label": "五、净利润（净亏损以“－”号填列）",
+      "indent": 0,
+      "calc_type": "Calculate Rows",
+      "calc_sources": "15,-16"
+    },
+    {
+      "idx": 14,
+      "label": "减：营业外支出",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6711"
+    },
+    {
+      "idx": 9,
+      "label": "财务费用",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6603"
+    },
+    {
+      "idx": 11,
+      "label": "三、营业利润（亏损以“－”号填列）",
+      "indent": 0,
+      "calc_type": "Calculate Rows",
+      "calc_sources": "4,5,-6,-7,-8,-9,-10"
+    },
+    {
+      "idx": 8,
+      "label": "管理费用",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6602"
+    },
+    {
+      "idx": 1,
+      "label": "一、主营业务收入",
+      "indent": 0,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6001"
+    },
+    {
+      "idx": 5,
+      "label": "加：其他业务收入",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6051"
+    },
+    {
+      "idx": 13,
+      "label": "营业外收入",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6301"
+    },
+    {
+      "idx": 6,
+      "label": "减：销售费用",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6605"
+    },
+    {
+      "idx": 15,
+      "label": "四、利润总额（亏损总额以“－”号填列）",
+      "indent": 0,
+      "calc_type": "Calculate Rows",
+      "calc_sources": "11,12,13,-14"
+    },
+    {
+      "idx": 3,
+      "label": "主营业务税金及附加",
+      "indent": 2,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6403"
+    },
+    {
+      "idx": 16,
+      "label": "减：所得税费用",
+      "indent": 1,
+      "calc_type": "Closing Balance",
+      "calc_sources": "6801"
+    },
+    {
+      "idx": 4,
+      "label": "二、主营业务利润（亏损以“－”号填列）",
+      "indent": 0,
+      "calc_type": "Calculate Rows",
+      "calc_sources": "1,-2,-3"
+    }
+  ]
+}

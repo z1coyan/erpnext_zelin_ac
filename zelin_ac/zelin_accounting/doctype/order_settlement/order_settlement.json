@@ -10,12 +10,16 @@
  "field_order": [
   "company",
   "column_break_yj2lr",
+  "workstation",
+  "column_break_pdpes",
   "fiscal_year",
   "column_break_a1f21",
   "month",
   "section_break_k11kx",
   "get_items",
   "items",
+  "section_break_1vil6",
+  "expenses",
   "amended_from"
  ],
  "fields": [
@@ -59,15 +63,17 @@
    "fieldtype": "Section Break"
   },
   {
-   "depends_on": "eval:doc.company&&doc.fiscal_year&&doc.month&&!(doc.items || []).length",
+   "depends_on": "eval:doc.company&&doc.fiscal_year&&doc.month",
    "fieldname": "get_items",
    "fieldtype": "Button",
-   "label": "Get Items"
+   "label": "Get Order Settlement Items"
   },
   {
+   "description": "Finish goods receipt via Stock Entry with type Manufacturing",
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Order Settlement Items",
+   "no_copy": 1,
    "options": "Order Settlement Item"
   },
   {
@@ -78,12 +84,35 @@
    "options": "Order Settlement",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "section_break_1vil6",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "expenses",
+   "fieldtype": "Table",
+   "label": "Allocatable Expenses",
+   "no_copy": 1,
+   "options": "Order Settlement Expense"
+  },
+  {
+   "fieldname": "column_break_pdpes",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Workstations",
+   "options": "Workstation"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-11 17:08:22.527363",
+ "modified": "2023-12-17 22:10:26.248329",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement",
@@ -91,6 +120,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -100,11 +131,41 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  },
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": [],
- "track_changes": 1
+ "states": []
 }

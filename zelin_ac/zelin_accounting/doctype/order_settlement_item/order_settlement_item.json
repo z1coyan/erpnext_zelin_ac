@@ -9,42 +9,53 @@
   "stock_entry",
   "item_code",
   "warehouse",
+  "workstation",
+  "column_break_tygpe",
   "qty",
+  "amount",
+  "column_break_dxxo5",
+  "included_expense",
+  "allocated_expense",
   "column_break_wjxxr",
   "posting_date",
-  "posting_time",
-  "column_break_tygpe",
-  "unit_cost",
-  "hours",
-  "hourly_rate"
+  "posting_time"
  ],
  "fields": [
   {
+   "columns": 2,
    "fieldname": "stock_entry",
    "fieldtype": "Link",
    "in_list_view": 1,
-   "label": "Stock Entry",
-   "options": "Stock Entry"
+   "label": "FG Receipt",
+   "no_copy": 1,
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
+   "columns": 2,
    "fieldname": "item_code",
    "fieldtype": "Link",
    "in_list_view": 1,
    "label": "Item Code",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Warehouse",
-   "options": "Warehouse"
+   "no_copy": 1,
+   "options": "Warehouse",
+   "read_only": 1
   },
   {
+   "columns": 1,
    "fieldname": "qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Qty"
+   "label": "Qty",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "column_break_wjxxr",
@@ -54,38 +65,63 @@
    "fieldname": "posting_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "Posting Date"
+   "label": "Posting Date",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "posting_time",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Posting Time"
+   "label": "Posting Time",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "column_break_tygpe",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "unit_cost",
-   "fieldtype": "Float",
-   "label": "Unit Cost"
+   "columns": 1,
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Workstation",
+   "no_copy": 1,
+   "options": "Workstation",
+   "read_only": 1
   },
   {
-   "fieldname": "hours",
+   "columns": 1,
+   "fieldname": "included_expense",
    "fieldtype": "Float",
-   "label": "Hours"
+   "in_list_view": 1,
+   "label": "Included Expense",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
-   "fieldname": "hourly_rate",
+   "columns": 1,
+   "fieldname": "allocated_expense",
    "fieldtype": "Float",
-   "label": "Hourly Rate"
+   "in_list_view": 1,
+   "label": "Allocated Expense"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "label": "Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_dxxo5",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-12-11 18:00:30.744507",
+ "modified": "2023-12-17 22:07:15.365892",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement Item",

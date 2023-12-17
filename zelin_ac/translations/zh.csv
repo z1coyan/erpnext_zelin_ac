@@ -17,7 +17,8 @@ Formula,公式
 Is Outflow,是流出
 Cash Flow Items,现金流明细
 Get Cash Flow Items,获取现金凭证明细
-Order Settlement Items,工单结算明细
+Order Settlement,制造费用差异结算
+Order Settlement Items,制造费用差异结算明细
 Cash Flow Subtotal,现金流量小计
 Cash Flow Report,现金流量表
 Download Cash Flow,下载现金流量表
@@ -29,3 +30,16 @@ Default Party Type,默认往来类型
 Yearly Amount,本年累计金额
 Monthly Amount,本月金额
 GL Entry {0} total amount {1} does not match amount {2} in general ledger,被拆分凭证 {0} 汇总金额 {1} 与会计总账金额 {2} 不一致
+Please enter Order Settlement Items,请输入制造费用差异结算明细
+Get Order Settlement Items,获取制造费用差异结算明细
+Allocatable Expenses,待分摊费用
+Allocatable Expense,待分摊费用
+Included Expense,已结转库存费用
+Actual Expense,实际费用
+Allocated Expense,分摊费用
+Expense variance settlement,制造费用差异结算
+Cancel Expense variance settlement,取消制造费用差异结算
+Workstations,工站
+Expenses Included in Valuation in comany master missing,请先在公司主数据中维护结转库存的费用科目
+Finish goods receipt via Stock Entry with type Manufacturing,工单成品入库明细
+FG Receipt,入库单号

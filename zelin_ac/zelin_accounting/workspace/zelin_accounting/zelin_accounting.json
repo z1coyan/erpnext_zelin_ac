@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"27aE6qMRNU\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u8d22\u52a1\u62a5\u8868</span>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}}]",
+ "content": "[{\"id\":\"27aE6qMRNU\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u8d22\u52a1\u62a5\u8868</span>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}},{\"id\":\"kU2hbVZnEf\",\"type\":\"card\",\"data\":{\"card_name\":\"\u6708\u7ed3\",\"col\":4}}]",
  "creation": "2023-12-08 10:37:07.389424",
  "custom_blocks": [],
  "docstatus": 0,
@@ -87,9 +87,27 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u6708\u7ed3",
+   "link_count": 1,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Order Settlement",
+   "link_count": 0,
+   "link_to": "Order Settlement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-12-16 16:37:27.269988",
+ "modified": "2023-12-17 18:14:04.252364",
  "modified_by": "yuxinyong@163.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",

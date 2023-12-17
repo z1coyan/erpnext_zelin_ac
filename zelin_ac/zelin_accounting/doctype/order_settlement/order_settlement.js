@@ -11,12 +11,30 @@ frappe.ui.form.on('Order Settlement', {
 			frm.set_value('month', month);
 		}
 	},
+	refresh(frm){
+		if (frm.doc.docstatus !== 0){
+			frm.add_custom_button(__('Repost Item Valuation'), () => {
+				const vouchers = frm.doc.items.map(
+					r=>{return r.stock_entry}
+				)
+				frappe.set_route('List', 'Repost Item Valuation', 
+					{
+						company: frm.doc.company,
+						//creation: ['>', frm.doc.modified],
+						posting_date: frm.doc.modified.split(' ')[0],
+						voucher_type:'Stock Entry',					
+						voucher_no: ['in', vouchers]});
+			}, __('View'));
+		}
+	},	
 	get_items(frm) {
 		frappe.call({
 			method: "get_items",
 			doc: frm.doc,
 			callback: function(r) {
 				refresh_field("items");
+				refresh_field("expenses");
+				frm.dirty();
 			}
 		});
 	},

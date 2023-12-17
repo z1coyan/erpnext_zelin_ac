@@ -262,7 +262,7 @@ class BalanceSheetDoubleColumns():
               idx = idx[1:]
               minus = True
             idx = cint(idx)
-            row = rows_map.get(prefix + cstr(idx))
+            row = rows_map.get(prefix + cstr(idx), {})
             d[prefix + "opening_balance"] += (-1 if minus else 1) * row.get("opening_balance", 0.0)
             d[prefix + "closing_balance"] += (-1 if minus else 1) * \
                 row.get("closing_balance", 0.0)

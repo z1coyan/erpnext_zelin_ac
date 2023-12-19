@@ -30,6 +30,7 @@ class OrderSettlement(Document):
                 (sed.is_finished_item == 1)
             ).select(
                 se.name.as_('stock_entry'),
+                se.work_order,
                 se.posting_date,
                 se.posting_time,                
                 sed.item_code,
@@ -40,8 +41,17 @@ class OrderSettlement(Document):
             ).orderby(se.posting_date
             ).orderby(se.posting_time
             ).run(as_dict = True)
+        #通过工单获取工站
+        wo_workstation_map = frappe._dict(frappe.get_all('Job Card', 
+            filters = {
+                'docstatus' : 1,
+                'work_order': ('in', {row.work_order for row in data})
+            },
+            fields = ['work_order','workstation'],
+            as_list = 1))    
         self.items = []    
         for d in data:
+            d.workstation = wo_workstation_map.get(d.work_order)            
             self.append('items', d)
         self.set_expenses()
 

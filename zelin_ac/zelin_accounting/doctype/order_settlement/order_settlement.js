@@ -21,7 +21,8 @@ frappe.ui.form.on('Order Settlement', {
 					{
 						company: frm.doc.company,
 						//creation: ['>', frm.doc.modified],
-						posting_date: frm.doc.modified.split(' ')[0],
+						//生成的成本调整凭证记账日期是入库单的记账日期，
+						//posting_date: frm.doc.modified.split(' ')[0],
 						voucher_type:'Stock Entry',					
 						voucher_no: ['in', vouchers]});
 			}, __('View'));

@@ -43,3 +43,7 @@ Workstations,工站
 Expenses Included in Valuation in comany master missing,请先在公司主数据中维护结转库存的费用科目
 Finish goods receipt via Stock Entry with type Manufacturing,工单成品入库明细
 FG Receipt,入库单号
+Production Cost Account,生产成本科目
+Production Input Account, 生产成本投入科目
+Production Output Account, 生产成本产出科目
+Actual Tax Amount,实际税额(手工输入)

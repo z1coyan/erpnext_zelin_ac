@@ -7,6 +7,13 @@ app_description = "Zelin Accounting"
 app_email = "vnimy@mediad.cn"
 app_license = "MIT"
 
+fixtures = [
+    {
+        "doctype": "Cash Flow Code",
+        "filters": [
+        ]
+    }
+]
 
 doctype_js = {
 	"Stock Entry" : "public/js/stock_entry.js",
@@ -16,13 +23,13 @@ doctype_js = {
 doc_events = {
  	"Stock Entry": {
  		"validate": "zelin_ac.doc_events.stock_entry_validate"
+	},
+	"Subcontracting Receipt": {
+ 		"validate": "zelin_ac.doc_events.subcontracting_receipt_validate"
 	}
 }
 
-fixtures = [
-    {
-        "doctype": "Cash Flow Code",
-        "filters": [
-        ]
-    }
-]
+override_doctype_class = {
+	"Purchase Invoice": "zelin_ac.overrides.CustomPurchaseInvoice",
+	"Sales Invoice": "zelin_ac.overrides.CustomSalesInvoice"
+}

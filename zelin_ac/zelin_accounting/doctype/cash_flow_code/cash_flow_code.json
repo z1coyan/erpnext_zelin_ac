@@ -75,7 +75,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-16 08:26:03.805861",
+ "modified": "2024-01-01 18:04:28.531967",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Cash Flow Code",
@@ -96,7 +96,7 @@
    "write": 1
   }
  ],
- "search_fields": "code",
+ "search_fields": "code,is_outflow",
  "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",

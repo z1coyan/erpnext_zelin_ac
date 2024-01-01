@@ -169,14 +169,19 @@ class CashFlow(Document):
                 gle.project,
                 gle.remarks
             ).run(as_dict = True)
-        self.items = []    
+
+        existing_code_map = {}    
+        if self.items:            
+            existing_code_map = {row.gl_entry:row.cash_flow_code for row in self.items if row.cash_flow_code}
+            self.items = []    
         for d in data:
             d.against = d.against[:140] #修改了字段类型为Data,避免出现超140字符的情况
+            d.cash_flow_code = existing_code_map.get(d.gl_entry)
             self.append('items', d)
         
-        self.assign_default_cash_flow_code()
+        self.assign_default_cash_flow_code(existing_code_map = existing_code_map)
 
-    def assign_default_cash_flow_code(self):
+    def assign_default_cash_flow_code(self, existing_code_map = {}):
         accounts = {row.account for row in self.items}
         accounts.update({row.against for row in self.items if row.against})
         account_cf_map = frappe._dict(frappe.get_all(
@@ -213,8 +218,9 @@ class CashFlow(Document):
             )
         if account_cf_map or party_type_cf_map or party_cf_map:
             for row in self.items:
-                cash_flow_code = (account_cf_map.get(row.account) or account_cf_map.get(row.against)
-                    or party_cf_map.get(row.party) or party_type_cf_map.get(row.party_type)
-                )
-                if cash_flow_code:
-                    row.cash_flow_code = cash_flow_code
+                if row.gl_entry not in existing_code_map:
+                    cash_flow_code = (account_cf_map.get(row.account) or account_cf_map.get(row.against)
+                        or party_cf_map.get(row.party) or party_type_cf_map.get(row.party_type)
+                    )
+                    if cash_flow_code:
+                        row.cash_flow_code = cash_flow_code

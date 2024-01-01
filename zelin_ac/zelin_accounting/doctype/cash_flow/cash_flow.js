@@ -3,10 +3,13 @@
 
 frappe.ui.form.on('Cash Flow', {
 	setup: function(frm) {
-		frm.set_query("cash_flow_code", "items", function(doc, cdt, cdn) {			
+		frm.set_query("cash_flow_code", "items", function(doc, cdt, cdn) {
+			const child = locals[cdt][cdn];
+			const is_outflow = child.debit? 0 : 1;			
 			return {			
 				filters: {
-					'formula': ['is', 'not set'],					
+					formula: ['is', 'not set'],
+					is_outflow: is_outflow
 				}
 			}
 		});
@@ -37,6 +40,18 @@ frappe.ui.form.on('Cash Flow', {
 	},
 });
 
+frappe.ui.form.on('Cash Flow Item', {
+	cash_flow_code(frm, cdt, cdn){
+		const child = locals[cdt][cdn];
+		const cf_code = child.cash_flow_code;
+		frm.grids[0].grid.get_selected_children().forEach( (row) =>{
+				if (row.name !== child.name && !row.cash_flow_code){
+					frappe.model.set_value(row.doctype, row.name, 'cash_flow_code', cf_code);
+				}
+			}
+		)
+	}
+})
 var download_cash_flow = function(frm) {
 	var data = [];
 	var docfields = [];

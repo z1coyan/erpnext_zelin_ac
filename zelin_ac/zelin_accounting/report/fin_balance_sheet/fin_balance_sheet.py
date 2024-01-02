@@ -178,7 +178,7 @@ class BalanceSheetDoubleColumns():
       acc.root_type, acc.report_type, acc.lft, acc.rgt
       from `tabAccount` acc
       left join `tabAccount` parent on parent.name = acc.parent_account
-      where acc.company=%s and acc.root_type in ('Asset', 'Liability', 'Equity') order by acc.lft""",
+      where acc.company=%s  order by acc.lft""", #fisher and acc.root_type in ('Asset', 'Liability', 'Equity'), 要考虑未结转损益
         self.company,
         as_dict=True,
     )

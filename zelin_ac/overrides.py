@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import flt
 from erpnext.accounts.doctype.purchase_invoice.purchase_invoice import PurchaseInvoice
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
@@ -26,26 +27,26 @@ class CustomSalesInvoice(SalesInvoice):
 
 def add_tax_adjust_gl_entries(doc, gl_entries):
         
-        tax_amount_map = {}
+        tax_amount_map = {} #按税科目小计手工输入的实际税额
         total_adjust_amount = 0
         for row in doc.taxes:
-            if row.charge_type != 'Actual' and row.actual_tax_amount:
-                tax_account = row.account_head
-                adjust_amount = row.actual_tax_amount - row.tax_amount
+            if row.charge_type != 'Actual' and row.actual_tax_amount and flt(row.actual_tax_amount - row.tax_amount):
+                tax_account = row.account_head                
                 tax_amount_map.setdefault(tax_account, 0)
-                tax_amount_map[tax_account] += adjust_amount
-                total_adjust_amount += adjust_amount
+                tax_amount_map[tax_account] += row.actual_tax_amount
 
         if tax_amount_map:
-            for (tax_account, adjust_amount) in tax_amount_map.items():
+            for (tax_account, actual_tax_amount) in tax_amount_map.items():
                 for row in gl_entries:
                     if row.account == tax_account:
                         if row.debit:
-                            row.debit += adjust_amount
-                            row.debit_in_account_currency += adjust_amount
+                            row.debit = actual_tax_amount
+                            row.debit_in_account_currency = actual_tax_amount
+                            total_adjust_amount +=  actual_tax_amount - row.debit
                         else:
-                            row.credit += adjust_amount
-                            row.credit_in_account_currency += adjust_amount
+                            row.credit = actual_tax_amount
+                            row.credit_in_account_currency = actual_tax_amount
+                            total_adjust_amount += actual_tax_amount - row.credit
                         break            
             add_adjust_gl_entry(doc, gl_entries, total_adjust_amount * -1)
                     
@@ -56,17 +57,28 @@ def add_adjust_gl_entry(doc, gl_entries, adjust_amount):
     round_off_account, round_off_cost_center = get_round_off_account_and_cost_center(
         doc.company, "Purchase Invoice", doc.name, doc.use_company_roundoff_cost_center
     )
-
-    gl_entries.append(
-        doc.get_gl_dict(
-            {
-                "account": round_off_account,
-                "against": None,
-                "debit_in_account_currency": adjust_amount,
-                "debit": adjust_amount,
-                "cost_center": round_off_cost_center
-                if doc.use_company_roundoff_cost_center
-                else (doc.cost_center or round_off_cost_center),
-            }            
+    has_round_off_account = False
+    for row in gl_entries:
+        if row.account == round_off_account:
+            if row.debit:
+                row.debit += adjust_amount
+                row.debit_in_account_currency += adjust_amount                
+            else:
+                row.credit += adjust_amount                            
+                row.credit_in_account_currency += adjust_amount                
+            has_round_off_account = True
+            break
+    if not has_round_off_account:
+        gl_entries.append(
+            doc.get_gl_dict(
+                {
+                    "account": round_off_account,
+                    "against": None,
+                    "debit_in_account_currency": adjust_amount,
+                    "debit": adjust_amount,
+                    "cost_center": round_off_cost_center
+                    if doc.use_company_roundoff_cost_center
+                    else (doc.cost_center or round_off_cost_center),
+                }            
+            )
         )
-    )

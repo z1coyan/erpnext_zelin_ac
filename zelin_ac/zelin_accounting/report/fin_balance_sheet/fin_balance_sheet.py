@@ -64,7 +64,7 @@ class BalanceSheetDoubleColumns():
       frappe.throw(_("Fiscal Year {0} is required").format(self.filters.fiscal_year))
     self.fiscal_year = self.filters.fiscal_year
 
-    fiscal_year = frappe.get_cached_value(
+    fiscal_year = frappe.db.get_value(
       "Fiscal Year", self.fiscal_year, ["year_start_date", "year_end_date"], as_dict=True
     )
     if not fiscal_year:
@@ -359,7 +359,7 @@ class BalanceSheetSingleColumn(BalanceSheetDoubleColumns):
 
     self.get_data()
 
-    currency = self.filters.presentation_currency or frappe.get_cached_value(
+    currency = self.filters.presentation_currency or frappe.db.get_value(
         "Company", self.filters.company, "default_currency"
     )
 

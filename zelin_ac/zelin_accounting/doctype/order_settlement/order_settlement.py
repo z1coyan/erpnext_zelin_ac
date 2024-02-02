@@ -11,10 +11,12 @@ from frappe.utils import cint, cstr, flt, getdate, datetime, get_first_day, get_
 class OrderSettlement(Document):
     @frappe.whitelist()
     def get_items(self):
+        #20240202 解决财务定义为24，返回0024-01-01问题
+        year = frappe.db.get_value('Fiscal Year', self.fiscal_year,'year_start_date').year
         from_date = get_first_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))
+            year=year, month=cint(self.month), day=1))
         to_date = get_last_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))               
+            year=year, month=cint(self.month), day=1))               
         se = frappe.qb.DocType('Stock Entry')
         sed = frappe.qb.DocType('Stock Entry Detail')
         data = frappe.qb.from_(se

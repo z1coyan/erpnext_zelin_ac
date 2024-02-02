@@ -52,10 +52,11 @@ def validate_filters(filters):
     filters.year_end_date = getdate(fiscal_year.year_end_date)
 
   if filters.month:
+    year = frappe.db.get_value('Fiscal Year', fiscal_year,'year_start_date').year
     filters.from_date = get_first_day(datetime.date(
-        year=cint(filters.fiscal_year), month=cint(filters.month), day=1))
+        year=year, month=cint(filters.month), day=1))
     filters.to_date = get_last_day(datetime.date(
-        year=cint(filters.fiscal_year), month=cint(filters.month), day=1))
+        year=year, month=cint(filters.month), day=1))
   else:
     filters.from_date = filters.year_start_date
     filters.to_date = filters.year_end_date

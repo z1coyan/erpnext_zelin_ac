@@ -80,12 +80,13 @@ class CashFlow(Document):
                     ).select(cf_subtotal.code, cf_subtotal.yearly_amount                
                     ).run(as_list = 1)
                 last_month_yearly_amount_map = frappe._dict(data)
+        year = frappe.db.get_value('Fiscal Year', self.fiscal_year,'year_start_date').year        
         from_date = get_first_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))
+            year=year, month=cint(self.month), day=1))
         year_start_date = get_first_day(datetime.date(
-            year=cint(self.fiscal_year), month=1, day=1))    
+            year=year, month=1, day=1))    
         to_date = get_last_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))
+            year=year, month=cint(self.month), day=1))
         filters = frappe._dict({
             'company': self.company,
             'from_date': from_date,
@@ -136,10 +137,11 @@ class CashFlow(Document):
 
     @frappe.whitelist()
     def get_cash_flow_items(self):
+        year = frappe.db.get_value('Fiscal Year', self.fiscal_year,'year_start_date').year
         from_date = get_first_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))
+            year=year, month=cint(self.month), day=1))
         to_date = get_last_day(datetime.date(
-            year=cint(self.fiscal_year), month=cint(self.month), day=1))
+            year=year, month=cint(self.month), day=1))
         account = frappe.qb.DocType('Account')    
         gle = frappe.qb.DocType('GL Entry')
         pe = frappe.qb.DocType('Payment Entry')

@@ -75,8 +75,9 @@ class BalanceSheetDoubleColumns():
 
 
     if self.filters.month:
-      self.filters.from_date = get_first_day(datetime.date(year=cint(self.fiscal_year), month=cint(self.filters.month), day=1))
-      self.filters.to_date = get_last_day(datetime.date(year=cint(self.fiscal_year), month=cint(self.filters.month), day=1))
+      year = frappe.db.get_value('Fiscal Year', self.fiscal_year,'year_start_date').year
+      self.filters.from_date = get_first_day(datetime.date(year=year, month=cint(self.filters.month), day=1))
+      self.filters.to_date = get_last_day(datetime.date(year=year, month=cint(self.filters.month), day=1))
     else:
       self.filters.from_date = self.year_start_date
       self.filters.to_date = self.year_end_date
@@ -400,11 +401,12 @@ class BalanceSheetSingleColumn(BalanceSheetDoubleColumns):
     for i in range(13):
       key = "balance_" + cstr(i)
       # 当月期末为下一个月的期初
-      from_date = get_first_day(datetime.date(year=cint(self.fiscal_year), month=1, day=1))
+      year = frappe.db.get_value('Fiscal Year', self.fiscal_year,'year_start_date').year
+      from_date = get_first_day(datetime.date(year=year, month=1, day=1))
       if i > 0 and i < 12:
-        from_date = get_first_day(datetime.date(year=cint(self.fiscal_year), month=cint(i + 1), day=1))
+        from_date = get_first_day(datetime.date(year=year, month=cint(i + 1), day=1))
       elif i == 12:
-        from_date = get_first_day(datetime.date(year=cint(self.fiscal_year) + 1, month=1, day=1))
+        from_date = get_first_day(datetime.date(year=year + 1, month=1, day=1))
       opening_balances = get_opening_balances(self.filters.copy().update({
           "from_date": from_date,
           "to_date": get_last_day(from_date),

@@ -160,44 +160,61 @@ class OrderSettlement(Document):
             将本月工站实际费用-已结转库存费用的差异金额基于已结转库存费用
             分摊到已入库成品，并调用更新入库时间点后续物料移动凭证(成本追溯调整)
         """
-
-        company_doc = frappe.get_cached_doc('Company', self.company)
-        expenses_included_in_valuation = company_doc.expenses_included_in_valuation
+        
+        (expenses_included_in_valuation, default_currency) = frappe.db.get_value("Company",self.company, 
+            ["expenses_included_in_valuation","default_currency"])
         if not expenses_included_in_valuation:
             frappe.throw(_("Expenses Included in Valuation in comany master missing"))
         
-        for d in self.get("items"):
-            allocated_expense = d.allocated_expense if self.docstatus == 1 else -1 * d.allocated_expense
-            if not allocated_expense: continue
-            doc = frappe.get_doc('Stock Entry', d.stock_entry)
-            #取消原物料及会计凭证
-            doc.docstatus = 2
-            sl_entries = []
-            finished_item_row = doc.get_finished_item_row()
-            doc.get_sle_for_source_warehouse(sl_entries, finished_item_row)
-            doc.get_sle_for_target_warehouse(sl_entries, finished_item_row)
-            sl_entries.reverse()
-            #允许负库存参数用于处理库存已被完全耗用，追溯调整结算时反冲出现负库存
-            doc.make_sl_entries(sl_entries, allow_negative_stock=True)
-            #doc.update_stock_ledger()
-            doc.make_gl_entries_on_cancel()
-            #添加结算费用明细行及金额
-            description = "{0}Expense variance settlement".format("" if self.docstatus == 1 else "Cancel ")
-            doc.append('additional_costs',{
-                'expense_account': expenses_included_in_valuation,
-                'exchange_rate': 1,
-                'account_currency': company_doc.default_currency or 'CNY',
-                'base_amount': allocated_expense,
-                'amount': allocated_expense,
-                'description': _(description)
-            })
-            doc.total_additional_costs -= allocated_expense
-            #重新计算成品入库成本价
-            doc.calculate_rate_and_amount()
-            doc.docstatus = 1
-            doc.update_stock_ledger()
-            doc.make_gl_entries()
-            doc.repost_future_sle_and_gle()
-            #直接使用save会触发不必要的校验，产生提交后某字段不能更新错误
-            doc.db_update()
-            doc.update_children()
+        if len(self.items) > 50:
+            frappe.enqueue(
+                repost_stock_entry,
+                docname=self.name,
+                default_currency=default_currency,
+                queue="long",
+                enqueue_after_commit=True
+            )
+            frappe.msgprint(
+                _("Rows more than 50, repost run in the background, it can take a few minutes."), alert=True
+            )
+        else:
+            repost_stock_entry(docname=self.name, default_currency=default_currency)
+
+def repost_stock_entry(docname, default_currency = None):
+    order_settlement = frappe.get_doc("Order Settlement", docname)
+    for d in order_settlement.get("items"):
+        allocated_expense = d.allocated_expense if order_settlement.docstatus == 1 else -1 * d.allocated_expense
+        if not allocated_expense: continue
+        doc = frappe.get_doc('Stock Entry', d.stock_entry)
+        #取消原物料及会计凭证
+        doc.docstatus = 2
+        sl_entries = []
+        finished_item_row = doc.get_finished_item_row()
+        doc.get_sle_for_source_warehouse(sl_entries, finished_item_row)
+        doc.get_sle_for_target_warehouse(sl_entries, finished_item_row)
+        sl_entries.reverse()
+        #允许负库存参数用于处理库存已被完全耗用，追溯调整结算时反冲出现负库存
+        doc.make_sl_entries(sl_entries, allow_negative_stock=True)
+        #doc.update_stock_ledger()
+        doc.make_gl_entries_on_cancel()
+        #添加结算费用明细行及金额
+        expense_account = frappe.db.get_value("Company", order_settlement.company, "expenses_included_in_valuation")
+        description = "{0}Expense variance settlement".format("" if order_settlement.docstatus == 1 else _("Cancel "))
+        doc.append('additional_costs',{
+            'expense_account': expense_account,
+            'exchange_rate': 1,
+            'account_currency': default_currency or 'CNY',
+            'base_amount': allocated_expense,
+            'amount': allocated_expense,
+            'description': _(description)
+        })
+        doc.total_additional_costs -= allocated_expense
+        #重新计算成品入库成本价
+        doc.calculate_rate_and_amount()
+        doc.docstatus = 1
+        doc.update_stock_ledger()
+        doc.make_gl_entries()
+        doc.repost_future_sle_and_gle()
+        #直接使用save会触发不必要的校验，产生提交后某字段不能更新错误
+        doc.db_update()
+        doc.update_children()

@@ -166,7 +166,7 @@ class OrderSettlement(Document):
         if not expenses_included_in_valuation:
             frappe.throw(_("Expenses Included in Valuation in comany master missing"))
         
-        if len(self.items) > 50:
+        if self.in_background_job or len(self.items) > 50:
             frappe.enqueue(
                 repost_stock_entry,
                 docname=self.name,
@@ -175,7 +175,7 @@ class OrderSettlement(Document):
                 enqueue_after_commit=True
             )
             frappe.msgprint(
-                _("Rows more than 50, repost run in the background, it can take a few minutes."), alert=True
+                _("Repost run in the background, it can take a few minutes."), alert=True
             )
         else:
             repost_stock_entry(docname=self.name, default_currency=default_currency)

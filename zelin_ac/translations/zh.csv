@@ -49,5 +49,7 @@ Production Output Account, 生产成本产出科目
 Actual Tax Amount,实际税额(手工输入)
 Amount From,金额来源
 Balance,余额
-"Rows more than 50, repost run in the background, it can take a few minutes.",工单结算明细超过50行，已提交后台处理。
+"Repost run in the background, it can take a few minutes.", 已启动后台处理。
 {0}Expense variance settlement, {0}费用差异结算
+Background Job Setting, 后台任务设置
+In Background Job,启动后台任务

@@ -20,7 +20,9 @@
   "items",
   "section_break_1vil6",
   "expenses",
-  "amended_from"
+  "amended_from",
+  "background_job_setting_section",
+  "in_background_job"
  ],
  "fields": [
   {
@@ -107,12 +109,25 @@
    "in_standard_filter": 1,
    "label": "Workstations",
    "options": "Workstation"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "background_job_setting_section",
+   "fieldtype": "Section Break",
+   "label": "Background Job Setting"
+  },
+  {
+   "default": "0",
+   "description": "\u52fe\u9009\u6b64\u6846\u6216\u7ed3\u7b97\u660e\u7ec6\u884c\u6570\u8d8550\uff0c\u63d0\u4ea4\u65f6\u542f\u52a8\u540e\u53f0\u8fd0\u884c",
+   "fieldname": "in_background_job",
+   "fieldtype": "Check",
+   "label": "In Background Job"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2023-12-17 22:10:26.248329",
+ "modified": "2024-03-11 15:51:16.071179",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement",

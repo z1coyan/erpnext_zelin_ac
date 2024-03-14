@@ -32,13 +32,12 @@
    "label": "\u7f29\u8fdb"
   },
   {
-    "fieldtype": "Column Break",
-    "fieldname": "cb_01" 
+   "fieldname": "cb_01",
+   "fieldtype": "Column Break"
   },
   {
    "columns": 1,
    "default": "Closing Balance",
-   "depends_on": "eval:!doc.lft_empty",
    "fieldname": "calc_type",
    "fieldtype": "Select",
    "in_list_view": 1,
@@ -47,26 +46,27 @@
   },
   {
    "columns": 5,
-   "depends_on": "eval:!doc.lft_empty",
+   "depends_on": "eval:in_list(['Closing Balance','Calculate Rows'], doc.calc_type)",
    "fieldname": "calc_sources",
    "fieldtype": "Small Text",
    "in_list_view": 1,
-   "label": "\u8ba1\u7b97\u6765\u6e90"
+   "label": "\u8ba1\u7b97\u6765\u6e90",
+   "mandatory_depends_on": "eval:in_list(['Closing Balance','Calculate Rows'], doc.calc_type)"
   },
   {
-    "columns": 1,
-    "fieldname": "amount_from",
-    "fieldtype": "Select",
-    "options":"Balance\nCredit\nDebit",
-    "default": "Balance",
-    "in_list_view": 1,
-    "label": "Amount From"
-   }
+   "columns": 1,
+   "default": "Balance",
+   "fieldname": "amount_from",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Amount From",
+   "options": "Balance\nCredit\nDebit"
+  }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-3-1 09:49:42.718745",
+ "modified": "2024-03-14 17:02:06.238683",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Profit and Loss Statement Settings Item",

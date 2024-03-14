@@ -130,6 +130,7 @@ def get_data(data, filters):
       start_date = filters.year_start_date,account_numbers = acc_nums)
   rows_map = {}
   for d in data:
+    d.amount, d.month_end_amount = 0, 0
     if d.calc_type and d.calc_sources and d.calc_type == "Closing Balance":
       row_monthly_amount, row_month_end_amount = 0, 0
       for (i,account) in enumerate(d.accounts):
@@ -153,11 +154,10 @@ def get_data(data, filters):
       d.amount = row_monthly_amount
       d.month_end_amount = row_month_end_amount
 
-      rows_map[cstr(d.idx)]= {          
-          "name": d.name,
-          "amount": d.amount,
-          "month_end_amount": d.month_end_amount
-      }     
+    rows_map[cstr(d.idx)]= {          
+        "amount": d.amount,
+        "month_end_amount": d.month_end_amount
+    }     
 
   for d in data:
     if d.calc_type and d.calc_sources and d.calc_type == "Calculate Rows":

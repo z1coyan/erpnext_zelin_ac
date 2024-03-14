@@ -3,9 +3,11 @@
 
 frappe.ui.form.on('Balance Sheet Settings', {
 	refresh: function(frm) {
-		frm.add_custom_button('导入范例数据', function() {
-			frm.events.import_example_data(frm);
-		});
+		if (!frm.doc.items || frm.doc.items.length === 0){
+			frm.add_custom_button('导入范例数据', function() {
+				frm.events.import_example_data(frm);
+			});
+		}
 	},
 
 	import_example_data(frm) {

@@ -17,10 +17,10 @@
     "fieldtype": "Link",
     "options":"Material Issue Reason Code",
     "insert_after": "stock_entry_type",
-    "label": "Material Issue Reason Code",
-    "depends_on": "eval:doc.stock_entry_type ==='Material Issue'", 
-    "mandatory_depends_on": "eval:doc.stock_entry_type ==='Material Issue'",    
-    "modified": "2023-12-10 22:12:02.049023",
+    "label": "Material Movement Reason Code",
+    "depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)", 
+    "mandatory_depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)",
+    "modified": "2024-3-14 22:12:02.049024",
     "name": "Stock Entry-reason_code"
    },
    {

@@ -40,3 +40,58 @@ frappe.ui.form.on('Order Settlement', {
 		});
 	},
 });
+
+frappe.ui.form.on('Order Settlement Item', {
+    qty(frm, cdt, cdn) {
+        calculate_subtotal(frm)  
+    },
+    items_add(frm, cdt, cdn) {
+        calculate_subtotal(frm)  
+    },
+    items_delete(frm, cdt, cdn) {
+        calculate_subtotal(frm)  
+    }
+})
+
+frappe.ui.form.on('Order Settlement Expense', {
+    actual_expense(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+		row.allocatable_expense = row.actual_expense - (row.included_expense | 0);
+		row.variance = row.allocatable_expense - (row.allocated_expense | 0);
+		frm.refresh_field('expenses'); 
+    },
+	included_expense(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+		row.allocatable_expense = row.actual_expense - (row.included_expense | 0);
+		row.variance = row.allocatable_expense - (row.allocated_expense | 0);
+		frm.refresh_field('expenses'); 
+    },
+    variance(frm, cdt, cdn) {
+        let row = locals[cdt][cdn];
+		row.allocatable_expense = row.variance  + (row.allocated_expense | 0)
+		row.actual_expense = row.allocatable_expense + (row.included_expense | 0)
+		frm.refresh_field('expenses'); 
+    }
+})
+
+
+var calculate_subtotal = function(frm){                    //字段值变更后触发这段代码执行
+	let ws_included_expense = frm.doc.items.reduce((accumulator, currentValue) => {  
+		// 如果当前Workstation已经存在于累加器中，则增加其included_expense  
+		let workstation = currentValue.workstation? currentValue.workstation: "empty"
+		if (accumulator[workstation]) {  
+		  accumulator[workstation] += currentValue.included_expense;  
+		} else {  
+		  // 否则，在累加器中创建一个新的条目，并设置qty  
+		  accumulator[workstation] = currentValue.included_expense;  
+		}  
+		return accumulator;  
+	  }, {});
+	frm.doc.expenses.forEach(
+		row=>{
+			let workstation = row.workstation? row.workstation: "empty";
+			frappe.model.set_value(row.doctype, row.name, 'included_expense', ws_included_expense[workstation] | 0)
+		}
+	)
+    frm.refresh_field('expenses');              //刷新主表字段，显示更新后结果
+}

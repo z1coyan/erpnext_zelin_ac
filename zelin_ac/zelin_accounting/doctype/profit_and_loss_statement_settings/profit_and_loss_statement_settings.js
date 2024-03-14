@@ -3,9 +3,11 @@
 
 frappe.ui.form.on('Profit and Loss Statement Settings', {
 	refresh: function(frm) {
-		frm.add_custom_button('导入范例数据', function() {
-			frm.events.import_example_data(frm);
-		});
+		if (!frm.doc.items || frm.doc.items.length === 0){
+			frm.add_custom_button('导入范例数据', function() {
+				frm.events.import_example_data(frm);
+			});
+		}
 	},
 
 	import_example_data(frm) {

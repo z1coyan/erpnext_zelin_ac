@@ -28,8 +28,8 @@
    "fieldname": "actual_expense",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "precision": "2",
-   "label": "Actual Expense"
+   "label": "Actual Expense",
+   "precision": "2"
   },
   {
    "fieldname": "included_expense",
@@ -64,15 +64,14 @@
    "fieldname": "variance",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "precision": "2",
    "label": "Variance",
-   "read_only": 1
+   "precision": "2"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-2-29 10:26:13.274477",
+ "modified": "2024-03-14 09:37:29.216650",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement Expense",

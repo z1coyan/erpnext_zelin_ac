@@ -5,9 +5,10 @@ Fin Profit and Loss Statement,利润表
 Profit and Loss Statement Settings,利润表设置
 Profit and Loss Statement Settings Item,利润表设置明细
 Calculate Rows,计算公式
-Material Issue Reason Code,其它出库原因代码
+Material Movement Reason Code,物料移动原因代码
+Material Issue Reason Code,物料移动原因代码
 Reason Code,原因代码
-Material Issue Default Account,其它出库默认科目
+Material Issue Default Account,物料移动默认科目
 Cash Flow Code,现金流编码
 Default Cash Flow Code,默认现金流编码
 Cash Flow Name,现金流名称

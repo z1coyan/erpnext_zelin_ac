@@ -60,6 +60,7 @@ class OrderSettlement(Document):
     def validate(self):
         if not self.get("items"):
             self.get_items()
+        self.set_expenses()
         self.check_mandatory()        
         self.set_applicable_expenses_on_item()
 
@@ -80,8 +81,13 @@ class OrderSettlement(Document):
             for row in self.expenses:
                 workstation = row.workstation or ''
                 row.included_expense = included_expense_map.get(workstation, 0)
-                row.allocatable_expense = row.actual_expense - row.included_expense
-                row.variance = row.allocatable_expense - (row.allocated_expense or 0)
+                if row.actual_expense:
+                    row.allocatable_expense = row.actual_expense - row.included_expense
+                    row.variance = row.allocatable_expense - (row.allocated_expense or 0)
+                elif row.variance:                    
+                    row.allocatable_expense = row.variance  + (row.allocated_expense or 0)
+                    row.actual_expense = row.allocatable_expense + row.included_expense
+
 
         for (workstaion, included_expense) in included_expense_map.items():
             if workstaion not in existing_workstations:

@@ -23,7 +23,7 @@ def subcontracting_receipt_validate(doc, method):
                 row.expense_account = expense_account
 
 def set_masterial_issue_expense_account(doc):
-    if doc.stock_entry_type == 'Material Issue' and doc.reason_code:
+    if doc.stock_entry_type in ['Material Issue', 'Material Receipt'] and doc.reason_code:
         expense_account = doc.expense_account
         if not expense_account:
             expense_account = frappe.db.get_value('Material Issue Default Account',

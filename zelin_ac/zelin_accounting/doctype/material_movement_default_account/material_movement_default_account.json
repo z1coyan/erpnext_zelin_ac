@@ -34,7 +34,7 @@
  "modified": "2023-12-10 09:32:41.983687",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
- "name": "Material Issue Default Account",
+ "name": "Material Movement Default Account",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",

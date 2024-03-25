@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestMaterialIssueReasonCode(FrappeTestCase):
+class TestMaterialMoveReasonCode(FrappeTestCase):
 	pass

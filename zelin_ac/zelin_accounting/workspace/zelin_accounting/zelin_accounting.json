@@ -53,9 +53,9 @@
   {
     "hidden": 0,
     "is_query_report": 0,
-    "label": "Material Issue Reason Code",
+    "label": "Material Move Reason Code",
     "link_count": 0,
-    "link_to": "Material Issue Reason Code",
+    "link_to": "Material Move Reason Code",
     "link_type": "DocType",
     "onboard": 0,
     "type": "Link"
@@ -117,7 +117,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-03-14 18:14:04.252364",
+ "modified": "2024-03-25 18:14:04.252365",
  "modified_by": "yuxinyong@163.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",

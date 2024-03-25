@@ -17,6 +17,7 @@ fixtures = [
 
 doctype_js = {
 	"Stock Entry" : "public/js/stock_entry.js",
+	"Material Request" : "public/js/material_request.js",
 	"Account" : "public/js/account.js"		
 }
 

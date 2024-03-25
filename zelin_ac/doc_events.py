@@ -26,7 +26,7 @@ def set_masterial_issue_expense_account(doc):
     if doc.stock_entry_type in ['Material Issue', 'Material Receipt'] and doc.reason_code:
         expense_account = doc.expense_account
         if not expense_account:
-            expense_account = frappe.db.get_value('Material Issue Default Account',
+            expense_account = frappe.db.get_value('Material Movement Default Account',
                 {'company': doc.company,
                  'parent': doc.reason_code
                 },

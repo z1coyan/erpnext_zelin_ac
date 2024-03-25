@@ -10,6 +10,16 @@ frappe.ui.form.on('Stock Entry', {
 			}
 		});
 	},
+    refresh: function (frm) {
+		frm.set_query('reason_code', function (doc) {			
+			return {
+				filters: {
+					for_material_issue: frm.doc.purpose === "Material Issue",
+					for_material_receipt: frm.doc.purpose === "Material Receipt"					
+				}
+			}
+		});
+	},
     reason_code(frm){
         if (frm.doc.reason_code){
             let filters = {'parent': frm.doc.reason_code,
@@ -18,10 +28,10 @@ frappe.ui.form.on('Stock Entry', {
             frappe.call({
                 method: "frappe.client.get_value",
     			args: {
-    				doctype: "Material Issue Default Account",
+    				doctype: "Material Movement Default Account",
     				filters: filters,
     				fieldname:"expense_account",
-    				parent:"Material Issue Reason Code"
+    				parent:"Material Move Reason Code"
     			},
             })
             .then(r=>{

@@ -9,6 +9,8 @@
  "engine": "InnoDB",
  "field_order": [
   "reason_code",
+  "for_material_issue",
+  "for_material_receipt",
   "column_break_4tecb",
   "description",
   "section_break_hsl3j",
@@ -42,15 +44,27 @@
    "fieldname": "accounts",
    "fieldtype": "Table",
    "label": "Default Accounts",
-   "options": "Material Issue Default Account"
+   "options": "Material Movement Default Account"
+  },
+  {
+   "default": "1",
+   "fieldname": "for_material_issue",
+   "fieldtype": "Check",
+   "label": "For Material Issue"
+  },
+  {
+   "default": "0",
+   "fieldname": "for_material_receipt",
+   "fieldtype": "Check",
+   "label": "For Material Receipt"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2023-12-10 09:36:36.335311",
+ "modified": "2024-03-25 20:58:25.453199",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
- "name": "Material Issue Reason Code",
+ "name": "Material Move Reason Code",
  "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [

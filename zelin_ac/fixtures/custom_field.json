@@ -3,11 +3,11 @@
     "dt": "Material Request",
     "fieldname": "reason_code",
     "fieldtype": "Link",
-    "options":"Material Issue Reason Code",
+    "options":"Material Move Reason Code",
     "insert_after": "schedule_date",
-    "label": "Material Issue Reason Code",
+    "label": "Material Move Reason Code",
     "depends_on": "eval:doc.material_request_type ==='Material Issue'",    
-    "modified": "2023-12-10 22:12:02.049023",
+    "modified": "2024-03-25 22:12:02.049024",
     "name": "Material Request-reason_code"
    },
    {
@@ -15,12 +15,12 @@
     "dt": "Stock Entry",
     "fieldname": "reason_code",
     "fieldtype": "Link",
-    "options":"Material Issue Reason Code",
+    "options":"Material Move Reason Code",
     "insert_after": "stock_entry_type",
-    "label": "Material Movement Reason Code",
+    "label": "Material Move Reason Code",
     "depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)", 
     "mandatory_depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)",
-    "modified": "2024-3-14 22:12:02.049024",
+    "modified": "2024-3-25 22:12:02.049025",
     "name": "Stock Entry-reason_code"
    },
    {

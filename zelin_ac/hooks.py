@@ -15,10 +15,14 @@ fixtures = [
     }
 ]
 
+doctype_list_js = {
+	"Delivery Note" : "public/js/delivery_note.js"	
+}
+
 doctype_js = {
 	"Stock Entry" : "public/js/stock_entry.js",
 	"Material Request" : "public/js/material_request.js",
-	"Account" : "public/js/account.js"		
+	"Account" : "public/js/account.js"
 }
 
 doc_events = {

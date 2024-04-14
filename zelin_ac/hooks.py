@@ -22,7 +22,8 @@ doctype_list_js = {
 doctype_js = {
 	"Stock Entry" : "public/js/stock_entry.js",
 	"Material Request" : "public/js/material_request.js",
-	"Account" : "public/js/account.js"
+	"Account" : "public/js/account.js",
+	"Sales Invoice" : "public/js/sales_invoice.js",
 }
 
 doc_events = {

@@ -56,3 +56,8 @@ In Background Job,启动后台任务
 For Material Issue,用于其它出库
 For Material Receipt,用于其它入库
 Create One Sales Invoice,合并开票
+Delivery Notes To Bill,已出库待开票明细
+Exclude in Draft Invoice,不含草稿发票中的出库明细
+Please select one or more rows.,请先勾选待开票明细行
+Zelin Accounting Settings,中国会计设置
+Disable Toggle Debit Credit If Negative,会计凭证负数金额不切换借货方向

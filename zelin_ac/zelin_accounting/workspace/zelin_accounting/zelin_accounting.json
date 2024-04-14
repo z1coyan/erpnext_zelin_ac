@@ -15,34 +15,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u8bbe\u7f6e",
-   "link_count": 2,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Balance Sheet Settings",
-   "link_count": 0,
-   "link_to": "Balance Sheet Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Profit and Loss Statement Settings",
-   "link_count": 0,
-   "link_to": "Profit and Loss Statement Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Cash Flow Code",
    "link_count": 0,
    "link_to": "Cash Flow Code",
@@ -51,15 +23,15 @@
    "type": "Link"
   },
   {
-    "hidden": 0,
-    "is_query_report": 0,
-    "label": "Material Move Reason Code",
-    "link_count": 0,
-    "link_to": "Material Move Reason Code",
-    "link_type": "DocType",
-    "onboard": 0,
-    "type": "Link"
-   },
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Material Move Reason Code",
+   "link_count": 0,
+   "link_to": "Material Move Reason Code",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -115,10 +87,69 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u8bbe\u7f6e",
+   "link_count": 5,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u8d44\u4ea7\u8d1f\u503a\u8868\uff08\u4e24\u680f\u5f0f\uff09\u8bbe\u7f6e",
+   "link_count": 0,
+   "link_to": "Balance Sheet Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u5229\u6da6\u8868\u8bbe\u7f6e",
+   "link_count": 0,
+   "link_to": "Profit and Loss Statement Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u73b0\u91d1\u6d41\u7f16\u7801",
+   "link_count": 0,
+   "link_to": "Cash Flow Code",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u7269\u6599\u79fb\u52a8\u539f\u56e0\u4ee3\u7801",
+   "link_count": 0,
+   "link_to": "Material Move Reason Code",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Zelin Accounting Settings",
+   "link_count": 0,
+   "link_to": "Zelin Accounting Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-03-25 18:14:04.252365",
- "modified_by": "yuxinyong@163.com",
+ "modified": "2024-04-14 09:40:30.395661",
+ "modified_by": "fisher@abc.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",
  "number_cards": [],

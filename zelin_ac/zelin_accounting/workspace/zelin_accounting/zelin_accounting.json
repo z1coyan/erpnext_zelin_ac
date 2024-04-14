@@ -35,34 +35,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u62a5\u8868",
-   "link_count": 2,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "\u8d44\u4ea7\u8d1f\u503a\u8868\uff08\u4e24\u680f\u5f0f\uff09",
-   "link_count": 0,
-   "link_to": "Fin Balance Sheet",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 1,
-   "label": "\u5229\u6da6\u8868",
-   "link_count": 0,
-   "link_to": "Fin Profit and Loss Statement",
-   "link_type": "Report",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "Cash Flow",
    "link_count": 0,
    "link_to": "Cash Flow",
@@ -146,9 +118,58 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u62a5\u8868",
+   "link_count": 4,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "\u8d44\u4ea7\u8d1f\u503a\u8868\uff08\u4e24\u680f\u5f0f\uff09",
+   "link_count": 0,
+   "link_to": "Fin Balance Sheet",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
+   "label": "\u5229\u6da6\u8868",
+   "link_count": 0,
+   "link_to": "Fin Profit and Loss Statement",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u73b0\u91d1\u6d41\u91cf\u8868",
+   "link_count": 0,
+   "link_to": "Cash Flow",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Delivery Notes To Bill",
+   "link_count": 0,
+   "link_to": "Delivery Notes To Bill",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-04-14 09:40:30.395661",
+ "modified": "2024-04-14 17:44:05.311436",
  "modified_by": "fisher@abc.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",

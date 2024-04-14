@@ -39,13 +39,13 @@ frappe.query_reports["Delivery Notes To Bill"] = {
 		},
     ],
     get_datatable_options(options) {
-		 // loops on each column and make one ore more of them editable
-		 options.columns.forEach(function(column, i) {
-			// column id i want to make editable
-			if(column.id == "my_qty") {
-				column.editable = true
-			}
-		});
+		// loops on each column and make one ore more of them editable
+		//  options.columns.forEach(function(column, i) {
+		// 	// column id i want to make editable
+		// 	if(column.id == "my_qty") {
+		// 		column.editable = true
+		// 	}
+		// });
 /*
 上面的修改被系统覆盖掉了，下面的可以
 datatable.options.columns[5].editable=true
@@ -56,39 +56,40 @@ datatable.refresh()
 			treeView: true,
 			checkedRowStatus: false,
 			checkboxColumn: true,
-			events: {
+/* 			events: {
 				onCheckRow: row => {
 					update_selection(row)
 				},
-/*
  				onSubmitEditing: function (cell) {
 					// rowValues : all cell values from row before edition
 					// cellId : key id of cell edited
 					// newVal : edited val
 					let [rowValues, cellId, newVal] = cell;
-					if(cellId == "your_editable_id") {
-						frappe.call({
-							method: "your.method",
-							type: "GET",
-							args: {name: rowValues.id, qty: newVal}, // for example
-							callback: function (r) {
-								if (r.message) {
-									frappe.msgprint(__(r.message));
-								}
-							},
-						});
+					if(cellId == "amount") {
+						console.log(rowValues);
+						// frappe.call({
+						// 	method: "your.method",
+						// 	type: "GET",
+						// 	args: {name: rowValues.id, qty: newVal}, // for example
+						// 	callback: function (r) {
+						// 		if (r.message) {
+						// 			frappe.msgprint(__(r.message));
+						// 		}
+						// 	},
+						// });
 					}
 				}, 
-*/
-			},
+			}, */
 		})
 	},
+	after_datatable_render(datatable){
+		datatable.options.columns[5].editable = true;
+		datatable.refresh();
+	},
+	// refresh事件未被调用
 	onload: reportview => {
 		manage_buttons(reportview)
-	},
-	refresh: reportview => {
-		manage_buttons(reportview)
-	},
+	}
 }
 
 function manage_buttons(reportview) {
@@ -97,7 +98,8 @@ function manage_buttons(reportview) {
 		function () {
 			create_sales_invoice()
 		},
-		//'Create'
+		null,       //'Create'
+		'primary'	//类型	
 	)
 
 	// these don't seem to be working
@@ -111,8 +113,14 @@ function create_sales_invoice() {
 	let source_names = frappe.query_report.datatable.datamanager.data.filter((row, index) => {
 		return selected_rows.includes(String(index)) ? row : false
 	})
+	// 从datamanager的rows content字段获取修改后的值
+	const rows = frappe.query_report.datatable.datamanager.rows;
+	source_names = source_names.map((row, index) => {
+		row.amount = rows[index][7].content;	// 7=5+2（勾选框与行序号两个字段)
+		return row
+	})
 	if (!source_names.length) {
-		frappe.show_alert({ message: 'Please select one or more rows.', seconds: 5, indicator: 'red' })
+		frappe.show_alert({ message: __('Please select one or more rows.'), seconds: 5, indicator: 'red' })
 	} else {
         frappe.call({
             method: "zelin_ac.api.create_sales_invoice",
@@ -129,8 +137,8 @@ function create_sales_invoice() {
 	}
 }
 
-function update_selection(row) {
-	if (row !== undefined && !row[5].content) {
-		const toggle = frappe.query_report.datatable.rowmanager.checkMap[row[0].rowIndex]
-	}
-}
+// function update_selection(row) {
+// 	if (row !== undefined && !row[5].content) {
+// 		const toggle = frappe.query_report.datatable.rowmanager.checkMap[row[0].rowIndex]
+// 	}
+// }

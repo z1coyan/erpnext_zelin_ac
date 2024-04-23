@@ -32,6 +32,14 @@ doc_events = {
 	},
 	"Subcontracting Receipt": {
  		"validate": "zelin_ac.doc_events.subcontracting_receipt_validate"
+	},
+	"Delivery Note": {
+ 		"on_submit": "zelin_ac.doc_events.process_return_doc_status",
+		"on_cancel": "zelin_ac.doc_events.process_return_doc_status"
+	},
+	"Purchase Receipt": {
+ 		"on_submit": "zelin_ac.doc_events.process_return_doc_status",
+		"on_cancel": "zelin_ac.doc_events.process_return_doc_status"
 	}
 }
 

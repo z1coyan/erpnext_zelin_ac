@@ -82,3 +82,40 @@ def add_adjust_gl_entry(doc, gl_entries, adjust_amount):
                 }            
             )
         )
+
+@frappe.whitelist()
+def custom_download_multi_pdf_async(
+	doctype: str | dict[str, list[str]],
+	name: str | list[str],
+	format: str | None = None,
+	no_letterhead: bool = False,
+	letterhead: str | None = None,
+	options: str | None = None,
+):
+    import json
+    from frappe.utils.print_format import download_multi_pdf_async as original_download_multi_pdf_async
+
+    # 每个原始凭证（源单据）生成多行总帐凭证，只用其中一个总帐凭证打印该原始凭证的多行总帐凭证
+    if isinstance(doctype, str) and doctype == 'GL Entry':
+        data = frappe.get_all('GL Entry', 
+            filters={
+                'name': ('in', json.loads(name))
+            },
+            fields = ['name', 'voucher_type', 'voucher_no']
+        )
+        keys = set()
+        new_names = []
+        for d in data:
+            key = (d.voucher_type, d.voucher_no)
+            if not key in keys:
+                new_names.append(d.name)
+                keys.add(key)
+        name = json.dumps(new_names)
+
+    return original_download_multi_pdf_async(
+        doctype=doctype,
+        name=name,
+        format=format,
+        no_letterhead=no_letterhead,
+        options=options
+    )

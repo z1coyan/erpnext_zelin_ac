@@ -47,3 +47,7 @@ override_doctype_class = {
 	"Purchase Invoice": "zelin_ac.overrides.CustomPurchaseInvoice",
 	"Sales Invoice": "zelin_ac.overrides.CustomSalesInvoice"
 }
+
+override_whitelisted_methods = {
+	"frappe.utils.print_format.download_multi_pdf_async": "zelin_ac.overrides.custom_download_multi_pdf_async"
+}

@@ -32,20 +32,31 @@ frappe.query_reports["Delivery Notes To Bill"] = {
 			options: "Customer",
 		},
 		{
+			fieldname: "delivery_category",
+			label: __("Delivery Category"),
+			fieldtype: "Select",
+			options: "\nNormal Delivery\nReturn Delivery",
+		},
+		{
+			fieldname: "po_no",
+			label: __("Customer's Purchase Order"),
+			fieldtype: "Text",
+			description: "Multi customer po no each in separate line supported"
+		},
+		{
 			fieldname: "exclude_in_draft_invoice",
 			label: __("Exclude in Draft Invoice"),
 			fieldtype: "Check",
 			default: 1
 		},
     ],
-    get_datatable_options(options) {
-		// loops on each column and make one ore more of them editable
-		//  options.columns.forEach(function(column, i) {
+    get_datatable_options(options) {		
+		options.columns && options.columns.forEach(function(column, i) {
 		// 	// column id i want to make editable
-		// 	if(column.id == "my_qty") {
-		// 		column.editable = true
-		// 	}
-		// });
+		 	if (column.id == "amount") {
+		 		column.editable = true
+		 	}
+		 });
 /*
 上面的修改被系统覆盖掉了，下面的可以
 datatable.options.columns[5].editable=true
@@ -83,12 +94,22 @@ datatable.refresh()
 		})
 	},
 	after_datatable_render(datatable){
-		datatable.options.columns[5].editable = true;
-		datatable.refresh();
+		const report_data = frappe.query_report.data;
+		if (report_data){
+	 		if (datatable.options) {
+				datatable.options.columns.filter(column=>{return column.id=='qty'})
+				.map(column=>{return column.editable = true})
+				const data = frappe.query_report.raw_data.add_total_row? report_data.slice(0, -1): report_data
+	 			datatable.refresh(data);
+			}
+		}
 	},
 	// refresh事件未被调用
 	onload: reportview => {
-		manage_buttons(reportview)
+		manage_buttons(reportview)		
+		const field = frappe.query_report.get_filter("po_no");		
+		field && field.$input.height(40);
+		field && field.$wrapper.height(40);		
 	}
 }
 
@@ -115,8 +136,11 @@ function create_sales_invoice() {
 	})
 	// 从datamanager的rows content字段获取修改后的值
 	const rows = frappe.query_report.datatable.datamanager.rows;
+	const columns = frappe.query_report.datatable.datamanager.columns;
+	// 字段名获取列序号
+	colIndex= columns.filter(column=>{return column.fieldname=='qty'}).map(column=>{return column.colIndex})[0]
 	source_names = source_names.map((row, index) => {
-		row.amount = rows[index][7].content;	// 7=5+2（勾选框与行序号两个字段)
+		row.qty = rows[index][colIndex].content;
 		return row
 	})
 	if (!source_names.length) {

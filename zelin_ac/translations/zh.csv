@@ -61,3 +61,8 @@ Exclude in Draft Invoice,不含草稿发票中的出库明细
 Please select one or more rows.,请先勾选待处理明细行
 Zelin Accounting Settings,中国会计设置
 Disable Toggle Debit Credit If Negative,会计凭证负数金额不切换借货方向
+Billable Amount,可开票金额
+Multi customer po no each in separate line supported,支持多个客户采购订单，每行一个
+Delivery Category,出库单种类
+Normal Delivery,出货单
+Return Delivery,退货单

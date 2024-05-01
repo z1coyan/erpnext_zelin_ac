@@ -161,7 +161,7 @@
   {
    "hidden": 0,
    "is_query_report": 1,
-   "label": "Delivery Notes To Bill",
+   "label": "\u5df2\u51fa\u5e93\u5f85\u5f00\u7968\u660e\u7ec6",
    "link_count": 0,
    "link_to": "Delivery Notes To Bill",
    "link_type": "Report",
@@ -169,7 +169,7 @@
    "type": "Link"
   }
  ],
- "modified": "2024-04-27 17:44:05.311436",
+ "modified": "2024-04-30 22:14:50.321418",
  "modified_by": "fisher@abc.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",

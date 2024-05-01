@@ -47,6 +47,9 @@ def create_sales_invoice(source_names):
             non_billable.append(dn)
     if sales_invoice and items:
         sales_invoice.items = items
+        # 混合模式不勾选 退款
+        if sales_invoice.is_return and any(row.qty>0 for row in items):
+            sales_invoice.is_return = 0
         sales_invoice.calculate_taxes_and_totals()
         if non_billable or non_billable_child:
             msg = ''

@@ -20,10 +20,28 @@ class CustomPurchaseInvoice(PurchaseInvoice):
 
 class CustomSalesInvoice(SalesInvoice):
     def get_gl_entries(self, warehouse_account=None):
-
         gl_entries = super(CustomSalesInvoice, self).get_gl_entries(warehouse_account = warehouse_account)
         add_tax_adjust_gl_entries(self, gl_entries)
         return gl_entries
+
+    def validate_qty(self):
+        """
+        允许正常出库与退货在一张发票中，即跳过标准的明细行是否允许负数与表头退货勾选一致性检查
+        """
+
+        names_changed = set() 
+        if not self.is_return:
+            for row in self.items:
+                if row.qty < 0:
+                    row.qty *= -1
+                    names_changed.add(row.name)
+
+        super().validate_qty()
+
+        if names_changed:
+            for row in self.items:
+                if row.name in names_changed:
+                    row.qty *= -1
 
 def add_tax_adjust_gl_entries(doc, gl_entries):
         

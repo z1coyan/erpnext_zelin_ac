@@ -137,3 +137,39 @@ def custom_download_multi_pdf_async(
         no_letterhead=no_letterhead,
         options=options
     )
+
+@frappe.whitelist()
+def get_payment_entry(
+	dt,
+	dn,
+	party_amount=None,
+	bank_account=None,
+	bank_amount=None,
+	party_type=None,
+	payment_type=None,
+	reference_date=None,
+):
+    from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry as original_get_payment_entry
+
+    pe = original_get_payment_entry(
+        dt=dt,
+        dn=dn,
+        party_amount=party_amount,
+        bank_account=bank_account,
+        bank_amount=bank_amount,
+        party_type=party_type,
+        payment_type=payment_type,
+        reference_date=reference_date,
+    )
+    if dt in  ('Sales Order', 'Purchase Order'):
+        doc = frappe.get_doc(dt, dn)
+        if doc.payment_schedule and doc.payment_schedule[0].due_date <= doc.transaction_date:
+            field = 'payment_amount' if pe.paid_to_account_currency == doc.currency else 'base_payment_amount'
+            adv_amount = doc.payment_schedule[0].get(field)
+            if pe.paid_amount > adv_amount:
+                pe.paid_amount = adv_amount                
+                pe.references = pe.references[:1]
+                pe.references[0].allocated_amount = adv_amount
+                pe.set_amounts()
+    return pe
+             

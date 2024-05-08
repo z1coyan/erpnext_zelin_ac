@@ -9,7 +9,7 @@ app_license = "MIT"
 
 fixtures = [
     {
-        "doctype": "Cash Flow Code",
+        "doctype": "Month End Tracking",
         "filters": [
         ]
     }
@@ -49,5 +49,6 @@ override_doctype_class = {
 }
 
 override_whitelisted_methods = {
-	"frappe.utils.print_format.download_multi_pdf_async": "zelin_ac.overrides.custom_download_multi_pdf_async"
+	"frappe.utils.print_format.download_multi_pdf_async": "zelin_ac.overrides.custom_download_multi_pdf_async",
+	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "zelin_ac.overrides.get_payment_entry"
 }

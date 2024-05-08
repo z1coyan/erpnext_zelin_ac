@@ -1,0 +1,385 @@
+{
+  "doctype": "Month End Tracking",  
+  "steps": [
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "设汇率",
+    "task": "设定次月1日汇率",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "采购入库",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "采购发票，金税系统勾选，核对",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "销售出库",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "销售发票（重点检查未开票的销售出库，要求当月出库当月开票）",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "房租发票",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "水电费计提",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "水电费支付",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "网费发票",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "其它费用入账",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "应收应付",
+    "task": "收付款凭证",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "薪酬",
+    "task": "社保缴纳",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "薪酬",
+    "task": "公积金缴纳",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "薪酬",
+    "task": "个税缴纳",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "薪酬",
+    "task": "工资计提",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "薪酬",
+    "task": "工资支付",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "税",
+    "task": "增值税缴纳",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "税",
+    "task": "印花税计提与缴纳（季度）",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "税",
+    "task": "所得税计提与缴纳（季度）",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "产品成本价异常检查",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "制造费用差异结算（只分摊到20半成品）",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----4001 生产成本科目余额",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----4101 制造费用科目余额",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----生产成本+制造费用科目余额合计",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----EN已经结转",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----EN实际费用应该填写",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "制造费用尾数处理，4开头的科目余额为0",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----4001 生产成本科目余额",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----4101 制造费用科目余额",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "-----尾数差",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "成本",
+    "task": "记账凭证调整（借5401贷400199）",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "对账",
+    "task": "损益结转凭证",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "对账",
+    "task": "银行科目余额，与银行对账单一致",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "对账",
+    "task": "制造费用/生产成本，全部结转，无余额",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "出报表",
+    "task": "利润表",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "出报表",
+    "task": "资产负债表",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "出报表",
+    "task": "现金流量表",
+    "voucher_no": null
+   },
+   {
+    "finish_date": null,
+    "parent": "",
+    "parentfield": "steps",
+    "parenttype": "Month End Tracking",
+    "remark": null,
+    "step": "关账",
+    "task": "应收应付重分类",
+    "voucher_no": null
+   }
+  ]
+ }

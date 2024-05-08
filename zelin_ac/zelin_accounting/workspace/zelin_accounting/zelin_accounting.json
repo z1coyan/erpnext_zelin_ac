@@ -45,24 +45,6 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "\u6708\u7ed3",
-   "link_count": 1,
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Order Settlement",
-   "link_count": 0,
-   "link_to": "Order Settlement",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
    "label": "\u8bbe\u7f6e",
    "link_count": 5,
    "link_type": "DocType",
@@ -122,8 +104,37 @@
   {
    "hidden": 0,
    "is_query_report": 0,
+   "label": "\u6708\u7ed3",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u5236\u9020\u8d39\u7528\u5dee\u5f02\u7ed3\u7b97",
+   "link_count": 0,
+   "link_to": "Order Settlement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Month End Tracking",
+   "link_count": 0,
+   "link_to": "Month End Tracking",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
    "label": "\u62a5\u8868",
-   "link_count": 4,
+   "link_count": 5,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -161,6 +172,16 @@
   {
    "hidden": 0,
    "is_query_report": 1,
+   "label": "GR IR Reconciliation",
+   "link_count": 0,
+   "link_to": "GR IR Reconciliation",
+   "link_type": "Report",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 1,
    "label": "\u5df2\u51fa\u5e93\u5f85\u5f00\u7968\u660e\u7ec6",
    "link_count": 0,
    "link_to": "Delivery Notes To Bill",
@@ -169,8 +190,8 @@
    "type": "Link"
   }
  ],
- "modified": "2024-04-30 22:14:50.321418",
- "modified_by": "fisher@abc.com",
+ "modified": "2024-05-08 12:05:38.467392",
+ "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",
  "number_cards": [],

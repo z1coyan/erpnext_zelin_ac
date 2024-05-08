@@ -66,3 +66,20 @@ Multi customer po no each in separate line supported,支持多个客户采购订
 Delivery Category,出库单种类
 Normal Delivery,出货单
 Return Delivery,退货单
+Finish Date,完成日期
+Month End Tracking,财务结账
+Month End Tracking Step,财务结账步骤
+GR IR Reconciliation,库存暂估对账报表
+PR Item Idx,入库序号
+PR Status,入库单状态
+PR Date,入库日期
+PR Qty,入库数量
+PR Rate,入库单价
+PR Amount,入库金额
+PI Date,发票日期
+PI Qty,发票数量
+PI Rate,发票单价
+PI Amount,发票金额
+PR Item Amount,入库行金额
+PI Item Amount,发票行金额
+Hide Fully Matched,不显示无差异记录

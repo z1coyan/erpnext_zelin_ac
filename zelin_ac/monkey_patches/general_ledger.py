@@ -23,11 +23,15 @@ def custom_process_gl_map(gl_map, merge_entries=True, precision=None):
 
     if merge_entries:
         gl_map = merge_similar_entries(gl_map, precision)
-    
-    disable_toggle_debit_credit_if_negative = frappe.cache().get_value(
-        'disable_toggle_debit_credit_if_negative', get_disable_toggle_debit_credit_if_negative
-    )
-    if not disable_toggle_debit_credit_if_negative:
+        
+    need_toggle  = True
+    if gl_map and gl_map[0]["voucher_type"] == "Journal Entry":
+        disable_toggle_debit_credit_if_negative = frappe.cache().get_value(
+            'disable_toggle_debit_credit_if_negative', get_disable_toggle_debit_credit_if_negative
+        )
+        if disable_toggle_debit_credit_if_negative:
+            need_toggle = False
+    if need_toggle:
         gl_map = toggle_debit_credit_if_negative(gl_map)
 
     return gl_map

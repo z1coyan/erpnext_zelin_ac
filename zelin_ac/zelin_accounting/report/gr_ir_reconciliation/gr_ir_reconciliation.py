@@ -5,7 +5,8 @@ import frappe
 from frappe import _
 from frappe.utils import flt
 from frappe.query_builder.functions import Sum, Avg
-from erpnext.accounts.report.general_ledger.general_ledger import get_gl_entries
+from frappe.model.meta import get_field_precision
+from erpnext.accounts.report.general_ledger.general_ledger import get_result
 
 
 def execute(filters=None):
@@ -18,14 +19,16 @@ def get_data(filters):
     if not gr_ir_acct:
         frappe.throw('公司主数据未维护默认暂估库存(已收货，未开票)科目')
     filters.account = gr_ir_acct    
-
-    gl_entries = get_gl_entries(filters, accounting_dimensions = [])
+    filters.group_by = "Group by Voucher (Consolidated)" 
+    gl_entries = get_result(filters, {})
+    #剔除期初、期末数据
+    gl_entries = [entry for entry in gl_entries if entry.get('gl_entry')]
 
     pr = frappe.qb.DocType('Purchase Receipt')
     pri = frappe.qb.DocType('Purchase Receipt Item')
     pi = frappe.qb.DocType('Purchase Invoice')
     pii = frappe.qb.DocType('Purchase Invoice Item')
-
+ 
     suppliers = filters.supplier if filters.supplier else None
     pi_amount, pr_amount = {}, {}
     for entry in gl_entries:
@@ -52,7 +55,7 @@ def get_data(filters):
             pii.item_name,
             pii.pr_detail,
             Sum(pii.qty).as_('pi_qty'),
-            Avg(pii.base_net_rate).as_('pi_rate'),
+            Avg(pii.valuation_rate).as_('pi_rate'),
             Sum(pii.base_net_amount).as_('pi_item_amount')
         ).groupby(
             pi.supplier, pi.name, pii.item_code, pii.item_name, pii.pr_detail
@@ -81,8 +84,8 @@ def get_data(filters):
             pri.item_name,
             pri.name.as_('pr_detail'),
             Sum(pri.qty).as_('pr_qty'),
-            Avg(pri.base_net_rate).as_('pr_rate'),
-            Sum(pri.base_net_amount).as_('pr_item_amount')
+            Avg(pri.valuation_rate).as_('pr_rate'),
+            Sum(pri.base_net_amount + pri.rate_difference_with_purchase_invoice).as_('pr_item_amount')
         ).groupby(
             pr.supplier, pr.status, pr.name,pri.idx, pri.item_code, pri.item_name, pri.name
         ).where(
@@ -108,11 +111,13 @@ def get_data(filters):
         data.extend([d for d in pr_data if d.pr_detail not in pr_detail_in_pi])
 
         #计算差异
+        df = frappe.get_meta("Purchase Invoice Item").get_field('amount')
+        precision = get_field_precision(df)        
         for d in data:
-            d.variance = flt(d.get('pi_item_amount', 0) - d.get('pr_item_amount', 0),2)
+            d.variance = flt(d.get('pi_item_amount', 0) - d.get('pr_item_amount', 0), precision)
             
         if filters.hide_fully_matched:
-            data = [d for d in data if flt(d.variance,0) != 0]
+            data = [d for d in data if flt(d.variance, precision) != 0]
 
     return data
 
@@ -232,20 +237,27 @@ def get_column():
             "width": 100,
             "options": "Company:company:default_currency",
         },  
-        {"label": _("Variance"), "fieldname": "variance", "fieldtype": "Float", "width": 120}        
+        {
+            "label": _("Variance"), 
+            "fieldname": "variance", 
+            "fieldtype": "Currency", 
+            "width": 120,
+            "options": "Company:company:default_currency",
+        }        
     ]
 
-    
+
 """
 for testing 
 from frappe import _
 from frappe.query_builder.functions import Sum, Avg
-from erpnext.accounts.report.general_ledger.general_ledger import get_gl_entries
+from erpnext.accounts.report.general_ledger.general_ledger import get_gl_entries,get_result
 filters= frappe._dict(
     {"company":"则霖信息技术（深圳）有限公司",
     "from_date":"2024-04-08",
     "to_date":"2024-05-08",
-    "party":["水电公司","新供应商"],
+    "account":["220202 - 应付账款-暂估库存 - 则"],
+    "group_by":"Group by Voucher (Consolidated)",
     "hide_fully_matched":1}
 )
 """

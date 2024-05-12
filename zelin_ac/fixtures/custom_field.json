@@ -1,40 +1,4 @@
-[{
-    "doctype": "Custom Field",
-    "dt": "Material Request",
-    "fieldname": "reason_code",
-    "fieldtype": "Link",
-    "options":"Material Move Reason Code",
-    "insert_after": "schedule_date",
-    "label": "Material Move Reason Code",
-    "depends_on": "eval:doc.material_request_type ==='Material Issue'",    
-    "modified": "2024-03-25 22:12:02.049024",
-    "name": "Material Request-reason_code"
-   },
-   {
-    "doctype": "Custom Field",
-    "dt": "Stock Entry",
-    "fieldname": "reason_code",
-    "fieldtype": "Link",
-    "options":"Material Move Reason Code",
-    "insert_after": "stock_entry_type",
-    "label": "Material Move Reason Code",
-    "depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)", 
-    "mandatory_depends_on": "eval:in_list(['Material Issue','Material Receipt'], doc.stock_entry_type)",
-    "modified": "2024-3-25 22:12:02.049025",
-    "name": "Stock Entry-reason_code"
-   },
-   {
-    "doctype": "Custom Field",
-    "dt": "Stock Entry",
-    "fieldname": "expense_account",
-    "fieldtype": "Link",
-    "options":"Account",
-    "insert_after": "reason_code",
-    "label": "Expense Account",
-    "depends_on": "eval:doc.reason_code",    
-    "modified": "2023-12-10 22:12:02.049023",
-    "name": "Stock Entry-expense_account"
-   },
+[
    {
     "doctype": "Custom Field",
     "dt": "Account",

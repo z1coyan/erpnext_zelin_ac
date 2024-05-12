@@ -177,7 +177,8 @@ class CashFlow(Document):
             existing_code_map = {row.gl_entry:row.cash_flow_code for row in self.items if row.cash_flow_code}
             self.items = []    
         for d in data:
-            d.against = d.against[:140] #修改了字段类型为Data,避免出现超140字符的情况
+            if d.against:
+                d.against = d.against[:140] #修改了字段类型为Data,避免出现超140字符的情况
             d.cash_flow_code = existing_code_map.get(d.gl_entry)
             self.append('items', d)
         

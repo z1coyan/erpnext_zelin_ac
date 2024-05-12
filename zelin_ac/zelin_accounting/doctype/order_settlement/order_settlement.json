@@ -15,8 +15,12 @@
   "fiscal_year",
   "column_break_a1f21",
   "month",
-  "section_break_k11kx",
+  "filtering_section",
+  "item_group",
   "get_items",
+  "column_break_kcnn",
+  "order_by",
+  "section_break_k11kx",
   "items",
   "section_break_1vil6",
   "expenses",
@@ -122,12 +126,33 @@
    "fieldname": "in_background_job",
    "fieldtype": "Check",
    "label": "In Background Job"
+  },
+  {
+   "fieldname": "filtering_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Used for filtering the order settlement items",
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group"
+  },
+  {
+   "fieldname": "column_break_kcnn",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "order_by",
+   "fieldtype": "Select",
+   "label": "Order By",
+   "options": "\nItem Group\nItem Code"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-03-11 15:51:16.071179",
+ "modified": "2024-05-12 20:21:05.383064",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement",

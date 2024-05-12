@@ -67,6 +67,7 @@
   {
    "columns": 3,
    "depends_on": "eval:!doc.lft_empty",
+   "description": "\u8ba1\u7b97\u65b9\u5f0f\u662f\u671f\u672b\u4f59\u989d\u65f6\u4e3a\u79d1\u76ee\u53f7\uff0c\u591a\u4e2a\u79d1\u76ee\u53f7\u4e4b\u95f4\u7528\u534a\u89d2\u9017\u53f7\u5206\u5f00\uff0c\u79d1\u76ee\u53f7\u524d\u53ef\u52a0-(\u51cf\u53f7)\u524d\u7f00\uff0c\n\u8ba1\u7b97\u65b9\u5f0f\u662f\u8ba1\u7b97\u516c\u5f0f\u65f6\u4e3a\u5176\u5b83\u884c\u53f7\uff0c\u884c\u53f7\u524d\u53ef\u52a0-(\u51cf\u53f7)\u524d\u7f00",
    "fieldname": "lft_calc_sources",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -120,6 +121,7 @@
   {
    "columns": 3,
    "depends_on": "eval:!doc.rgt_empty",
+   "description": "\u8ba1\u7b97\u65b9\u5f0f\u662f\u671f\u672b\u4f59\u989d\u65f6\u4e3a\u79d1\u76ee\u53f7\uff0c\u591a\u4e2a\u79d1\u76ee\u53f7\u4e4b\u95f4\u7528\u534a\u89d2\u9017\u53f7\u5206\u5f00\uff0c\u79d1\u76ee\u53f7\u524d\u53ef\u52a0-(\u51cf\u53f7)\u524d\u7f00\uff0c\n\u8ba1\u7b97\u65b9\u5f0f\u662f\u8ba1\u7b97\u516c\u5f0f\u65f6\u4e3a\u5176\u5b83\u884c\u53f7\uff0c\u884c\u53f7\u524d\u53ef\u52a0-(\u51cf\u53f7)\u524d\u7f00",
    "fieldname": "rgt_calc_sources",
    "fieldtype": "Small Text",
    "in_list_view": 1,
@@ -129,7 +131,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2023-12-08 09:48:56.989651",
+ "modified": "2024-05-12 20:29:53.846929",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Balance Sheet Settings Item",

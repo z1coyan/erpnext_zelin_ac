@@ -60,7 +60,7 @@ Delivery Notes To Bill,已出库待开票明细
 Exclude in Draft Invoice,不含草稿发票中的出库明细
 Please select one or more rows.,请先勾选待处理明细行
 Zelin Accounting Settings,中国会计设置
-Disable Toggle Debit Credit If Negative,会计凭证负数金额不切换借货方向
+Disable Toggle Debit Credit If Negative,日记账凭证负数金额不切换借货方向
 Billable Amount,可开票金额
 Multi customer po no each in separate line supported,支持多个客户采购订单，每行一个
 Delivery Category,出库单种类
@@ -83,3 +83,6 @@ PI Amount,发票金额
 PR Item Amount,入库行金额
 PI Item Amount,发票行金额
 Hide Fully Matched,不显示无差异记录
+Enable Stock Entry Movement Reason,启用物料移动原因代码
+When ticked will add mandatory movement reason code for material issue and receipt in stock entry,勾选后系统会为物料移动中的其它出入库添加必填的物料移动原因代码字段
+Used for filtering the order settlement items,用于过滤待结算的工单成品入库明细

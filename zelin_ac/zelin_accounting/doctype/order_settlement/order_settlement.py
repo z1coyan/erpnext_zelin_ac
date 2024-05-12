@@ -19,7 +19,7 @@ class OrderSettlement(Document):
             year=year, month=cint(self.month), day=1))               
         se = frappe.qb.DocType('Stock Entry')
         sed = frappe.qb.DocType('Stock Entry Detail')
-        data = frappe.qb.from_(se
+        query = frappe.qb.from_(se
             ).join(sed
             ).on(se.name == sed.parent
             ).where(
@@ -36,13 +36,23 @@ class OrderSettlement(Document):
                 se.posting_date,
                 se.posting_time,                
                 sed.item_code,
+                sed.item_group,
                 sed.t_warehouse.as_('warehouse'),
                 sed.additional_cost.as_('included_expense'),
                 sed.qty,
                 sed.amount
-            ).orderby(se.posting_date
-            ).orderby(se.posting_time
-            ).run(as_dict = True)
+            )
+        if self.item_group:
+            query = query.where(sed.item_group == self.item_group)
+
+        if self.order_by:
+            order_by = 'item_group' if self.order_by == 'Item Group' else 'item_code'
+            query = query.orderby(sed[order_by])
+            
+        query = query.orderby(se.posting_date
+        ).orderby(se.posting_time)
+
+        data = query.run(as_dict = True)
         #通过工单获取工站
         wo_workstation_map = frappe._dict(frappe.get_all('Job Card', 
             filters = {

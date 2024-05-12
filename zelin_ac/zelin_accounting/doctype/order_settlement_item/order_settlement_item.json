@@ -9,6 +9,7 @@
   "stock_entry",
   "work_order",
   "item_code",
+  "item_group",
   "warehouse",
   "workstation",
   "column_break_tygpe",
@@ -98,8 +99,8 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Included Expense",
-   "precision": "2",
    "no_copy": 1,
+   "precision": "2",
    "read_only": 1
   },
   {
@@ -107,8 +108,8 @@
    "fieldname": "allocated_expense",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "precision": "2",
-   "label": "Allocated Expense"
+   "label": "Allocated Expense",
+   "precision": "2"
   },
   {
    "fieldname": "amount",
@@ -126,12 +127,21 @@
    "fieldtype": "Link",
    "label": "Work Order",
    "options": "Work Order"
+  },
+  {
+   "fetch_from": "item_code.item_group",
+   "fetch_if_empty": 1,
+   "fieldname": "item_group",
+   "fieldtype": "Link",
+   "label": "Item Group",
+   "options": "Item Group",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-2-29 20:50:06.201368",
+ "modified": "2024-05-12 19:29:46.439884",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Order Settlement Item",

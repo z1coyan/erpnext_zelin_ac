@@ -5,7 +5,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "disable_toggle_debit_credit_if_negative"
+  "disable_toggle_debit_credit_if_negative",
+  "enable_stock_entry_movement_reason"
  ],
  "fields": [
   {
@@ -13,12 +14,19 @@
    "fieldname": "disable_toggle_debit_credit_if_negative",
    "fieldtype": "Check",
    "label": "Disable Toggle Debit Credit If Negative"
+  },
+  {
+   "default": "1",
+   "description": "When ticked will add mandatory movement reason code for material issue and receipt in stock entry",
+   "fieldname": "enable_stock_entry_movement_reason",
+   "fieldtype": "Check",
+   "label": "Enable Stock Entry Movement Reason"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-04-09 10:22:25.625689",
+ "modified": "2024-05-12 14:10:22.462851",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting Settings",

@@ -6,7 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "disable_toggle_debit_credit_if_negative",
-  "enable_stock_entry_movement_reason"
+  "enable_stock_entry_movement_reason",
+  "enable_rate_include_tax"
  ],
  "fields": [
   {
@@ -21,12 +22,19 @@
    "fieldname": "enable_stock_entry_movement_reason",
    "fieldtype": "Check",
    "label": "Enable Stock Entry Movement Reason"
+  },
+  {
+   "default": "0",
+   "description": "Create rate include tax hidden field in sales order item table for printing",
+   "fieldname": "enable_rate_include_tax",
+   "fieldtype": "Check",
+   "label": "Enable Rate Include Tax"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-12 14:10:22.462851",
+ "modified": "2024-05-13 15:03:56.829681",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting Settings",

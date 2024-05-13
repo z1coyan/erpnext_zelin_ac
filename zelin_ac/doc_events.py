@@ -51,6 +51,26 @@ def process_return_doc_status(doc, method):
                     returned_doc.status = None
                     returned_doc.set_status(update=True)    #恢复未退货前状态
 
+def sales_order_before_print(doc, method, print_settings=None):
+    """
+    销售订单多种税率，即物料税费模板，基于系统内的json内容的物料税率提取税率赋值给含税价隐藏字段
+    用于打印输出
+    """
+
+    if frappe.db.has_column('Sales Order Item', 'custom_rate_include_tax'):
+        import json
+
+        for row in doc.items:
+            item_tax_rate = row.item_tax_rate
+            tax_rate = 0
+            if item_tax_rate and item_tax_rate != '{}':
+                try:
+                    tax_rate = list(json.loads(item_tax_rate).values())[0] / 100
+                except:
+                    frappe.msgprint(f'sales_order_before_print failed parse item_tax_rate {item_tax_rate}')
+            row.custom_rate_include_tax = row.base_rate * (1+tax_rate)
+            row.custom_amount_include_tax = row.base_amount * (1+tax_rate)
+
 def set_masterial_issue_expense_account(doc):
     if doc.stock_entry_type in ['Material Issue', 'Material Receipt'] and doc.reason_code:
         expense_account = doc.expense_account

@@ -86,3 +86,5 @@ Hide Fully Matched,不显示无差异记录
 Enable Stock Entry Movement Reason,启用物料移动原因代码
 When ticked will add mandatory movement reason code for material issue and receipt in stock entry,勾选后系统会为物料移动中的其它出入库添加必填的物料移动原因代码字段
 Used for filtering the order settlement items,用于过滤待结算的工单成品入库明细
+Enable Rate Include Tax,启用销售订单明细含税价字段
+Create rate include tax hidden field in sales order item table for printing,在销售订单明细增加用于打印的含税价字段

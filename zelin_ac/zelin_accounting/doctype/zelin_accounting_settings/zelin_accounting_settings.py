@@ -44,6 +44,32 @@ custom_fields = {
 			"modified": "2023-12-10 22:12:02.049023",
 			"name": "Stock Entry-expense_account"
 		}
+	],
+	'enable_rate_include_tax': [
+		{
+			"doctype": "Custom Field",
+			"dt": "Sales Order Item",
+			"fieldname": "custom_rate_include_tax",
+			"fieldtype": "Float",
+			"hidden": 1,
+			"read_only": 1,
+			"insert_after": "rate",
+			"label": "Rate Include Tax",			
+			"modified": "2024-05-13 22:12:02.049024",
+			"name": "Sales Order Item-custom_rate_include_tax"
+		},
+		{
+			"doctype": "Custom Field",
+			"dt": "Sales Order Item",
+			"fieldname": "custom_amount_include_tax",
+			"fieldtype": "Float",
+			"hidden": 1,
+			"read_only": 1,
+			"insert_after": "custom_rate_include_tax",
+			"label": "Amount Include Tax",			
+			"modified": "2024-05-13 22:12:02.049024",
+			"name": "Sales Order Item-custom_amount_include_tax"
+		}
 	]
 }
 
@@ -54,11 +80,12 @@ class ZelinAccountingSettings(Document):
 			before_save.disable_toggle_debit_credit_if_negative != self.disable_toggle_debit_credit_if_negative):
 			frappe.cache().delete_value('disable_toggle_debit_credit_if_negative')
 
-		if (not before_save or before_save.enable_stock_entry_movement_reason != self.enable_stock_entry_movement_reason):
-			if self.enable_stock_entry_movement_reason:
-				self.create_custom_fields(key='enable_stock_entry_movement_reason')
-			else:
-				self.remove_custom_fields(key='enable_stock_entry_movement_reason')
+		for key in custom_fields.keys():
+			if (not before_save or before_save.get(key) != self.get(key)):
+				if self.get(key):
+					self.create_custom_fields(key)
+				else:
+					self.remove_custom_fields(key)		
 
 	def create_custom_fields(self, key):
 		fields = custom_fields.get(key) or []

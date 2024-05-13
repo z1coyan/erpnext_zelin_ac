@@ -40,7 +40,10 @@ doc_events = {
 	"Purchase Receipt": {
  		"on_submit": "zelin_ac.doc_events.process_return_doc_status",
 		"on_cancel": "zelin_ac.doc_events.process_return_doc_status"
-	}
+	},
+	"Sales Order": {
+ 		"before_print": "zelin_ac.doc_events.sales_order_before_print"
+	},
 }
 
 override_doctype_class = {

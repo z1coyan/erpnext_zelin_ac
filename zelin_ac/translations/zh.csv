@@ -60,7 +60,7 @@ Delivery Notes To Bill,已出库待开票明细
 Exclude in Draft Invoice,不含草稿发票中的出库明细
 Please select one or more rows.,请先勾选待处理明细行
 Zelin Accounting Settings,中国会计设置
-Disable Toggle Debit Credit If Negative,日记账凭证负数金额不切换借货方向
+Disable Toggle Debit Credit If Negative,负数不自动切换借货方向(红冲)
 Billable Amount,可开票金额
 Multi customer po no each in separate line supported,支持多个客户采购订单，每行一个
 Delivery Category,出库单种类
@@ -88,3 +88,5 @@ When ticked will add mandatory movement reason code for material issue and recei
 Used for filtering the order settlement items,用于过滤待结算的工单成品入库明细
 Enable Rate Include Tax,启用销售订单明细含税价字段
 Create rate include tax hidden field in sales order item table for printing,在销售订单明细增加用于打印的含税价字段
+If enabled delivery note billed status will be based on delivery note item rate * billed qty,如勾选，销售出库开票状态基于出库单价*开票数量(标准为开票金额)
+Enable DNI Billed Qty,启用出库单开票数量状态控制

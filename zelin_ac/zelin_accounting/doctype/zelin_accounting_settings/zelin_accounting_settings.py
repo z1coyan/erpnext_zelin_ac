@@ -70,15 +70,28 @@ custom_fields = {
 			"modified": "2024-05-13 22:12:02.049024",
 			"name": "Sales Order Item-custom_amount_include_tax"
 		}
+	],
+	'enable_dni_billed_qty': [
+		{
+			"doctype": "Custom Field",
+			"dt": "Delivery Note Item",
+			"fieldname": "custom_billed_qty",
+			"fieldtype": "Float",
+			"read_only": 1,
+			"insert_after": "base_net_amount",
+			"label": "Billed Qty",			
+			"modified": "2024-05-14 22:12:02.049024",
+			"name": "Delivery Note Item-custom_billed_qty"
+		}
 	]
 }
 
 class ZelinAccountingSettings(Document):
 	def on_update(self):
 		before_save = self.get_doc_before_save()
-		if (before_save and 
-			before_save.disable_toggle_debit_credit_if_negative != self.disable_toggle_debit_credit_if_negative):
-			frappe.cache().delete_value('disable_toggle_debit_credit_if_negative')
+		for key in ['disable_toggle_debit_credit_if_negative', 'enable_dni_billed_qty']:
+			if before_save and before_save.get(key) != self.get(key):
+				frappe.cache().delete_value(key)
 
 		for key in custom_fields.keys():
 			if (not before_save or before_save.get(key) != self.get(key)):

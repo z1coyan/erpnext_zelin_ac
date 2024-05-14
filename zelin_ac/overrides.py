@@ -3,7 +3,9 @@ from frappe import _
 from frappe.utils import flt
 from erpnext.accounts.doctype.purchase_invoice.purchase_invoice import PurchaseInvoice
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
+from erpnext.stock.doctype.delivery_note.delivery_note import update_billed_amount_based_on_so
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
+from frappe.query_builder.functions import Sum
 
 
 class CustomPurchaseInvoice(PurchaseInvoice):
@@ -42,6 +44,62 @@ class CustomSalesInvoice(SalesInvoice):
             for row in self.items:
                 if row.name in names_changed:
                     row.qty *= -1
+
+    def update_billing_status_in_dn(self , update_modified=True):
+        """
+            开票金额修正为出库单价*开票数量，实现基于开票数量更新出库单开票状态
+        """
+
+        def get_enable_dni_billed_qty():
+            return frappe.db.get_single_value('Zelin Accounting Settings',
+                'enable_dni_billed_qty')
+
+        enable_dni_billed_qty = frappe.cache().get_value('enable_dni_billed_qty', get_enable_dni_billed_qty)
+        if not enable_dni_billed_qty:
+            super().update_billing_status_in_dn(update_modified=update_modified)
+        else:
+            updated_delivery_notes = []
+            dn_detail_wise_data = {}
+            dn_details = {row.dn_detail for row in self.items}
+            if dn_details:
+                sii = frappe.qb.DocType('Sales Invoice Item')
+                dni = frappe.qb.DocType('Delivery Note Item')
+
+                data = frappe.qb.from_(sii
+                ).join(dni
+                ).on(sii.dn_detail == dni.name
+                ).select(
+                    sii.dn_detail,
+                    Sum(dni.rate*sii.qty).as_('billed_amt'),
+                    Sum(sii.qty).as_('billed_qty'),
+                ).where(
+                    (dni.name.isin(dn_details)) &
+                    (sii.docstatus==1)
+                ).groupby(sii.dn_detail
+                ).run(as_dict=1)
+                dn_detail_wise_data = {row.dn_detail:row for row in data}
+
+            for row in self.items:
+                if row.dn_detail:
+                    dn_detail_dict = dn_detail_wise_data.get(row.dn_detail, {})
+                    if dn_detail_dict:
+                        billed_amt, billed_qty = dn_detail_dict.billed_amt, dn_detail_dict.billed_qty
+                    else:
+                        billed_amt, billed_qty = 0, 0
+                    frappe.db.set_value("Delivery Note Item", row.dn_detail, 
+                        {
+                            "billed_amt": billed_amt,
+                            "custom_billed_qty": billed_qty
+                        },
+                        update_modified=update_modified
+                    )                    
+                    updated_delivery_notes.append(row.delivery_note)
+                elif d.so_detail :
+                    updated_delivery_notes += update_billed_amount_based_on_so(row.so_detail, update_modified)
+
+            for dn in set(updated_delivery_notes):
+                if dn:
+                    frappe.get_doc("Delivery Note", dn).update_billing_percentage(update_modified=update_modified)
 
 def add_tax_adjust_gl_entries(doc, gl_entries):
         
@@ -149,6 +207,10 @@ def get_payment_entry(
 	payment_type=None,
 	reference_date=None,
 ):
+    """
+        销售订单与采购订单下推付款时默认付款金额基于预付百分比(付款条款明细中到期日小于等于当天）而非整个订单金额
+    """
+
     from erpnext.accounts.doctype.payment_entry.payment_entry import get_payment_entry as original_get_payment_entry
 
     pe = original_get_payment_entry(

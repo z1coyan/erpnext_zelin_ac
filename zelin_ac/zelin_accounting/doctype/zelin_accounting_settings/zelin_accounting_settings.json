@@ -7,7 +7,8 @@
  "field_order": [
   "disable_toggle_debit_credit_if_negative",
   "enable_stock_entry_movement_reason",
-  "enable_rate_include_tax"
+  "enable_rate_include_tax",
+  "enable_dni_billed_qty"
  ],
  "fields": [
   {
@@ -29,12 +30,19 @@
    "fieldname": "enable_rate_include_tax",
    "fieldtype": "Check",
    "label": "Enable Rate Include Tax"
+  },
+  {
+   "default": "0",
+   "description": "If enabled delivery note billed status will be based on delivery note item rate * billed qty",
+   "fieldname": "enable_dni_billed_qty",
+   "fieldtype": "Check",
+   "label": "Enable DNI Billed Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-13 15:03:56.829681",
+ "modified": "2024-05-14 11:48:16.357478",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting Settings",

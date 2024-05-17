@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-16 08:15:42.515214",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "scale_qty",
+  "upper_limit_qty",
+  "price_list_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "scale_qty",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Scale Qty"
+  },
+  {
+   "description": "Equals to next row scale qty, excluded from target qty match",
+   "fieldname": "upper_limit_qty",
+   "fieldtype": "Float",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Upper Limit Qty",
+   "read_only": 1
+  },
+  {
+   "fieldname": "price_list_rate",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Price List Rate"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-05-16 20:57:38.001297",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Item Price Scale Price",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

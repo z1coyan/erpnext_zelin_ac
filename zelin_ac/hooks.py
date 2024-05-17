@@ -21,6 +21,7 @@ doctype_list_js = {
 
 doctype_js = {
 	"Stock Entry" : "public/js/stock_entry.js",
+	"Item Price" : "public/js/item_price.js",
 	"Material Request" : "public/js/material_request.js",
 	"Account" : "public/js/account.js",
 	"Sales Invoice" : "public/js/sales_invoice.js",
@@ -44,6 +45,9 @@ doc_events = {
 	"Sales Order": {
  		"before_print": "zelin_ac.doc_events.sales_order_before_print"
 	},
+	"Item Price": {
+ 		"validate": "zelin_ac.doc_events.item_price_validate"
+	},
 }
 
 override_doctype_class = {
@@ -54,4 +58,12 @@ override_doctype_class = {
 override_whitelisted_methods = {
 	"frappe.utils.print_format.download_multi_pdf_async": "zelin_ac.overrides.custom_download_multi_pdf_async",
 	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "zelin_ac.overrides.get_payment_entry"
+}
+
+permission_query_conditions = {
+	"Print Log": "zelin_ac.zelin_accounting.doctype.print_log.print_log.get_permission_query_conditions",
+}
+
+has_permission = {
+	"Print Log": "zelin_ac.zelin_accounting.doctype.print_log.print_log.has_permission",
 }

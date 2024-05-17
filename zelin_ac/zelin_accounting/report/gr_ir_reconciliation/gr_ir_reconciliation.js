@@ -45,6 +45,13 @@ frappe.query_reports["GR IR Reconciliation"] = {
 			options: "Line Item\nDoc\nSupplier",
 		},
 		{
+			fieldname: "extended_match",
+			label: __("Extended Match"),
+			description: __("Fetch linked GR/IR out of filtering date range"),
+			fieldtype: "Check",
+			default: 1
+		},
+		{
 			fieldname: "hide_fully_matched",
 			label: __("Hide Fully Matched"),
 			fieldtype: "Check",

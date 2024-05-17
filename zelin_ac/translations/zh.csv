@@ -90,3 +90,14 @@ Enable Rate Include Tax,启用销售订单明细含税价字段
 Create rate include tax hidden field in sales order item table for printing,在销售订单明细增加用于打印的含税价字段
 If enabled delivery note billed status will be based on delivery note item rate * billed qty,如勾选，销售出库开票状态基于出库单价*开票数量(标准为开票金额)
 Enable DNI Billed Qty,启用出库单开票数量状态控制
+Print Log,打印日志
+Track Print,记录打印日志
+Enable Scale Price,物料价格启用阶梯价
+If enabled you can maintain scale price in item price child table directly,如果勾选系统在物料价格新增阶梯价明细表
+Scale Prices,阶梯价
+Item Price Scale Price,阶梯价明细
+Scale Qty,等级数量
+Upper Limit Qty,上限数量
+Scale Price: the {0} Row qty {1} should be bigger than previous row qty {2}, 阶梯价明细表: 第 {0} 行数量： {1} 前一行数量： {2}
+Extended Match,匹配筛选日期外的入库与发票
+Fetch linked GR/IR out of filtering date range,匹配关联的筛选日期之外的采购入库与发票

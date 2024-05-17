@@ -83,18 +83,37 @@ custom_fields = {
 			"modified": "2024-05-14 22:12:02.049024",
 			"name": "Delivery Note Item-custom_billed_qty"
 		}
+	],
+	'enable_scale_price':[		
+   		{
+			"doctype": "Custom Field",
+			"dt": "Item Price",
+			"fieldname": "sb_scale_price",
+			"fieldtype": "Section Break",
+			"insert_after": "reference",
+			"modified": "2024-05-16 22:18:02.049025",
+			"name": "Item Price-sb_scale_price"
+		},
+		{
+			"doctype": "Custom Field",
+			"dt": "Item Price",
+			"fieldname": "scale_prices",
+			"label": "Scale Prices",
+			"fieldtype": "Table",
+			"options": "Item Price Scale Price",
+			"insert_after": "sb_scale_price",
+			"modified": "2024-05-16 22:18:02.049025",
+			"name": "Item Price-scale_prices"
+		}
 	]
 }
 
 class ZelinAccountingSettings(Document):
 	def on_update(self):
 		before_save = self.get_doc_before_save()
-		for key in ['disable_toggle_debit_credit_if_negative', 'enable_dni_billed_qty']:
-			if before_save and before_save.get(key) != self.get(key):
-				frappe.cache().delete_value(key)
-
 		for key in custom_fields.keys():
 			if (not before_save or before_save.get(key) != self.get(key)):
+				frappe.cache().delete_value(key)
 				if self.get(key):
 					self.create_custom_fields(key)
 				else:

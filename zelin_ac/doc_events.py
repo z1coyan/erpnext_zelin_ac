@@ -22,6 +22,22 @@ def subcontracting_receipt_validate(doc, method):
             if expense_account:
                 row.expense_account = expense_account
 
+def item_price_validate(doc, method):
+    """将上限数量设为下一行的等级数量，最后一行设为最大数"""
+    scale_prices = doc.get('scale_prices')
+    if scale_prices:
+        last = len(scale_prices) - 1
+        cur_qty = 0
+        for (i, row) in enumerate(scale_prices):
+            if row.scale_qty < cur_qty:
+                frappe.throw(_('Scale Price: the {0} Row qty {1} should be bigger than previous row qty {2}'
+                    ).format(i+1, row.scale_qty, cur_qty))
+            cur_qty = row.scale_qty
+            if i < last:
+                row.upper_limit_qty = scale_prices[i+1].scale_qty
+            else:
+                row.upper_limit_qty = 999999999
+
 def process_return_doc_status(doc, method):
     doctype = doc.doctype
     item_field_name = 'dn_detail' if doctype=='Delivery Note' else 'purchase_receipt_item'

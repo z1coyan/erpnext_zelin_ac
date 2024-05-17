@@ -8,7 +8,10 @@
   "disable_toggle_debit_credit_if_negative",
   "enable_stock_entry_movement_reason",
   "enable_rate_include_tax",
-  "enable_dni_billed_qty"
+  "enable_dni_billed_qty",
+  "column_break_kdzb",
+  "enable_scale_price",
+  "track_print"
  ],
  "fields": [
   {
@@ -37,12 +40,29 @@
    "fieldname": "enable_dni_billed_qty",
    "fieldtype": "Check",
    "label": "Enable DNI Billed Qty"
+  },
+  {
+   "fieldname": "column_break_kdzb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "track_print",
+   "fieldtype": "Check",
+   "label": "Track Print"
+  },
+  {
+   "default": "0",
+   "description": "If enabled you can maintain scale price in item price child table directly",
+   "fieldname": "enable_scale_price",
+   "fieldtype": "Check",
+   "label": "Enable Scale Price"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-14 11:48:16.357478",
+ "modified": "2024-05-16 15:47:50.383321",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting Settings",

@@ -15,7 +15,9 @@
    "fieldname": "scale_qty",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Scale Qty"
+   "label": "Scale Qty",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "description": "Equals to next row scale qty, excluded from target qty match",
@@ -27,16 +29,19 @@
    "read_only": 1
   },
   {
+   "description": "Scale price logic: current scale qty <= qty < next scale qty",
    "fieldname": "price_list_rate",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Price List Rate"
+   "label": "Price List Rate",
+   "non_negative": 1,
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-05-16 20:57:38.001297",
+ "modified": "2024-05-17 11:21:45.428419",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Item Price Scale Price",

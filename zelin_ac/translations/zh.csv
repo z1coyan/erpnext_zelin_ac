@@ -98,6 +98,7 @@ Scale Prices,阶梯价
 Item Price Scale Price,阶梯价明细
 Scale Qty,等级数量
 Upper Limit Qty,上限数量
-Scale Price: the {0} Row qty {1} should be bigger than previous row qty {2}, 阶梯价明细表: 第 {0} 行数量： {1} 前一行数量： {2}
+Scale Price: the {0} Row qty {1} should be bigger than previous row qty {2}, 阶梯价明细表: 第 {0} 行数量：{1} 须大于前一行数量：{2}
 Extended Match,匹配筛选日期外的入库与发票
 Fetch linked GR/IR out of filtering date range,匹配关联的筛选日期之外的采购入库与发票
+Scale price logic: current scale qty <= qty < next scale qty,阶梯价逻辑： 当前等级数量 <= 数量 < 下一个等级数量

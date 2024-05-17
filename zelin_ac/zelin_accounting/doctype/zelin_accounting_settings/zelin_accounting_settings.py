@@ -90,8 +90,9 @@ custom_fields = {
 			"dt": "Item Price",
 			"fieldname": "sb_scale_price",
 			"fieldtype": "Section Break",
-			"insert_after": "reference",
-			"modified": "2024-05-16 22:18:02.049025",
+			"collapsible": 1,
+			"insert_after": "price_list_rate",
+			"modified": "2024-05-17 22:18:02.049025",
 			"name": "Item Price-sb_scale_price"
 		},
 		{
@@ -100,9 +101,10 @@ custom_fields = {
 			"fieldname": "scale_prices",
 			"label": "Scale Prices",
 			"fieldtype": "Table",
+			"allow_bulk_edit": 1,
 			"options": "Item Price Scale Price",
 			"insert_after": "sb_scale_price",
-			"modified": "2024-05-16 22:18:02.049025",
+			"modified": "2024-05-17 22:18:02.049025",
 			"name": "Item Price-scale_prices"
 		}
 	]

@@ -1,5 +1,5 @@
 import frappe
-
+from frappe import _
 
 def stock_entry_validate(doc, method):
     set_masterial_issue_expense_account(doc)

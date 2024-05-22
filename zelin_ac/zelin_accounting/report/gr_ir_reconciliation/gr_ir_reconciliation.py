@@ -5,6 +5,7 @@ import frappe
 from frappe import _
 from frappe.utils import flt
 from frappe.query_builder.functions import Sum, Avg
+from frappe.query_builder.custom import ConstantColumn
 from frappe.model.meta import get_field_precision
 from erpnext.accounts.report.general_ledger.general_ledger import get_result
 
@@ -31,7 +32,7 @@ def get_data(filters):
  
     suppliers = filters.supplier if filters.supplier else None
     extended_match = filters.extended_match
-    pi_amount, pr_amount, pr_detail_dict, pr_data = {}, {}, {}, []
+    pi_amount, pr_amount, pr_detail_dict, po_detail_dict, pr_data, pr_data_by_po_detail = {}, {}, {},{}, [], []
     for entry in gl_entries:
         voucher_no = entry.voucher_no
         if entry.get('voucher_type') =='Purchase Invoice':
@@ -42,7 +43,7 @@ def get_data(filters):
             pr_amount[voucher_no] += entry.debit - entry.credit 
 
     data = []
-    pr_detail_in_pi = set()
+    pr_detail_in_pi,po_detail_in_pi = set(), set()
     
     pi_query = frappe.qb.from_(pii
     ).join(pi
@@ -54,23 +55,43 @@ def get_data(filters):
         pi.posting_date.as_('pi_date'),
         pii.item_code,
         pii.item_name,
-        pii.pr_detail,
         Sum(pii.qty).as_('pi_qty'),
         Avg(pii.valuation_rate).as_('pi_rate'),
         Sum(pii.base_net_amount).as_('pi_item_amount')
     ).groupby(
-        pi.supplier, pi.name, pii.item_code, pii.item_name, pii.pr_detail
+        pi.supplier, pi.name, pii.item_code, pii.item_name
     ).where(
         (pii.valuation_rate>0) &    # 剔除非库存物料
         (pi.docstatus==1)
     )                  
-
+    
     if pi_amount:    
         query = pi_query.where((pi.name.isin(list(pi_amount))))
         if suppliers:
             query = query.where(pi.supplier.isin(suppliers))
-        data = query.run(as_dict=1)
-        pr_detail_in_pi = {d.pr_detail for d in data}
+        #发票明细4种情况：同时有pr_detail与po_detail,分别只有pr_detail或po_detail,两者都没有
+        pi_not_by_po = query.select(
+            ConstantColumn("").as_("po_detail"),
+            pii.pr_detail
+        ).where(
+            (
+                (pii.pr_detail.notnull()) |
+                (pii.pr_detail.isnull() & pii.po_detail.isnull())
+            ) 
+        ).groupby(pii.pr_detail
+        ).run(as_dict=1)
+        
+        pi_by_po = query.select(
+            ConstantColumn("").as_("pr_detail"),
+            pii.po_detail
+        ).where(
+            (pii.po_detail.notnull()) & 
+            (pii.pr_detail.isnull()) 
+        ).groupby(pii.po_detail
+        ).run(as_dict=1)
+        data = pi_not_by_po + pi_by_po
+        pr_detail_in_pi = {d.pr_detail for d in data if d.pr_detail}
+        po_detail_in_pi = {d.po_detail for d in data if d.po_detail}
         for d in data:
             d.pi_amount = pi_amount.get(d.purchase_invoice)
     
@@ -85,68 +106,137 @@ def get_data(filters):
         pr.status.as_('pr_status'),
         pri.idx.as_('pr_item_idx'),
         pri.item_code,
-        pri.item_name,
-        pri.name.as_('pr_detail'),
+        pri.item_name,        
         Sum(pri.qty).as_('pr_qty'),
         Avg(pri.valuation_rate).as_('pr_rate'),
         Sum(pri.base_net_amount + pri.rate_difference_with_purchase_invoice).as_('pr_item_amount')
     ).groupby(
-        pr.supplier, pr.status, pr.name,pri.idx, pri.item_code, pri.item_name, pri.name
-    ).where(
-        (pri.valuation_rate>0) &
+        pr.supplier, pr.status, pr.name, pri.idx, pri.item_code, pri.item_name
+    ).where(        
         (pr.docstatus==1)
     )
 
     if pr_amount:
-        query = pr_query.where((pr.name.isin(list(pr_amount))))
+        query_filtered_pr = pr_query.where(
+            (pri.valuation_rate>0) &
+            (pr.name.isin(list(pr_amount)))
+        )
         if suppliers:
-            query = query.where(pr.supplier.isin(suppliers))
-        pr_data = query.run(as_dict=1)
-        for d in pr_data:
-            d.pr_amount = pr_amount.get(d.purchase_receipt, 0)
+            query_filtered_pr = query_filtered_pr.where(pr.supplier.isin(suppliers))
+                    
+        query_pr_detail = query_filtered_pr.select(pri.name.as_('pr_detail')).groupby(pri.name)
+        if po_detail_in_pi:
+            query_pr_detail = query_pr_detail.where(
+                (
+                    pri.purchase_order_item.notin(po_detail_in_pi) |
+                    pri.purchase_order_item.isnull()
+                )
+            )
+        pr_data = query_pr_detail.run(as_dict=1)
         pr_detail_dict = {d.pr_detail:d for d in pr_data}
 
+        if po_detail_in_pi:
+            query_po_detail = query_filtered_pr.select(pri.purchase_order_item.as_('po_detail')
+            ).where(pri.purchase_order_item.isin(po_detail_in_pi)       #用发票是否以采购订单对账为准区分
+            ).groupby(pri.purchase_order_item)
+            pr_data_by_po_detail = query_po_detail.run(as_dict=1)
+            po_detail_dict = {d.po_detail:d for d in pr_data_by_po_detail}
+
+    fields = ['purchase_receipt', 'pr_date', 'pr_status','pr_item_idx', 'pr_qty','pr_rate','pr_item_amount']
     #发票匹配入库
-    if pr_detail_dict:        
+    if pr_detail_dict or po_detail_dict:        
         for d in data:
-            pr_detail = pr_detail_dict.get(d.pr_detail)
+            pr_detail = {}
+            if not (d.pr_detail or d.po_detail):continue
+            #用pop而不是get 处理出库明细多次开票场景，出库明细只匹配第一个发票明细行
+            if d.pr_detail:
+                pr_detail = pr_detail_dict.pop(d.pr_detail, {})
+            if not pr_detail and d.po_detail:
+                pr_detail = po_detail_dict.pop(d.po_detail,{})
             if pr_detail:
-                for f in ['purchase_receipt', 'pr_date', 'pr_status','pr_item_idx', 
-                    'pr_qty','pr_rate','pr_item_amount','pr_amount']:
-                    d[f] = pr_detail[f]       
+                for f in fields:
+                    d[f] = pr_detail[f]
     
     #有入库无发票
-    if pr_data:
-        #globals().update(locals())
-        data.extend([d for d in pr_data if d.pr_detail not in pr_detail_in_pi])
+    if pr_data or pr_data_by_po_detail:
+        globals().update(locals())
+        matched_pr = {d.purchase_receipt for d in data if d.purchase_receipt}
+        data.extend([d for d in pr_data + pr_data_by_po_detail if 
+            (d.pr_detail and d.pr_detail not in pr_detail_in_pi) or 
+            (d.po_detail and d.po_detail not in po_detail_in_pi) or
+            (not (d.po_detail or d.pr_detail) and d.purchase_receipt not in matched_pr)
+        ])
 
     #扩展匹配，继续匹配有发票无入库以及有入库无发票的
     if extended_match:
-        pr_detail_in_pi_no_pr = [d.pr_detail for d in data if d.purchase_invoice and not d.purchase_receipt]
-        pr_detail_in_pr_no_pi = [d.pr_detail for d in data if not d.purchase_invoice and d.purchase_receipt]
-        if pr_detail_in_pi_no_pr:
-            pr_data = pr_query.where(pri.name.isin(pr_detail_in_pi_no_pr)).run(as_dict=1)                
-            amount_map={}
-            for d in pr_data:
-                amount_map.setdefault(d.purchase_receipt, 0)
-                amount_map[d.purchase_receipt] += d.pr_item_amount
-            pr_detail_dict = {d.pr_detail:d for d in pr_data}
+        #处理发票对入库一对多问题，只匹配一次
+        matched_pr_detail = {d.pr_detail for d in data if d.pr_detail}
+        pr_detail_in_pi_no_pr = [d.pr_detail for d in data if d.purchase_invoice and d.pr_detail and not d.purchase_receipt
+            and not d.pr_detail in matched_pr_detail
+        ]
+        matched_po_detail = {d.po_detail for d in data if d.po_detail}
+        po_detail_in_pi_no_pr = [d.po_detail for d in data if d.purchase_invoice and d.po_detail and not d.purchase_receipt
+            and not d.po_detail in matched_po_detail
+        ]
+        pr_detail_no_pi = [d.pr_detail for d in data if not d.purchase_invoice and d.purchase_receipt]
+        if pr_detail_in_pi_no_pr or po_detail_in_pi_no_pr:
+            if pr_detail_in_pi_no_pr:
+                pr_data = pr_query.select(pri.name.as_('pr_detail')
+                ).groupby(pri.name
+                ).where(pri.name.isin(pr_detail_in_pi_no_pr)
+                ).run(as_dict=1)
+                #按采购入库汇总明细行金额                                
+                for d in pr_data:
+                    pr_amount.setdefault(d.purchase_receipt, 0)
+                    pr_amount[d.purchase_receipt] += d.pr_item_amount
+                pr_detail_dict = {d.pr_detail:d for d in pr_data}
+            elif po_detail_in_pi_no_pr:
+                pr_data = pr_query.select(pri.purchase_order_item.as_('po_detail')
+                ).groupby(pri.purchase_order_item
+                ).where(pri.purchase_order_item.isin(po_detail_in_pi_no_pr)
+                ).run(as_dict=1)
+
+                for d in pr_data:
+                    pr_amount.setdefault(d.purchase_receipt, 0)
+                    pr_amount[d.purchase_receipt] += d.pr_item_amount
+                po_detail_dict = {d.po_detail:d for d in pr_data}
 
             #发票匹配入库        
             for d in data:
-                if not d.purchase_receipt:
-                    pr_detail = pr_detail_dict.get(d.pr_detail)
+                if d.purchase_receipt:continue
+                #按入库明细行与采购明细行匹配,用pop而不是get处理出库多次开发票场景，避免重复匹配
+                if d.pr_detail or d.po_detail:
+                    pr_detail = (pr_detail_dict.pop(d.pr_detail, {}) if d.pr_detail
+                        else po_detail_dict.pop(d.po_detail, {}))
                     if pr_detail:
-                        for f in ['purchase_receipt', 'pr_date', 'pr_status','pr_item_idx', 
-                            'pr_qty','pr_rate','pr_item_amount']:
+                        for f in fields:
                             d[f] = pr_detail[f]
-                        d.pr_amount = amount_map.get(d.purchase_receipt)                                 
-        if pr_detail_in_pr_no_pi:                
-            pi_data = pi_query.where(pii.pr_detail.isin(pr_detail_in_pr_no_pi)).run(as_dict=1)                
-            amount_map={}
+
+        if pr_detail_no_pi:
+            pi_query = pi_query.where(pii.pr_detail.isin(pr_detail_no_pi))
+            pi_not_by_po = pi_query.select(
+                ConstantColumn("").as_("po_detail"),
+                pii.pr_detail
+            ).where(
+                (
+                    (pii.pr_detail.notnull()) |
+                    (pii.pr_detail.isnull() & pii.po_detail.isnull())
+                ) 
+            ).groupby(pii.pr_detail
+            ).run(as_dict=1)
+            
+            pi_by_po = pi_query.select(
+                ConstantColumn("").as_("pr_detail"),
+                pii.po_detail
+            ).where(
+                (pii.po_detail.notnull()) & 
+                (pii.pr_detail.isnull()) 
+            ).groupby(pii.po_detail
+            ).run(as_dict=1)
+            pi_data = pi_not_by_po + pi_by_po               
             for d in pi_data:
-                amount_map.setdefault(d.purchase_invoice, 0)
-                amount_map[d.purchase_invoice] += d.pi_item_amount
+                pi_amount.setdefault(d.purchase_invoice, 0)
+                pi_amount[d.purchase_invoice] += d.pi_item_amount
             pi_detail_dict = {d.pr_detail:d for d in pi_data}
 
             #入库匹配发票
@@ -154,17 +244,29 @@ def get_data(filters):
                 if not d.purchase_invoice:
                     pi_detail = pi_detail_dict.get(d.pr_detail)
                     if pi_detail:
-                        for f in ['purchase_invoice', 'pi_date',  
-                            'pi_qty','pi_rate','pi_item_amount']:
-                            d[f] = pi_detail[f]
-                        d.pi_amount = amount_map.get(d.purchase_invoice)                                 
+                        for f in ['purchase_invoice', 'pi_date', 'pi_qty','pi_rate','pi_item_amount']:
+                            d[f] = pi_detail[f]                        
 
     #计算差异
     df = frappe.get_meta("Purchase Invoice Item").get_field('amount')
     precision = get_field_precision(df)        
     for d in data:
+        if d.purchase_receipt:
+            d.pr_amount = pr_amount.get(d.purchase_receipt, 0)
+        elif d.purchase_invoice:
+            d.pi_amount = pi_amount.get(d.purchase_invoice, 0)        
         d.variance = flt(d.get('pi_item_amount', 0) - d.get('pr_item_amount', 0), precision)
-        
+        msg = ''
+
+        if not d.purchase_receipt:
+            msg = _('No purchase receipt')
+        elif not d.purchase_invoice:
+            msg = _('No purchase invoice')
+        elif not d.pr_rate:            
+            msg = _('PR valuation rate is 0')
+        elif d.variance:
+            msg = _('PR and PI not match')
+        if msg: d.variance_reason = msg
     if filters.hide_fully_matched:
         data = [d for d in data if flt(d.variance, precision) != 0]
 
@@ -230,13 +332,13 @@ def get_column():
             "label": _("PR Qty"),
             "fieldname": "pr_qty",
             "fieldtype": "Float",
-            "width": 100
+            "width": 90
         },
         {
             "label": _("PR Rate"),
             "fieldname": "pr_rate",
             "fieldtype": "Float",
-            "width": 100
+            "width": 90
         },
         {
             "label": _("PR Item Amount"),
@@ -257,7 +359,7 @@ def get_column():
             "fieldname": "purchase_invoice",
             "fieldtype": "Link",
             "options": "Purchase Invoice",
-            "width": 140,
+            "width": 150,
         },       
         {"label": _("PI Date"), "fieldname": "pi_date", "fieldtype": "Date", "width": 120},
         {
@@ -290,9 +392,15 @@ def get_column():
             "label": _("Variance"), 
             "fieldname": "variance", 
             "fieldtype": "Currency", 
-            "width": 120,
+            "width": 100,
             "options": "Company:company:default_currency",
-        }        
+        },
+        {
+            "label": _("Variance Reason"), 
+            "fieldname": "variance_reason", 
+            "fieldtype": "Data", 
+            "width": 130,
+        }          
     ]
 
 
@@ -304,11 +412,11 @@ from erpnext.accounts.report.general_ledger.general_ledger import get_gl_entries
 from zelin_ac.zelin_accounting.report.gr_ir_reconciliation.gr_ir_reconciliation import *
 filters= frappe._dict(
     {"company":"则霖信息技术（深圳）有限公司",
-    "from_date":"2024-04-23",
-    "to_date":"2024-04-23",
+    "from_date":"2024-01-1",
+    "to_date":"2024-05-23",
     "account":["220202 - 应付账款-暂估库存 - 则"],
     "group_by":"Group by Voucher (Consolidated)",
-    "extended_match":1,
-    "hide_fully_matched":1}
+    "extended_match":0,
+    "hide_fully_matched":0}
 )
 """

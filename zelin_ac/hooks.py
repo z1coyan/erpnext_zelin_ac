@@ -42,6 +42,10 @@ doc_events = {
  		"on_submit": "zelin_ac.doc_events.process_return_doc_status",
 		"on_cancel": "zelin_ac.doc_events.process_return_doc_status"
 	},
+	"Purchase Invoice": {
+ 		"on_submit": "zelin_ac.doc_events.purchase_invoice_submit",
+		"on_cancel": "zelin_ac.doc_events.purchase_invoice_cancel"
+	},
 	"Sales Order": {
  		"before_print": "zelin_ac.doc_events.sales_order_before_print"
 	},
@@ -52,11 +56,15 @@ doc_events = {
 
 override_doctype_class = {
 	"Purchase Invoice": "zelin_ac.overrides.CustomPurchaseInvoice",
+	"Stock Entry": "zelin_ac.overrides.CustomStockEntry",
+	"Delivery Note": "zelin_ac.overrides.CustomDeliveryNote",
 	"Sales Invoice": "zelin_ac.overrides.CustomSalesInvoice"
 }
 
 override_whitelisted_methods = {
 	"frappe.utils.print_format.download_multi_pdf_async": "zelin_ac.overrides.custom_download_multi_pdf_async",
+	"frappe.www.printview.get_html_and_style": "zelin_ac.overrides.custom_get_html_and_style",
+	"frappe.utils.print_format.download_pdf": "zelin_ac.overrides.custom_download_pdf",
 	"erpnext.accounts.doctype.payment_entry.payment_entry.get_payment_entry": "zelin_ac.overrides.get_payment_entry"
 }
 

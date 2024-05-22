@@ -11,7 +11,8 @@
   "enable_dni_billed_qty",
   "column_break_kdzb",
   "enable_scale_price",
-  "track_print"
+  "track_print",
+  "enable_purchase_invoice_variance_settlement"
  ],
  "fields": [
   {
@@ -57,12 +58,18 @@
    "fieldname": "enable_scale_price",
    "fieldtype": "Check",
    "label": "Enable Scale Price"
+  },
+  {
+   "default": "0",
+   "fieldname": "enable_purchase_invoice_variance_settlement",
+   "fieldtype": "Check",
+   "label": "Enable Purchase Invoice Variance Settlement"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-05-16 15:47:50.383321",
+ "modified": "2024-05-19 13:09:16.999714",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting Settings",

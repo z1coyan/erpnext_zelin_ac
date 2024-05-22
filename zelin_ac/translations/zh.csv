@@ -75,7 +75,7 @@ PR Status,入库单状态
 PR Date,入库日期
 PR Qty,入库数量
 PR Rate,入库单价
-PR Amount,入库金额
+PR Amount,入库单金额
 PI Date,发票日期
 PI Qty,发票数量
 PI Rate,发票单价
@@ -102,3 +102,11 @@ Scale Price: the {0} Row qty {1} should be bigger than previous row qty {2}, 阶
 Extended Match,匹配筛选日期外的入库与发票
 Fetch linked GR/IR out of filtering date range,匹配关联的筛选日期之外的采购入库与发票
 Scale price logic: current scale qty <= qty < next scale qty,阶梯价逻辑： 当前等级数量 <= 数量 < 下一个等级数量
+Enable Purchase Invoice Variance Settlement,启用采购发票差异自动结转库存
+Settle purchase invoice variance stock,采购发票差异结转库存
+Variance Reason,差异原因
+PR valuation rate is 0,入库成本价为0
+Purchase receipt not assigned,发票未关联入库
+No purchase invoice,无采购发票
+No purchase receipt,无采购入库
+PR and PI not match,入库与发票记账金额不匹配

@@ -33,17 +33,16 @@
   },
   {
    "fieldname": "print_format",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Print Format",
-   "options": "Print Format"
+   "label": "Print Format"
   }
  ],
  "in_create": 1,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-05-16 11:13:55.806928",
+ "modified": "2024-05-20 09:59:00.547051",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Print Log",

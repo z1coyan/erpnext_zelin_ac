@@ -1,4 +1,5 @@
 import frappe
+from frappe.utils import flt
 from erpnext.stock import get_item_details
 from erpnext.stock.get_item_details import (
 	get_price_list_rate_for as original_get_price_list_rate_for,
@@ -7,10 +8,7 @@ from erpnext.stock.get_item_details import (
 )
 from frappe.query_builder import Case
 from frappe.query_builder.functions import IfNull, Sum
-
-
-def get_enable_scale_price():
-	return frappe.db.get_single_value('Zelin Accounting Settings', 'enable_scale_price')
+from zelin_ac.api import get_cached_value
 
 def custom_get_price_list_rate_for(args, item_code):
 	"""
@@ -18,8 +16,7 @@ def custom_get_price_list_rate_for(args, item_code):
 	原来调用get_item_price 替换为了custom_get_item_price
 	"""
 
-	enable_scale_price = frappe.cache().get_value('enable_scale_price', get_enable_scale_price)
-	if not enable_scale_price:
+	if not get_cached_value('enable_scale_price'):
 		return original_get_price_list_rate_for(args, item_code)
 	else:
 		item_price_args = {
@@ -73,8 +70,7 @@ def custom_get_item_price(args, item_code, ignore_party=False):
 
 	data = original_get_item_price(args, item_code, ignore_party=False)
 	qty = args.get('qty')
-	enable_scale_price = frappe.cache().get_value('enable_scale_price', get_enable_scale_price)
-	if data and enable_scale_price and qty:
+	if data and get_cached_value('enable_scale_price') and qty:
 		ipsp = frappe.qb.DocType('Item Price Scale Price')
 		item_price_names = [d[0] for d in data]
 		scale_price_map = frappe._dict(frappe.qb.from_(ipsp

@@ -61,3 +61,9 @@ def create_sales_invoice(source_names):
         return sales_invoice
     else:
         frappe.msgprint("选择的出库单无可开票明细")
+
+def get_cached_value(key, settings='Zelin Accounting Settings'):
+    def get_value():
+        return frappe.db.get_single_value(settings, key)
+
+    return frappe.cache().get_value(key, get_value)

@@ -107,6 +107,33 @@ custom_fields = {
 			"modified": "2024-05-17 22:18:02.049025",
 			"name": "Item Price-scale_prices"
 		}
+	],
+	'enable_purchase_invoice_variance_settlement':[
+		{
+			"doctype": "Custom Field",
+			"dt": "Stock Entry",
+			"fieldname": "purchase_invoice",
+			"label": "Purchase Invoice",
+			"fieldtype": "Link",
+			"read_only": 1,
+			"options": "Purchase Invoice",
+			"insert_after": "sales_invoice_no",
+			"depends_on": "eval:doc.purpose=='Repack'",
+			"modified": "2024-05-19 22:18:02.049025",
+			"name": "Stock Entry-purchase_invoice"
+		},
+		{
+			"doctype": "Custom Field",
+			"dt": "Stock Entry Detail",
+			"fieldname": "flagged_additional_cost",
+			"label": "flagged_additional_cost",
+			"fieldtype": "Float",
+			"read_only": 1,
+			"hidden": 1,
+			"insert_after": "additional_cost",
+			"modified": "2024-05-19 22:18:02.049025",
+			"name": "Stock Entry Detail-flagged_additional_cost"
+		}
 	]
 }
 
@@ -114,6 +141,10 @@ class ZelinAccountingSettings(Document):
 	def on_update(self):
 		before_save = self.get_doc_before_save()
 		for key in custom_fields.keys():
+			#标准结转采购入库未考虑账期关闭问题，需停掉
+			if key == 'enable_purchase_invoice_variance_settlement' and self.get(key):
+				frappe.db.set_single_value("Buying Settings",
+					"set_landed_cost_based_on_purchase_invoice_rate", 0)
 			if (not before_save or before_save.get(key) != self.get(key)):
 				frappe.cache().delete_value(key)
 				if self.get(key):

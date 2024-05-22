@@ -1,9 +1,21 @@
 import frappe
 from frappe import _
+from zelin_ac.api import get_cached_value
 
 def stock_entry_validate(doc, method):
     set_masterial_issue_expense_account(doc)
     set_manufacture_production_cost_account(doc)
+
+def process_item_wise_additional_cost(doc):
+    flagged_additional_cost = None
+    for row in doc.items:
+        flagged_additional_cost = row.get('flagged_additional_cost')
+        if flagged_additional_cost:
+            row.additional_cost = flagged_additional_cost
+    if flagged_additional_cost:
+        doc.update_valuation_rate()
+        doc.set_total_incoming_outgoing_value()
+        doc.set_total_amount()
 
 def subcontracting_receipt_validate(doc, method):
     # 14版委外入库明细行还没有采购订单明细字段
@@ -66,6 +78,169 @@ def process_return_doc_status(doc, method):
                 if returned_doc.status == 'Closed':
                     returned_doc.status = None
                     returned_doc.set_status(update=True)    #恢复未退货前状态
+
+def purchase_invoice_cancel(doc, method):    
+    if get_cached_value('enable_purchase_invoice_variance_settlement'):
+        ste_doc = frappe.db.get_value('Stock Entry', {'purchase_invoice': doc.name, 'docstatus':1})
+        if ste_doc:
+            frappe.get_doc('Stock Entry', ste_doc).cancel()
+
+def purchase_invoice_submit(doc, method):
+    """
+    采购发票价差自动结转库存，需在中国会计设置中勾选启用，只适用于未启用批号与序列号的普通库存物料
+    检查关联的采购入库日期如果可以记账（库存关帐，会计锁帐，会计期间业务交易，使用标准的价差调采购入库功能(追溯调整)
+    否则创建物料移动-重新包装，将价差作为额外费用以记账日结转库存(向后适用)
+    """
+    
+    if not get_cached_value('enable_purchase_invoice_variance_settlement'): return
+
+    pr_details = {row.pr_detail for row in doc.items}
+    if not pr_details: return
+
+    pr = frappe.qb.DocType('Purchase Receipt')
+    pri = frappe.qb.DocType('Purchase Receipt Item')
+    item = frappe.qb.DocType('Item')
+
+    pr_details = frappe.qb.from_(pr
+    ).join(pri
+    ).on(pr.name == pri.parent
+    ).join(item
+    ).on(
+        (item.name == pri.item_code) &
+        (item.has_batch_no==0) &    #不处理有批号与序列号的场景
+        (item.has_serial_no==0)
+    ).select(
+        pr.name.as_('docname'),
+        pr.posting_date,
+        pri.item_code,
+        pri.warehouse,
+        (pri.billed_amt - pri.amount).as_('variance')
+    ).where(
+        (pri.name.isin(pr_details)) &
+        ((pri.billed_amt - pri.amount) != 0) 
+    ).run(as_dict=1)
+    
+    if not pr_details: return
+
+    pr_adjusted = set()
+    for row in pr_details:
+        pr_docname = row.pr_docname
+        if not pr_docname in pr_adjusted and not is_posting_date_closed(doc.company, row.posting_date):
+            pr_doc = frappe.get_doc('Purchase Receipt', pr_docname)
+            pr_adjusted.add(pr_docname)
+    items = [row for row in pr_details if not row.pr_docname in pr_adjusted]
+    create_repack_stock_entry(doc.company, doc.name, items)
+
+def get_item_wh_qty_map(item_wh_tuple):
+    from pypika.terms import Tuple
+
+    bin= frappe.qb.DocType('Bin')        
+    data = frappe.qb.from_(bin
+        ).select(bin.item_code,bin.warehouse,bin.actual_qty,bin.stock_value
+        ).where(Tuple(bin.item_code,bin.warehouse).isin(item_wh_tuple)
+        ).run(as_dict=1)
+    qty_map = {(d.item_code,d.warehouse):d for d in data}
+    return qty_map
+
+@frappe.whitelist()
+def create_repack_stock_entry(company, docname, items):    
+    """
+    将采购发票价差通过重新包装以当天记帐日期结转进库存
+    前提条件：
+        物料当前有库存，
+        差异+库存金额为正
+    """
+
+    from frappe.utils import today, nowtime
+
+    if not items: return
+
+    #获取物料库存数量与金额
+    item_wh_tuple = {(row.item_code,row.warehouse) for row in items}
+    qty_map = get_item_wh_qty_map(item_wh_tuple)
+
+    item_wh_data = {}
+    for row in items:
+        key = (row.item_code, row.warehouse)
+        item_wh_data.setdefault(key, 0)
+        item_wh_data[key] += row.variance
+    
+    stock_entry = frappe.get_doc(
+        {
+            "doctype": "Stock Entry",
+            "purpose": "Repack",
+            "stock_entry_type": "Repack",
+            "posting_date": today,
+            "posting_time": nowtime,
+            "company": company,
+            "purchase_invoice": docname
+        }
+    ) 
+    #添加表头额外费用
+    gr_ir_acct = frappe.db.get_value('Company', company, 'stock_received_but_not_billed')
+    stock_entry.append('additional_costs', 
+        {
+            'expense_account': gr_ir_acct,
+            'description': _('Settle purchase invoice variance stock'),
+            'amount': sum(row.variance for row in items)                    
+        }
+    )
+
+    for (key, variance) in item_wh_data.items():
+        bin_data = qty_map.get(key, {})
+        actual_qty = bin_data.get('actual_qty')
+        stock_value = bin_data.get('stock_value')
+        if actual_qty and stock_value >= variance:
+            stock_entry.append('items', 
+                {
+                    'item_code': key[0] ,                    
+                    's_warehouse': key[1],
+                    'qty': actual_qty
+                }
+            )
+            stock_entry.append('items', 
+                {
+                    'item_code': key[0] ,                    
+                    't_warehouse': key[1],
+                    'qty': actual_qty,
+                    'additional_cost':variance 
+                }
+            )
+        else:
+            msg = '无库存,差异无法结转'
+    if stock_entry.items:        
+        stock_entry.insert(ignore_mandatory=True)
+    return stock_entry
+
+def is_posting_date_closed(company, posting_date):
+    from datetime import date
+    from frappe.utils import cint, add_days, getdate
+
+    stock_settings = frappe.get_cached_doc("Stock Settings")
+    if (stock_settings.stock_frozen_upto and 
+        getdate(posting_date) <= getdate(stock_settings.stock_frozen_upto)):
+        return  True
+
+    stock_frozen_upto_days = cint(stock_settings.stock_frozen_upto_days)
+    if (stock_frozen_upto_days and
+            add_days(getdate(posting_date), stock_frozen_upto_days) <= date.today()
+        ):
+        return True
+        
+    acc_frozen_upto = frappe.db.get_single_value("Accounts Settings", "acc_frozen_upto")
+    if acc_frozen_upto and getdate(posting_date) <= getdate(acc_frozen_upto):
+        return True
+    
+    if frappe.db.get_all('Accounting Period',
+        filters = {
+            'company': company,
+            'document_type': "Purchase Receipt",
+            'closed':1,
+            'start_date': ('<=', posting_date),
+            'end_date': ('>=', posting_date),
+        }
+    ):        
+        return True
 
 def sales_order_before_print(doc, method, print_settings=None):
     """

@@ -1,11 +1,18 @@
+from datetime import datetime, timedelta
 import frappe
+import json
 from frappe import _
 from frappe.utils import flt
+from frappe.query_builder.functions import Sum, Now
+from frappe.query_builder import Interval
+from frappe.www.printview import get_html_and_style as original_get_html_and_style
 from erpnext.accounts.doctype.purchase_invoice.purchase_invoice import PurchaseInvoice
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
+from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
+from erpnext.stock.doctype.delivery_note.delivery_note import DeliveryNote
 from erpnext.stock.doctype.delivery_note.delivery_note import update_billed_amount_based_on_so
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
-from frappe.query_builder.functions import Sum
+from zelin_ac.api import get_cached_value
 
 
 class CustomPurchaseInvoice(PurchaseInvoice):
@@ -20,7 +27,39 @@ class CustomPurchaseInvoice(PurchaseInvoice):
         add_tax_adjust_gl_entries(self, gl_entries)
         return gl_entries
 
+class CustomStockEntry(StockEntry):
+    def distribute_additional_costs(self):
+        """
+        以代码在明细行直接分派的费用为准，不再用标准按金额分摊覆盖
+        """
+
+        additional_costs = sum(flt(t.base_amount) for t in self.get("additional_costs") or [])
+        if additional_costs:
+            item_additional_costs = sum(flt(t.additional_cost) for t in self.get("items") if t.t_warehouse)
+            if flt(additional_costs - item_additional_costs, 4):
+                super().distribute_additional_costs()
+
+class CustomDeliveryNote(DeliveryNote):
+    def validate_internal_transfer(self):
+        if not self.doctype in ("Delivery Note"):
+            super().validate_internal_transfer()
+
 class CustomSalesInvoice(SalesInvoice):
+    def validate_delivery_note(self):
+        if any(row.dn_detail for row in self.items if row.dn_detail):
+            dni = frappe.qb.DocType('Delivery Note Item')
+            target_wh_map = frappe._dict(frappe.qb.from_(dni
+            ).select(dni.name, dni.target_warehouse
+            ).where(
+                (dni.name.isin({row.dn_detail for row in self.items if row.dn_detail})) &
+                (dni.target_warehouse.notnull())
+            ).run())
+            if target_wh_map:
+                for row in self.items:
+                    row.warehouse = target_wh_map.get(row.dn_detail) or row.warehouse
+            else:
+                super().validate_delivery_note()
+
     def get_gl_entries(self, warehouse_account=None):
         gl_entries = super(CustomSalesInvoice, self).get_gl_entries(warehouse_account = warehouse_account)
         add_tax_adjust_gl_entries(self, gl_entries)
@@ -50,12 +89,7 @@ class CustomSalesInvoice(SalesInvoice):
             开票金额修正为出库单价*开票数量，实现基于开票数量更新出库单开票状态
         """
 
-        def get_enable_dni_billed_qty():
-            return frappe.db.get_single_value('Zelin Accounting Settings',
-                'enable_dni_billed_qty')
-
-        enable_dni_billed_qty = frappe.cache().get_value('enable_dni_billed_qty', get_enable_dni_billed_qty)
-        if not enable_dni_billed_qty:
+        if not get_cached_value('enable_dni_billed_qty'):
             super().update_billing_status_in_dn(update_modified=update_modified)
         else:
             updated_delivery_notes = []
@@ -161,12 +195,12 @@ def add_adjust_gl_entry(doc, gl_entries, adjust_amount):
 
 @frappe.whitelist()
 def custom_download_multi_pdf_async(
-	doctype: str | dict[str, list[str]],
-	name: str | list[str],
-	format: str | None = None,
-	no_letterhead: bool = False,
-	letterhead: str | None = None,
-	options: str | None = None,
+    doctype: str | dict[str, list[str]],
+    name: str | list[str],
+    format: str | None = None,
+    no_letterhead: bool = False,
+    letterhead: str | None = None,
+    options: str | None = None,
 ):
     import json
     from frappe.utils.print_format import download_multi_pdf_async as original_download_multi_pdf_async
@@ -196,16 +230,73 @@ def custom_download_multi_pdf_async(
         options=options
     )
 
+def create_print_log(doctype, docname, print_format):
+    #当前会话同一个打印只创建一次打印日志
+    user = frappe.session.user
+    key = f'{doctype}{docname}{print_format}{user}'
+    last_time = frappe.cache.get_value(key)
+    frappe.errprint(f'key={key}, user={user},last_time={last_time}')
+    if get_cached_value('track_print'):
+        print_log = frappe.qb.DocType('Print Log')
+        frappe.get_doc({
+            'doctype':"Print Log",
+            'reference_doctype': doctype,
+            'reference_name': docname,
+            'print_format': print_format
+        }).insert(ignore_permissions=1)
+        frappe.cache.set_value(key, datetime.now(), expires_in_sec=10, user=user)
+            #frappe.db.commit()
+
+@frappe.whitelist(allow_guest=True)
+def custom_download_pdf(doctype, name, format=None, doc=None, no_letterhead=0, language=None, letterhead=None):
+    from frappe.utils.print_format import download_pdf as original_download_pdf
+
+    pdf = original_download_pdf(doctype, name, 
+        format=format, doc=doc, no_letterhead=no_letterhead, language=language, letterhead=letterhead)
+    document = doc or frappe.get_doc(doctype, name)
+    create_print_log(document.doctype, document.name, format)
+    return pdf
+
+@frappe.whitelist()
+def custom_get_html_and_style(
+    doc: str | None = None,
+    name: str | None = None,
+    print_format: str | None = None,
+    no_letterhead: bool | None = None,
+    letterhead: str | None = None,
+    trigger_print: bool = False,
+    style: str | None = None,
+    settings: str | None = None,
+):
+    if not doc: return
+    html = original_get_html_and_style(
+        doc = doc,
+        name = name,
+        print_format = print_format,
+        no_letterhead = no_letterhead,
+        letterhead = letterhead,
+        trigger_print = trigger_print,
+        style = style,
+        settings = settings,
+    )
+    if isinstance(name, str):
+        document = frappe.get_doc(doc, name)
+    else:
+        document = frappe.get_doc(json.loads(doc))
+    if html:
+        create_print_log(document.doctype, document.name, print_format)
+    return html
+
 @frappe.whitelist()
 def get_payment_entry(
-	dt,
-	dn,
-	party_amount=None,
-	bank_account=None,
-	bank_amount=None,
-	party_type=None,
-	payment_type=None,
-	reference_date=None,
+    dt,
+    dn,
+    party_amount=None,
+    bank_account=None,
+    bank_amount=None,
+    party_type=None,
+    payment_type=None,
+    reference_date=None,
 ):
     """
         销售订单与采购订单下推付款时默认付款金额基于预付百分比(付款条款明细中到期日小于等于当天）而非整个订单金额

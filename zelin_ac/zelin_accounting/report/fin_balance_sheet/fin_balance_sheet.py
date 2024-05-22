@@ -25,6 +25,10 @@ class BalanceSheetDoubleColumns():
     self.get_columns()
 
     settings = frappe.get_single("Balance Sheet Settings")
+    if not settings.items:
+      form_link = frappe.utils.get_link_to_form("Balance Sheet Settings",'')
+      frappe.msgprint(_("请先进行资产负债表（两栏式）设置").format(form_link))
+      return    
 
     self.data = list(map(lambda d: frappe._dict({
         "idx": d.idx,

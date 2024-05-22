@@ -14,6 +14,10 @@ def execute(filters=None):
   settings = frappe.get_single("Profit and Loss Statement Settings")
   fields = ['idx','label','indent','calc_type','calc_sources','amount_from']
   #globals().update(locals())
+  if not settings.items:
+    form_link = frappe.utils.get_link_to_form("Profit and Loss Statement Settings",'')
+    frappe.msgprint(_("请先进行利润表设置").format(form_link))
+    return
   data = [frappe._dict({f:d.get(f) for f in fields}) for d in settings.items]      
   data = get_data(data, filters)
 

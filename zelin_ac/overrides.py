@@ -232,10 +232,6 @@ def custom_download_multi_pdf_async(
 
 def create_print_log(doctype, docname, print_format):
     #当前会话同一个打印只创建一次打印日志
-    user = frappe.session.user
-    key = f'{doctype}{docname}{print_format}{user}'
-    last_time = frappe.cache.get_value(key)
-    frappe.errprint(f'key={key}, user={user},last_time={last_time}')
     if get_cached_value('track_print'):
         print_log = frappe.qb.DocType('Print Log')
         frappe.get_doc({
@@ -244,8 +240,6 @@ def create_print_log(doctype, docname, print_format):
             'reference_name': docname,
             'print_format': print_format
         }).insert(ignore_permissions=1)
-        frappe.cache.set_value(key, datetime.now(), expires_in_sec=10, user=user)
-            #frappe.db.commit()
 
 @frappe.whitelist(allow_guest=True)
 def custom_download_pdf(doctype, name, format=None, doc=None, no_letterhead=0, language=None, letterhead=None):

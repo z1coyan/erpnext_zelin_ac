@@ -128,7 +128,7 @@ class CustomSalesInvoice(SalesInvoice):
                         update_modified=update_modified
                     )                    
                     updated_delivery_notes.append(row.delivery_note)
-                elif d.so_detail :
+                elif row.so_detail :
                     updated_delivery_notes += update_billed_amount_based_on_so(row.so_detail, update_modified)
 
             for dn in set(updated_delivery_notes):

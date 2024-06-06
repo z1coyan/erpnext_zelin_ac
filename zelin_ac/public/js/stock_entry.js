@@ -11,12 +11,15 @@ frappe.ui.form.on('Stock Entry', {
 		});
 	},
     refresh: function (frm) {
-		frm.set_query('reason_code', function (doc) {			
+		frm.set_query('reason_code', function (doc) {
+			let filters = {};
+			if (frm.doc.purpose === "Material Issue"){
+				filters['for_material_issue'] = 1					
+			} else {
+				filters['for_material_receipt'] = 1
+			}			
 			return {
-				filters: {
-					for_material_issue: frm.doc.purpose === "Material Issue",
-					for_material_receipt: frm.doc.purpose === "Material Receipt"					
-				}
+				filters: filters
 			}
 		});
 	},
@@ -45,3 +48,22 @@ frappe.ui.form.on('Stock Entry', {
         }  
     }
 })
+
+// frappe.call({
+// 	method: "frappe.client.get_list",
+// 	args: {
+// 		doctype: "Item Customer Detail",
+// 		filters: {'customer_name':frm.doc.customer,
+// 				  'ref_code': row.customer_item_code
+// 				 },
+// 		fields: ["parent as item_code"],
+// 		parent:'Item',
+// 		parent_doctype:'Item'
+// 	},
+// })
+// .then((r) => {
+// 	if (r.message) {
+// 		frappe.model.set_value(cdt, cdn, 'item_code', r.message[0].item_code);
+// 	}
+// });
+// }

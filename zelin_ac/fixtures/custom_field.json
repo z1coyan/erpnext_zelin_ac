@@ -85,15 +85,5 @@
     "label": "Actual Tax Amount",
     "modified": "2023-12-30 22:18:02.049025",
     "name": "Sales Taxes and Charges-actual_tax_amount"
-   },
-   {
-    "doctype": "Custom Field",
-    "dt": "Delivery Note Item",
-    "fieldname": "po_no",
-    "fieldtype": "Data",
-    "insert_after": "customer_item_code",
-    "label": "Customer's Purchase Order",
-    "modified": "2024-04-30 22:18:02.049025",
-    "name": "Delivery Note Item-po_no"
    }
 ]

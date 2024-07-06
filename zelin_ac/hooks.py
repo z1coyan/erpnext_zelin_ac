@@ -58,7 +58,8 @@ override_doctype_class = {
 	"Purchase Invoice": "zelin_ac.overrides.CustomPurchaseInvoice",
 	"Stock Entry": "zelin_ac.overrides.CustomStockEntry",
 	"Delivery Note": "zelin_ac.overrides.CustomDeliveryNote",
-	"Sales Invoice": "zelin_ac.overrides.CustomSalesInvoice"
+	"Sales Invoice": "zelin_ac.overrides.CustomSalesInvoice",
+	"Payment Entry": "zelin_ac.overrides.CustomPaymentEntry"
 }
 
 override_whitelisted_methods = {

@@ -8,31 +8,12 @@ from frappe.query_builder import Interval
 from frappe.www.printview import get_html_and_style as original_get_html_and_style
 from erpnext.accounts.doctype.purchase_invoice.purchase_invoice import PurchaseInvoice
 from erpnext.accounts.doctype.sales_invoice.sales_invoice import SalesInvoice
-from erpnext.accounts.doctype.payment_entry.payment_entry import PaymentEntry
 from erpnext.stock.doctype.stock_entry.stock_entry import StockEntry
 from erpnext.stock.doctype.delivery_note.delivery_note import DeliveryNote
 from erpnext.stock.doctype.delivery_note.delivery_note import update_billed_amount_based_on_so
 from erpnext.accounts.general_ledger import get_round_off_account_and_cost_center
 from zelin_ac.api import get_cached_value
 
-
-class CustomPaymentEntry(PaymentEntry):
-	def validate_allocated_amount(self):
-		if self.payment_type == "Internal Transfer":
-			return
-
-		if self.party_type in ("Customer", "Supplier"):
-			self.validate_allocated_amount_with_latest_data()
-		else:
-			fail_message = _("Row #{0}: Allocated Amount cannot be greater than outstanding amount.")
-			for d in self.get("references"):
-                # flt加精度参数，以避免像142.73已分配金额(内部值可能是142.73000000001)，报错分配金额不能大于未付金额
-				if (flt(d.allocated_amount)) > 0 and flt(d.allocated_amount, 3) > flt(d.outstanding_amount, 3):
-					frappe.throw(fail_message.format(d.idx))
-
-				# Check for negative outstanding invoices as well
-				if flt(d.allocated_amount) < 0 and flt(d.allocated_amount) < flt(d.outstanding_amount):
-					frappe.throw(fail_message.format(d.idx))
 
 class CustomPurchaseInvoice(PurchaseInvoice):
     def get_gl_entries(self, warehouse_account=None):

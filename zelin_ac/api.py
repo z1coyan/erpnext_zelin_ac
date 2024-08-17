@@ -116,6 +116,10 @@ def recognize_invoice(doc):
     doc.expenses = []
     for file in files:
         try:
+            if file.file_url[-4:].lower() not in ['.pdf','.jpg','.png']:
+                msg.append(f"{file.file_url} 只支持识别.pdf,.jpg,.png后缀的文件")
+                continue
+
             recognized_invoice_name = recognized_invoice_map.get(file.content_hash)
             if recognized_invoice_name:
                 invoice_recognition_doc = frappe.get_doc('Invoice Recognition', recognized_invoice_name)                

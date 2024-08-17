@@ -88,7 +88,11 @@ class InvoiceRecognition(Document):
 		
 		if self.data and not re_recognize:
 			return
+		suffix = self.attach[-4:].lower()
+		if suffix not in ['.pdf','.jpg','.png']:
+			frappe.throw("只支持识别.pdf,.jpg,.png后缀的文件")
 
+			return
 		if re_recognize or not self.is_same_file_recognized():
 			return self.recognize_invoice()	
 

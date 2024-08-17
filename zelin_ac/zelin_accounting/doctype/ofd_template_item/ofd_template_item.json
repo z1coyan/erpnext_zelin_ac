@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-08 15:55:53.913005",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "account",
+  "party_type",
+  "party",
+  "user_remark",
+  "column_break_krbs",
+  "debit_in_account_currency",
+  "credit_in_account_currency",
+  "exchange_rate"
+ ],
+ "fields": [
+  {
+   "fieldname": "party",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Party",
+   "length": 500
+  },
+  {
+   "description": "\u652f\u6301\u9009\u62e9\u79d1\u76ee\uff0c\u4e5f\u652f\u6301\u7c7b\u578b{{doc.xxx}}\u8fd9\u6837\u7684jinja\u8868\u8fbe\u5f0f",
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "party_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Party Type",
+   "length": 500
+  },
+  {
+   "fieldname": "debit_in_account_currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Debit",
+   "length": 500
+  },
+  {
+   "fieldname": "credit_in_account_currency",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Credit",
+   "length": 500
+  },
+  {
+   "fieldname": "user_remark",
+   "fieldtype": "Data",
+   "label": "Remark",
+   "length": 500
+  },
+  {
+   "fieldname": "column_break_krbs",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "exchange_rate",
+   "fieldtype": "Data",
+   "label": "Exchange Rate"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2024-08-13 22:12:47.791122",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "OFD Template Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,5 +1,6 @@
 import frappe
 from frappe import _
+from frappe.utils import today
 from zelin_ac.api import get_cached_value
 
 def stock_entry_validate(doc, method):
@@ -130,6 +131,22 @@ def purchase_invoice_submit(doc, method):
             pr_adjusted.add(pr_docname)
     items = [row for row in pr_details if not row.pr_docname in pr_adjusted]
     create_repack_stock_entry(doc.company, doc.name, items)
+
+def file_after_insert(doc, method):
+    """
+    将上传的多个ofd文件拆分到多个上传ofd单据中，分别创建日记账凭证
+    """
+
+    doctype = doc.attached_to_doctype
+    if doctype and doctype in ('Import OFD', 'Invoice Recognition') and not doc.attached_to_field:        
+        parsed_doc = frappe.get_doc({'doctype':doctype, 'attach': doc.file_url}).insert(ignore_permissions=1)        
+        frappe.db.set_value('File', doc.name, 'attached_to_name', parsed_doc.name)            
+
+def file_on_trash(doc, method):
+
+    doctype, docname = doc.attached_to_doctype, doc.attached_to_name
+    if doctype and docname and frappe.db.get_value(doctype, docname, 'docstatus') == 1:
+        frappe.throw("不允许删除已提交单据的附件")
 
 def get_item_wh_qty_map(item_wh_tuple):
     from pypika.terms import Tuple
@@ -286,3 +303,17 @@ def set_manufacture_production_cost_account(doc):
                     row.expense_account = production_output_account
                 elif row.s_warehouse and production_input_account:
                     row.expense_account = production_input_account
+
+def validate_invoice_status(doc, method=None):
+    if doc.docstatus == 1:
+        for d in doc.expenses:
+            if d.invoice_recognition:
+                ir = frappe.get_doc('Invoice Recognition', d.invoice_recognition)
+                ir.db_set('status','Used')
+    elif doc.docstatus == 2:
+        for d in doc.expenses:
+            if d.invoice_recognition:
+                ir = frappe.get_doc('Invoice Recognition', d.invoice_recognition)
+                ir.db_set('status','Recognized')
+    else:
+        frappe.log_error('发票状态不详')

@@ -1,0 +1,113 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2024-08-08 15:44:42.533011",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "attach",
+  "ofd_template",
+  "column_break_gvch",
+  "journal_entry",
+  "message",
+  "section_break_hvye",
+  "contents"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_gvch",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "message",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Message",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_hvye",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "ofd_template",
+   "fieldtype": "Link",
+   "label": "OFD Template",
+   "no_copy": 1,
+   "options": "OFD Template",
+   "read_only": 1
+  },
+  {
+   "fieldname": "contents",
+   "fieldtype": "Table",
+   "label": "Contents",
+   "no_copy": 1,
+   "options": "Import OFD Content",
+   "read_only": 1
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "no_copy": 1,
+   "options": "Journal Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attach",
+   "fieldtype": "Attach",
+   "label": "Upload OFD File",
+   "no_copy": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-15 15:26:22.058447",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Import OFD",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

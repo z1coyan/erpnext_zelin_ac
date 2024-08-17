@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"27aE6qMRNU\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">\u8d22\u52a1\u62a5\u8868</span>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}},{\"id\":\"kU2hbVZnEf\",\"type\":\"card\",\"data\":{\"card_name\":\"\u6708\u7ed3\",\"col\":4}}]",
+ "content": "[{\"id\":\"bmuFRLOujE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>\u5feb\u6377\u65b9\u5f0f</b></span>\",\"col\":12}},{\"id\":\"iwalCCeDwJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Invoice Recognition\",\"col\":3}},{\"id\":\"DWp8EGe_KL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Import OFD\",\"col\":3}},{\"id\":\"xc4AQjjzJL\",\"type\":\"header\",\"data\":{\"text\":\"<b>\u4e3b\u6570\u636e\u3001\u4e1a\u52a1\u4ea4\u6613\u3001\u62a5\u8868</b><br>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}},{\"id\":\"kU2hbVZnEf\",\"type\":\"card\",\"data\":{\"card_name\":\"\u6708\u7ed3\",\"col\":4}}]",
  "creation": "2023-12-08 10:37:07.389424",
  "custom_blocks": [],
  "docstatus": 0,
@@ -38,94 +38,6 @@
    "label": "Cash Flow",
    "link_count": 0,
    "link_to": "Cash Flow",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u8bbe\u7f6e",
-   "link_count": 5,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u8d44\u4ea7\u8d1f\u503a\u8868\uff08\u4e24\u680f\u5f0f\uff09\u8bbe\u7f6e",
-   "link_count": 0,
-   "link_to": "Balance Sheet Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u5229\u6da6\u8868\u8bbe\u7f6e",
-   "link_count": 0,
-   "link_to": "Profit and Loss Statement Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u73b0\u91d1\u6d41\u7f16\u7801",
-   "link_count": 0,
-   "link_to": "Cash Flow Code",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u7269\u6599\u79fb\u52a8\u539f\u56e0\u4ee3\u7801",
-   "link_count": 0,
-   "link_to": "Material Move Reason Code",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Zelin Accounting Settings",
-   "link_count": 0,
-   "link_to": "Zelin Accounting Settings",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u6708\u7ed3",
-   "link_count": 2,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "\u5236\u9020\u8d39\u7528\u5dee\u5f02\u7ed3\u7b97",
-   "link_count": 0,
-   "link_to": "Order Settlement",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Month End Tracking",
-   "link_count": 0,
-   "link_to": "Month End Tracking",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -188,10 +100,118 @@
    "link_type": "Report",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u8bbe\u7f6e",
+   "link_count": 7,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u8d44\u4ea7\u8d1f\u503a\u8868\uff08\u4e24\u680f\u5f0f\uff09\u8bbe\u7f6e",
+   "link_count": 0,
+   "link_to": "Balance Sheet Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u5229\u6da6\u8868\u8bbe\u7f6e",
+   "link_count": 0,
+   "link_to": "Profit and Loss Statement Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u73b0\u91d1\u6d41\u7f16\u7801",
+   "link_count": 0,
+   "link_to": "Cash Flow Code",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u7269\u6599\u79fb\u52a8\u539f\u56e0\u4ee3\u7801",
+   "link_count": 0,
+   "link_to": "Material Move Reason Code",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u4e2d\u56fd\u4f1a\u8ba1\u8bbe\u7f6e",
+   "link_count": 0,
+   "link_to": "Zelin Accounting Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "ofd\u6a21\u677f",
+   "link_count": 0,
+   "link_to": "OFD Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Baidu Interface Setting",
+   "link_count": 0,
+   "link_to": "Baidu Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u6708\u7ed3",
+   "link_count": 2,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u5236\u9020\u8d39\u7528\u5dee\u5f02\u7ed3\u7b97",
+   "link_count": 0,
+   "link_to": "Order Settlement",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "\u8d22\u52a1\u7ed3\u8d26",
+   "link_count": 0,
+   "link_to": "Month End Tracking",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-06-09 10:56:39.590747",
- "modified_by": "Administrator",
+ "modified": "2024-08-15 14:28:45.248155",
+ "modified_by": "fisher@abc.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",
  "number_cards": [],
@@ -201,6 +221,23 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 2.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Invoice Recognition",
+   "link_to": "Invoice Recognition",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "Import OFD",
+   "link_to": "Import OFD",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
  "title": "Zelin Accounting"
 }

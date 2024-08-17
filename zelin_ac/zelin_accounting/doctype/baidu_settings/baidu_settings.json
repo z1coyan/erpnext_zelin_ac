@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-05-02 13:11:32.805885",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "appid",
+  "api_key",
+  "secret_key",
+  "column_break_mvkv",
+  "limit_per_user",
+  "limit_per_day",
+  "overall_limit",
+  "call_count",
+  "section_break_dxva",
+  "access_token"
+ ],
+ "fields": [
+  {
+   "description": "\u767e\u5ea6\u667a\u80fd\u4e91-\u6587\u5b57\u8bc6\u522b-\u667a\u80fd\u8d22\u52a1\u7968\u636e\u8bc6\u522b",
+   "fieldname": "appid",
+   "fieldtype": "Data",
+   "label": "AppID"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Data",
+   "label": "API Key"
+  },
+  {
+   "fieldname": "secret_key",
+   "fieldtype": "Password",
+   "label": "Secret Key"
+  },
+  {
+   "fieldname": "section_break_dxva",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Access Token"
+  },
+  {
+   "fieldname": "column_break_mvkv",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "limit_per_user",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Limit Per User"
+  },
+  {
+   "fieldname": "limit_per_day",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Limit Per Day"
+  },
+  {
+   "fieldname": "overall_limit",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Overall Limit"
+  },
+  {
+   "bold": 1,
+   "fieldname": "call_count",
+   "fieldtype": "Int",
+   "hidden": 1,
+   "label": "Call Count",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2024-08-16 11:56:54.157864",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Baidu Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

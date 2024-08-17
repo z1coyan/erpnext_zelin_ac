@@ -15,6 +15,9 @@ fixtures = [
     }
 ]
 
+after_install = "zelin_ac.install.make_custom_fields"
+before_uninstall = "zelin_ac.install.delete_custom_fields"
+
 doctype_list_js = {
 	"Delivery Note" : "public/js/delivery_note.js"	
 }
@@ -25,6 +28,7 @@ doctype_js = {
 	"Material Request" : "public/js/material_request.js",
 	"Account" : "public/js/account.js",
 	"Sales Invoice" : "public/js/sales_invoice.js",
+	"Expense Claim" : "public/js/expense_claim.js",
 }
 
 doc_events = {
@@ -51,6 +55,19 @@ doc_events = {
 	},
 	"Item Price": {
  		"validate": "zelin_ac.doc_events.item_price_validate"
+	},
+	"File": {
+ 		"after_insert": "zelin_ac.doc_events.file_after_insert",
+		"on_trash": "zelin_ac.doc_events.file_on_trash"
+
+	},
+	"Expense Claim": {
+		"on_submit": [
+			"zelin_ac.doc_events.validate_invoice_status",
+			],
+		"on_cancel": [
+			"zelin_ac.doc_events.validate_invoice_status",
+			],
 	},
 }
 

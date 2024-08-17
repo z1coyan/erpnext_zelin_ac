@@ -1,0 +1,149 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-08-08 15:59:24.314499",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "template_code",
+  "column_break_utmx",
+  "template_name",
+  "section_break_samy",
+  "company",
+  "entry_type",
+  "posting_date",
+  "multi_currency",
+  "column_break_znat",
+  "cheque_no",
+  "cheque_date",
+  "section_break_zoig",
+  "match_condition",
+  "section_break_gled",
+  "accounts"
+ ],
+ "fields": [
+  {
+   "fieldname": "column_break_utmx",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name"
+  },
+  {
+   "fieldname": "section_break_zoig",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "match_condition",
+   "fieldtype": "Code",
+   "label": "Match Condition"
+  },
+  {
+   "fieldname": "section_break_gled",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "template_code",
+   "fieldtype": "Data",
+   "label": "Template Code"
+  },
+  {
+   "fieldname": "entry_type",
+   "fieldtype": "Data",
+   "label": "Entry Type"
+  },
+  {
+   "fieldname": "posting_date",
+   "fieldtype": "Data",
+   "label": "Posting Date"
+  },
+  {
+   "fieldname": "accounts",
+   "fieldtype": "Table",
+   "label": "Accounting Entries",
+   "options": "OFD Template Item"
+  },
+  {
+   "fieldname": "cheque_no",
+   "fieldtype": "Data",
+   "label": "Reference Number"
+  },
+  {
+   "fieldname": "cheque_date",
+   "fieldtype": "Data",
+   "label": "Reference Date"
+  },
+  {
+   "fieldname": "section_break_samy",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "column_break_znat",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "multi_currency",
+   "fieldtype": "Check",
+   "label": "Multi Currency"
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2024-08-13 14:59:13.557080",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "OFD Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "template_name"
+}

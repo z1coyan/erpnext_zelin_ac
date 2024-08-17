@@ -110,3 +110,28 @@ Purchase receipt not assigned,发票未关联入库
 No purchase invoice,无采购发票
 No purchase receipt,无采购入库
 PR and PI not match,入库与发票记账金额不匹配
+Enable Debug Repost Item Valuation,启用物料成本价追溯调整调试功能
+Import OFD,上传ofd
+OFD Template,ofd模板
+Contents,文件内容
+Upload OFD File,上传ofd文件
+Field Value,字段值
+Template Code,模板代码
+Match Condition,匹配条件
+Invoice Recognition,发票识别
+Tax Amount,税额
+Model Type,规格型号
+Invoice Type Org,发票种类
+Invoice Code,发票代码
+Invoice Num,发票号码
+Baidu Interface Setting,百度智能云接口设置
+Rerecognize,重新识别
+Make Expense Claim,创建费用报销
+Preview Invoice,预览发票
+Get Invoice Recognition,获取已识别发票
+Recognized,已识别
+Invoice Info,发票信息
+Total Recognized Amount,总已识别金额
+Recognize Invoice,识别发票填明细
+Default Expense Type,默认报销类型
+Recognize Failed,识别异常

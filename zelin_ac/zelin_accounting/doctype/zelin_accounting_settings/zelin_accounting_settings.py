@@ -134,7 +134,51 @@ custom_fields = {
 			"modified": "2024-05-19 22:18:02.049025",
 			"name": "Stock Entry Detail-flagged_additional_cost"
 		}
+	],
+	'enable_debug_repost_item_valuation':[
+		{
+			"doctype": "Custom Field",
+			"dt": "Repost Item Valuation",
+			"fieldname": "custom_items_to_be_repost",
+			"fieldtype": "Code",
+			"insert_after": "affected_transactions",
+			"depends_on": "eval:frappe.session.user == 'Administrator' || frappe.user.has_role('System Manager')",
+			"label": "Items to Be Repost",
+			"no_copy": 1,
+			"print_hide": 1,
+			"read_only": 1,
+			"modified": "2024-07-18 22:18:02.049025",
+			"name": "Repost Item Valuation-custom_items_to_be_repost"
+		},
+		{
+			"doctype": "Custom Field",
+			"dt": "Repost Item Valuation",
+			"fieldname": "custom_distinct_item_and_warehouse",
+			"fieldtype": "Code",
+			"insert_after": "custom_items_to_be_repost",
+			"depends_on": "eval:frappe.session.user == 'Administrator' || frappe.user.has_role('System Manager')",
+			"label": "Distinct Item and Warehouse",
+			"no_copy": 1,
+			"print_hide": 1,
+			"read_only": 1,
+			"modified": "2024-07-18 22:18:02.049025",
+			"name": "Repost Item Valuation-custom_distinct_item_and_warehouse"
+		},		
+		{
+			"doctype": "Custom Field",
+			"dt": "Repost Item Valuation",
+			"fieldname": "custom_affected_transactions",
+			"fieldtype": "Code",
+			"insert_after": "custom_distinct_item_and_warehouse",
+			"depends_on": "eval:frappe.session.user == 'Administrator' || frappe.user.has_role('System Manager')",
+			"label": "Affected Transactions",
+			"no_copy": 1,
+			"read_only": 1,
+			"modified": "2024-07-18 22:18:02.049025",
+			"name": "Repost Item Valuation-custom_affected_transactions"
+		}
 	]
+
 }
 
 class ZelinAccountingSettings(Document):

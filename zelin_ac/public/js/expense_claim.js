@@ -37,11 +37,11 @@ frappe.ui.form.on('Expense Claim',{
 	},
 
 	onload_post_render(frm){
-		const btn_field = frm.get_field('custom_recognize_invoice')
+		const btn_field = frm.get_field('recognize_invoice')
 		btn_field && btn_field.$input && btn_field.$input.addClass('btn-primary');		
 	},
 		
-	custom_recognize_invoice: function(frm) {
+	recognize_invoice: function(frm) {
 		frappe.call({
 			method: "zelin_ac.api.recognize_invoice",
 			freeze: true,
@@ -50,7 +50,7 @@ frappe.ui.form.on('Expense Claim',{
 			callback: function(r) {
 				frappe.model.sync(r.message);
 				refresh_field("expenses");
-				refresh_field("custom_total_recognized_amount");
+				refresh_field("total_recognized_amount");
 				frm.dirty();
 			}
 		})

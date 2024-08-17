@@ -158,7 +158,7 @@ def recognize_invoice(doc):
         except:
             traceback = frappe.get_traceback(with_context=True)
             frappe.log_error("Failed Invoice Recognition for Expense Claim ", traceback)            
-    doc.custom_total_recognized_amount = total_recognized_amount
+    doc.total_recognized_amount = total_recognized_amount
     if msg:
         msg = "\n".join(msg)
         doc.add_comment("Comment", msg)

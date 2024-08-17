@@ -42,14 +42,14 @@ def make_custom_fields():
 						"fieldname": "default_expense_type",
 						"fieldtype": "Link",
 						"label": "Default Expense Type",
-						"options":"Expense Type",						
+						"options":"Expense Claim Type",						
 						"insert_after": "approval_status",
 					},
 					{
 						"fieldname": "recognize_invoice",
 						"fieldtype": "Button",
 						"label": "Recognize Invoice",
-						"depends_on": "eval:(!doc.__islocal && (!doc.expenses || doc.expenses.length===0))"					
+						"depends_on": "eval:(!doc.__islocal && (!doc.expenses || doc.expenses.length===0))",					
 						"insert_after": "expense_details",
 					},					
 					{
@@ -62,8 +62,6 @@ def make_custom_fields():
 					}
 				]
 			}
-
-			total_claimed_amount
 		)
 		make_property_setter("Expense Claim", "expenses", "reqd", 0, "Check", validate_fields_for_doctype=False)
 		frappe.clear_cache(doctype="Expense Claim")

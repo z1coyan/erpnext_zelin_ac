@@ -137,7 +137,7 @@ def recognize_invoice(doc):
                 inv_rec_doc = frappe.get_doc(
                     {
                         'doctype': 'Invoice Recognition',
-                        'invoice_type': 'Expense Claim',
+                        'invoice_category': 'Expense Claim',
                         'employee': doc.employee,
                         'attach': file.file_url
                     }
@@ -157,7 +157,7 @@ def recognize_invoice(doc):
                     "invoice_recognition": inv_rec_doc.name,
                     "cost_center": doc.cost_center,
                     "invoice_num": inv_rec_doc.invoice_num or inv_rec_doc.invoice_code,
-                    "tax_amount": inv_rec_doc.tax_amount if inv_rec_doc.invoice_type_org == "电子发票(专用发票)" else 0,
+                    "tax_amount": inv_rec_doc.tax_amount if inv_rec_doc.invoice_type == "电子发票(专用发票)" else 0,
                     "default_account":account,
                 }
             )

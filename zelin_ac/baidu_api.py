@@ -5,6 +5,35 @@ import json
 import frappe
 import mimetypes
 
+
+invoice_type_map ={
+	'电子发票(专用发票)':'elec_special_vat_invoice'
+}
+
+@frappe.whitelist()
+def vat_invoice_verification(doc):
+	'''OCR-增值税发票验真'''
+
+	baidu_settings = frappe.get_single('Baidu Settings')
+	API_KEY = baidu_settings.api_key
+	SECRET_KEY = baidu_settings.get_password(fieldname="secret_key", raise_exception=False)
+	access_token = get_baidu_access_token(API_KEY, SECRET_KEY)
+	if not access_token:
+		frappe.throw('获取百度智能云接口API access_token失败，请联系系统管理员')
+		return
+	
+	url = "https://aip.baidubce.com/rest/2.0/ocr/v1/vat_invoice_verification?access_token=" + access_token
+	params = {f:doc.get(f) for f in 
+		["check_code","invoice_code","invoice_date","invoice_num","invoice_type","total_amount"] if doc.get(f)}
+	invoice_type = params['invoice_type']
+	params['invoice_type'] = invoice_type_map.get(invoice_type, invoice_type)
+	params['invoice_date'] = ''.join(params['invoice_date'].replace('年', '').replace('月', '').replace('日', '')) 
+	#params = {"check_code":"校验码。填写发票校验码后6位","invoice_code":"发票代码","invoice_date":"开票日期","invoice_num":"发票号码","invoice_type":"发票类型","total_amount":"不含税金额"}	
+	headers = {'content-type': 'application/x-www-form-urlencoded'}
+	response = requests.post(url, data=params, headers=headers)
+	if response:
+		print (response.json())
+
 @frappe.whitelist()
 def get_invoice_info(file_url):
 	from cloud_storage.cloud_storage.overrides.file import get_file_stream

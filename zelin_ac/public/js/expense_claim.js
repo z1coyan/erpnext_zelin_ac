@@ -170,8 +170,8 @@ frappe.ui.form.on('Expense Claim',{
 								columns:1
 							}, {
 								fieldtype: 'Data',
-								fieldname: 'invoice_type_org',
-								label: __('Invoice Type Org'),
+								fieldname: 'invoice_type',
+								label: __('Invoice Type'),
 								"width": 1,
 								"read_only": 1,
 								in_list_view: 1,

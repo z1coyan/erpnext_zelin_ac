@@ -128,7 +128,7 @@ class InvoiceRecognition(Document):
 		header_field_mapping = {  
 			'company': 'PurchaserName',  
 			'party': 'SellerName',  
-			'invoice_type_org': ['InvoiceType', 'InvoiceTypeOrg'],  
+			'invoice_type': ['InvoiceType', 'InvoiceTypeOrg'],  
 			'invoice_num': 'InvoiceNum',  
 			'invoice_date': ['InvoiceDate','Date'],  
 			'invoice_code': 'InvoiceCode',  
@@ -146,9 +146,9 @@ class InvoiceRecognition(Document):
 
 			if info.InvoiceType:
 				# 纸质加油发票可能的结果
-				self.invoice_type_org = info.InvoiceType[0].get('word')
+				self.invoice_type = info.InvoiceType[0].get('word')
 			elif info.InvoiceTypeOrg:
-				self.invoice_type_org = info.InvoiceTypeOrg[0].get('word')
+				self.invoice_type = info.InvoiceTypeOrg[0].get('word')
 
 			self.invoice_num = info.InvoiceNum[0].get('word')
 			if info.InvoiceDate:
@@ -162,6 +162,7 @@ class InvoiceRecognition(Document):
 
 			self.grand_total = info.AmountInFiguers[0].get('word')
 			self.total_tax = info.TotalTax[0].get('word')
+			self.total_amount = extract_amount(get_field_value('TotalAmount', default=0))
 		
 		row_field_mapping = {  
 			'item_name': 'CommodityName',    
@@ -231,7 +232,7 @@ class InvoiceRecognition(Document):
 			if info.invoice_rate_in_figure:
 				self.grand_total = info.invoice_rate_in_figure[0].get('word')
 			if info.invoice_type:
-				self.invoice_type_org = info.invoice_type[0].get('word')
+				self.invoice_type = info.invoice_type[0].get('word')
 			if info.invoice_code:
 				self.invoice_num = info.invoice_code[0].get('word')
 
@@ -395,7 +396,7 @@ def make_expense_claim(args):
 					"amount": doc.grand_total,
 					"invoice_recognition": doc.name,
 					"invoice_num": doc.invoice_num or doc.invoice_code,
-                    "tax_amount": doc.tax_amount if doc.invoice_type_org == "电子发票(专用发票)" else 0,
+                    "tax_amount": doc.tax_amount if doc.invoice_type == "电子发票(专用发票)" else 0,
 					"cost_center": default_cost_center,
 					"default_account":account,
 				},
@@ -447,7 +448,7 @@ def make_expense_claim(args):
 						"amount": ir.get('grand_total'),
 						"invoice_recognition": ir.get('name'),
                     	"invoice_num": ir.get('invoice_num') or ir.get('invoice_code'),
-                    	"tax_amount": ir.get('tax_amount') if ir.get('invoice_type_org') == "电子发票(专用发票)" else 0,
+                    	"tax_amount": ir.get('tax_amount') if ir.get('invoice_type') == "电子发票(专用发票)" else 0,
 						"cost_center": default_cost_center,
 						"default_account":account,
 					}
@@ -481,7 +482,7 @@ def get_invoice_recognition(company, employee, project=None):
 		(detail.invoice_recognition == inv_rec.name) &
 		(detail.docstatus<2)
 	).select(inv_rec.name, inv_rec.invoice_date, inv_rec.party, inv_rec.expense_type,
-		inv_rec.invoice_type_org, inv_rec.invoice_code, inv_rec.invoice_num, inv_rec.total_tax,
+		inv_rec.invoice_type, inv_rec.invoice_code, inv_rec.invoice_num, inv_rec.total_tax,
 		inv_rec.grand_total, inv_rec.attach, inv_rec.project, inv_rec.company, inv_rec.employee
 	).where(
 		(inv_rec.company == company) &

@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_hbrr",
-  "invoice_type",
+  "invoice_category",
   "employee",
   "attach",
   "column_break_bnep",
@@ -16,22 +16,25 @@
   "invoice_date",
   "column_break_ayxq",
   "company",
+  "project",
   "reference_doctype",
   "reference_name",
   "section_break_fwss",
   "party",
-  "invoice_type_org",
+  "invoice_type",
   "column_break_okas",
   "expense_type",
   "invoice_code",
   "column_break_rkgm",
-  "project",
   "invoice_num",
+  "check_code",
   "section_break_cude",
   "items",
   "section_break_rflr",
-  "total_tax",
+  "total_amount",
   "column_break_plsr",
+  "total_tax",
+  "column_break_ozcb",
   "grand_total",
   "section_break_xlph",
   "preview_html",
@@ -46,13 +49,13 @@
    "label": "Basic Info"
   },
   {
-   "default": "Expense Claim",
    "fieldname": "invoice_type",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Invoice Type",
-   "options": "Expense Claim\nPurchase Invoice\nPayment Request"
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "reference_doctype",
@@ -118,15 +121,6 @@
    "fieldtype": "Section Break",
    "label": "Invoice Info",
    "no_copy": 1
-  },
-  {
-   "fieldname": "invoice_type_org",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "in_standard_filter": 1,
-   "label": "Invoice Type Org",
-   "no_copy": 1,
-   "read_only": 1
   },
   {
    "fieldname": "invoice_num",
@@ -223,17 +217,17 @@
   {
    "allow_on_submit": 1,
    "default": "Food",
-   "depends_on": "eval:doc.invoice_type == \"Expense Claim\" && doc.attach",
+   "depends_on": "eval:doc.invoice_category == \"Expense Claim\" && doc.attach",
    "fieldname": "expense_type",
    "fieldtype": "Link",
    "label": "Expense Type",
-   "mandatory_depends_on": "eval:doc.invoice_type == \"Expense Claim\" && doc.attach",
+   "mandatory_depends_on": "eval:doc.invoice_category == \"Expense Claim\" && doc.attach",
    "no_copy": 1,
    "options": "Expense Claim Type"
   },
   {
    "allow_on_submit": 1,
-   "depends_on": "eval:doc.invoice_type == \"Expense Claim\" && doc.attach",
+   "depends_on": "eval:doc.invoice_category == \"Expense Claim\" && doc.attach",
    "fieldname": "project",
    "fieldtype": "Link",
    "label": "Project",
@@ -261,12 +255,35 @@
    "length": 200,
    "no_copy": 1,
    "read_only": 1
+  },
+  {
+   "default": "Expense Claim",
+   "fieldname": "invoice_category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Invoice Category",
+   "options": "Expense Claim\nPurchase Invoice\nPayment Request"
+  },
+  {
+   "fieldname": "check_code",
+   "fieldtype": "Data",
+   "label": "Check Code"
+  },
+  {
+   "fieldname": "total_amount",
+   "fieldtype": "Float",
+   "label": "Total Amount"
+  },
+  {
+   "fieldname": "column_break_ozcb",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-08-19 18:32:37.822873",
+ "modified": "2024-08-20 12:26:04.779806",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Invoice Recognition",
@@ -318,7 +335,7 @@
    "write": 1
   }
  ],
- "search_fields": "party,grand_total,invoice_type_org",
+ "search_fields": "party,grand_total,invoice_type",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

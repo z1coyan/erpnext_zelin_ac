@@ -5,7 +5,7 @@ import frappe
 import re
 from frappe.utils import flt
 from frappe.model.document import Document
-from zelin_ac.utils import get_ofd_xml
+from zelin_ac.utils import get_ofd_xml, extract_amount
 
 
 class ImportOFD(Document):
@@ -106,14 +106,6 @@ class ImportOFD(Document):
 					'attached_to_name': je_doc.name
 				}).insert(ignore_permissions=1)
 				self.message = f'日记账凭证 {self.journal_entry} 创建成功'
-
-def extract_amount(s):      
-    # 使用正则表达式匹配字符串中的数字部分，包括小数点和小数部分 \d+ 表示一个或多个数字  
-    # (?:\.\d+)? 表示非捕获组，匹配小数点后跟一个或多个数字，但整个组不包含在最终的匹配结果中，且该部分是可选的  
-    # ^[^0-9]*(?P<amount>\d+(?:,\d+)*(?:\.\d+)?) 匹配不以数字开头的任意字符（包括空字符串），然后捕获数字部分  
-    # 注意：这里假设货币金额中的千分位分隔符是逗号，如果不是，请相应修改正则表达式  
-    match = re.match(r'^[^0-9]*(?P<amount>\d+(?:,\d+)*(?:\.\d+)?)', s)           
-    return match.group('amount').replace(',', '') if match  else ""
 
 def auto_round_off_account(doc):
 	"""

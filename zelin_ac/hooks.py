@@ -68,6 +68,7 @@ doc_events = {
 		"on_cancel": [
 			"zelin_ac.doc_events.validate_invoice_status",
 			],
+		"before_submit":"zelin_ac.doc_events.expense_claim_before_submit",
 	},
 }
 

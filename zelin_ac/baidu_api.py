@@ -7,6 +7,7 @@ import mimetypes
 
 @frappe.whitelist()
 def get_invoice_info(file_url):
+	from cloud_storage.cloud_storage.overrides.file import get_file_stream
 
 	file_type = mimetypes.guess_type(file_url)[0]
 
@@ -23,16 +24,28 @@ def get_invoice_info(file_url):
 	if not access_token:
 		frappe.throw('获取百度智能云接口API access_token失败，请联系系统管理员')
 		return
-
-	payload= file_type +  file_to_base64_and_urlencode('./' + frappe.local.site + file_url) +'&verify_parameter=false&probability=false&location=false'
+	
 	url = "https://aip.baidubce.com/rest/2.0/ocr/v1/multiple_invoice?access_token=" + access_token
 
-	headers = {
-		'Content-Type': 'application/x-www-form-urlencoded',
-		'Accept': 'application/json'
-	}
-
-	response = requests.request("POST", url, headers=headers, data=payload)
+	#将了cloud_storage后，file_url长这样 /api/method/retrieve?key=erpnext/Item/A/上传.pdf	
+	if file_url[:5] == '/api/':
+		headers = {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/json'
+		}
+		file_name, s3_key = frappe.db.get_value('File', {'file_url': file_url}, ['file_name','s3_key'])
+		file_stream = get_file_stream(s3_key)
+		params = {"image":file_stream}
+		file_type='image' if file_type == 'image=' else 'pdf'
+		files = {file_type: (file_name or file_url, file_stream, mimetypes.guess_type(file_url)[0])}  # 注意：这里的'filename.jpg'是文件名，可以自定义  
+		response = requests.request("POST", url, data=params, headers=headers)
+	else:
+		payload= file_type +  file_to_base64_and_urlencode('./' + frappe.local.site + file_url) +'&verify_parameter=false&probability=false&location=false'
+		headers = {
+			'Content-Type': 'application/x-www-form-urlencoded',
+			'Accept': 'application/json'
+		}
+		response = requests.request("POST", url, headers=headers, data=payload)
 	baidu_settings.call_count = (baidu_settings.call_count or 0) + 1
 	baidu_settings.save(ignore_permissions=1)
 	# print(response.text)

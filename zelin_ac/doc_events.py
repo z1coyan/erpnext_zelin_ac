@@ -136,11 +136,20 @@ def file_after_insert(doc, method):
     """
     将上传的多个ofd文件拆分到多个上传ofd单据中，分别创建日记账凭证
     """
+    from zelin_ac.utils import move_file_to_sub_directory, sanitize_filename
 
     doctype = doc.attached_to_doctype
-    if doctype and doctype in ('Import OFD', 'Invoice Recognition') and not doc.attached_to_field:        
-        parsed_doc = frappe.get_doc({'doctype':doctype, 'attach': doc.file_url}).insert(ignore_permissions=1)        
-        frappe.db.set_value('File', doc.name, 'attached_to_name', parsed_doc.name)            
+    if doctype and doctype in ('Import OFD', 'Invoice Recognition') and not doc.attached_to_field:
+        try:        
+            parsed_doc = frappe.get_doc({'doctype':doctype, 'attach': doc.file_url}).insert(ignore_permissions=1)        
+            frappe.db.set_value('File', doc.name, 'attached_to_name', parsed_doc.name)
+        except:
+            traceback = frappe.get_traceback(with_context=True)
+            frappe.log_error("zelin_ac file_after_insert ", traceback)              
+
+    # if doctype == "Expense Claim":
+    #     move_file_to_sub_directory([doc.attached_to_doctype, doc.attached_to_name], doc)
+        
 
 def file_on_trash(doc, method):
 
@@ -303,6 +312,20 @@ def set_manufacture_production_cost_account(doc):
                     row.expense_account = production_output_account
                 elif row.s_warehouse and production_input_account:
                     row.expense_account = production_input_account
+
+def expense_claim_before_submit(doc, method=None):
+    invoices = [r.invoice_recognition for r in doc.expenses if r.invoice_recognition]
+    if invoices:
+        used_invoices = frappe.get_all('Invoice Recognition',
+            filters={
+                'name':('in', invoices),
+                'status': ('!=', 'Recognized')
+            },
+            fields = ['name','status']
+        )
+        if used_invoices:
+            msg = ','.join(f"{r.name} {_(r.status)}" for r in used_invoices)
+            frappe.throw(f"关联的发票 {msg} 不是要求的已识别状态")
 
 def validate_invoice_status(doc, method=None):
     if doc.docstatus == 1:

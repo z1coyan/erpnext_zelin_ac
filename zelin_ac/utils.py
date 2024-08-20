@@ -2,6 +2,7 @@ import frappe
 import os
 import io
 import json
+import re
 import shutil
 import zipfile
 import xml.etree.ElementTree as ET
@@ -164,3 +165,67 @@ def get_ofd_xml(file_url):
     path =f"{frappe.utils.get_bench_path()}/sites{file_doc.get_full_path()[1:]}"
     with OFDParser(path) as parser:        
         return parser.get_first_xbrl_data_dict()
+
+  
+def move_file_to_sub_directory(directory_parts, file_doc):  
+    """  
+    将文件file_doc由源目录移动到由directory_parts指定的多层目录中。       
+    :param directory_parts: 目录部分的列表，例如['expense_claim', 'ec0001']  
+    :param file_doc: 源文件单据  
+    """
+
+    try:
+        file_path = file_doc.get_full_path()
+        folder = file_doc.folder
+        #globals().update(locals())
+        directory_parts = [sanitize_filename(frappe.scrub(d)) for d in directory_parts]  
+        dir_path_no_slash = os.path.dirname(file_path)  
+        base_dir = dir_path_no_slash + '/' if not dir_path_no_slash.endswith('/') else dir_path_no_slash 
+        target_dir = os.path.join(base_dir, *directory_parts)  
+        target_file_path = os.path.join(target_dir, os.path.basename(file_path))  
+
+        if not os.path.exists(target_dir):  
+            os.makedirs(target_dir)
+
+        for part in directory_parts:
+            previous_folder = folder
+            folder = f"{folder}/{part}"
+            if not frappe.db.exists('File', folder):
+                frappe.get_doc(
+                    {
+                        "doctype": "File",
+                        "folder": previous_folder,
+                        "is_folder": 1,
+                        "is_attachments_folder": 1,
+                         #autoname: parent/file_name, 
+                        "file_name": part, 
+                    }
+                ).insert(ignore_if_duplicate=True)        
+          
+        shutil.move(file_path, target_file_path)
+        #去掉./site_name前缀
+        file_url = target_file_path.replace(frappe.utils.get_site_base_path(),'')
+        frappe.db.set_value('File', file_doc.name, 
+            {
+                'folder': folder,
+                'file_url': file_url
+            }
+        )
+        return target_file_path  
+    except Exception as e:
+        traceback = frappe.get_traceback(with_context=True)
+        frappe.log_error("File move to subfolder error", traceback)            
+        print(f"移动文件时发生错误: {e}")
+
+def sanitize_filename(filename):  
+    special_chars_regex = r'[/\0<>:\*?"\|\\]'  
+    sanitized_filename = re.sub(special_chars_regex, '', filename)  
+    return sanitized_filename 
+
+def extract_amount(s):      
+    # 使用正则表达式匹配字符串中的数字部分，包括小数点和小数部分 \d+ 表示一个或多个数字  
+    # (?:\.\d+)? 表示非捕获组，匹配小数点后跟一个或多个数字，但整个组不包含在最终的匹配结果中，且该部分是可选的  
+    # ^[^0-9]*(?P<amount>\d+(?:,\d+)*(?:\.\d+)?) 匹配不以数字开头的任意字符（包括空字符串），然后捕获数字部分  
+    # 注意：这里假设货币金额中的千分位分隔符是逗号，如果不是，请相应修改正则表达式  
+    match = re.match(r'^[^0-9]*(?P<amount>\d+(?:,\d+)*(?:\.\d+)?)', s)           
+    return frappe.utils.flt(match.group('amount').replace(',', '') if match  else "")        

@@ -20,7 +20,7 @@ def make_custom_fields():
 						"read_only":1,
 						"allow_on_submit":1,
 						"insert_after": "project",
-					},
+					},					
 					{
 						"fieldname": "invoice_recognition",
 						"fieldtype": "Link",
@@ -30,6 +30,20 @@ def make_custom_fields():
 						"allow_on_submit":1,
 						"in_list_view":1,
 						"insert_after": "file_url",
+					},
+					{
+						"fieldname": "invoice_num",
+						"fieldtype": "Data",
+						"label": "Invoice Num",
+						"read_only":1,
+						"insert_after": "invoice_recognition",
+					},
+					{
+						"fieldname": "tax_amount",
+						"fieldtype": "Float",
+						"label": "Tax Amount(Refundable)",
+						"read_only":1,						
+						"insert_after": "invoice_num",
 					}
 				]
 			}
@@ -81,6 +95,8 @@ def delete_custom_fields():
 
 		fieldnames = (
 			"invoice_recognition",
+			"tax_amount",
+			"invoice_num",
 			"file_url"
 		)
 

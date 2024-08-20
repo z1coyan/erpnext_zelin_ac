@@ -122,7 +122,7 @@ def recognize_invoice(doc):
 
             recognized_invoice_name = recognized_invoice_map.get(file.content_hash)
             if recognized_invoice_name:
-                invoice_recognition_doc = frappe.get_doc('Invoice Recognition', recognized_invoice_name)                
+                inv_rec_doc = frappe.get_doc('Invoice Recognition', recognized_invoice_name)                
                 expense_claim = frappe.db.get_value('Expense Claim Detail', 
                     {
                         'invoice_recognition': recognized_invoice_name,
@@ -131,10 +131,10 @@ def recognize_invoice(doc):
                     'parent'
                 )
                 if expense_claim:
-                    msg.append(f'{invoice_recognition_doc.attach} 已被报销单 {expense_claim} 使用过 ')
+                    msg.append(f'{inv_rec_doc.attach} 已被报销单 {expense_claim} 使用过 ')
                     continue
             else:            
-                invoice_recognition_doc = frappe.get_doc(
+                inv_rec_doc = frappe.get_doc(
                     {
                         'doctype': 'Invoice Recognition',
                         'invoice_type': 'Expense Claim',
@@ -142,23 +142,26 @@ def recognize_invoice(doc):
                         'attach': file.file_url
                     }
                 ).insert(ignore_permissions=1)
-            if invoice_recognition_doc.status == 'Recognize Failed' or invoice_recognition_doc.error_message:
-                msg.append(f"{invoice_recognition_doc.name} {invoice_recognition_doc.attach} {invoice_recognition_doc.error_message}")
+            if inv_rec_doc.status == 'Recognize Failed' or inv_rec_doc.error_message:
+                msg.append(f"{inv_rec_doc.name} {inv_rec_doc.attach} {inv_rec_doc.error_message}")
                 continue
 
-            expense_type = invoice_recognition_doc.get('expense_type') or doc.get('default_expense_type')
+            expense_type = inv_rec_doc.get('expense_type') or doc.get('default_expense_type')
             account = get_exp_account(expense_type)
             doc.append("expenses",
                 {
                     "expense_date": today(),
                     "expense_type": expense_type,
-                    "amount": invoice_recognition_doc.grand_total,
-                    "invoice_recognition": invoice_recognition_doc.name,
+                    "amount": inv_rec_doc.grand_total,
+                    "file_url": inv_rec_doc.attach,
+                    "invoice_recognition": inv_rec_doc.name,
                     "cost_center": doc.cost_center,
+                    "invoice_num": inv_rec_doc.invoice_num or inv_rec_doc.invoice_code,
+                    "tax_amount": inv_rec_doc.tax_amount if inv_rec_doc.invoice_type_org == "电子发票(专用发票)" else 0,
                     "default_account":account,
                 }
             )
-            total_recognized_amount += flt(invoice_recognition_doc.grand_total)
+            total_recognized_amount += flt(inv_rec_doc.grand_total)
         except:
             traceback = frappe.get_traceback(with_context=True)
             frappe.log_error("Failed Invoice Recognition for Expense Claim ", traceback)            

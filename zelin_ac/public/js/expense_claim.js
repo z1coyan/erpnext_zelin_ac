@@ -1,5 +1,9 @@
 frappe.ui.form.on('Expense Claim',{
 	refresh : function(frm) {
+		if (frm.doc.docstatus === 1){
+			$(".form-attachments .attachment-row .remove-btn").hide();
+		}
+		
 		frm.set_query("invoice_recognition","expenses", function(doc, cdt, cdn) {
 			let d = locals[cdt][cdn];
 
@@ -8,6 +12,7 @@ frappe.ui.form.on('Expense Claim',{
 				filters: {
 					"company": frm.doc.company,
 					"grand_total": d.amount,
+					"docstatus": 1,
 					"employee": frm.doc.employee,
 					"expense_type": d.expense_type,
 				}
@@ -15,7 +20,7 @@ frappe.ui.form.on('Expense Claim',{
 		});
 
 		// 预览发票
-		const invoice_recognition = frm.doc.expenses.filter((row) => row.invoice_recognition)
+		const invoice_recognition = frm.doc.expenses.filter((row) => row.invoice_recognition && row.file_url)
 		if (!frm.doc.__islocal && invoice_recognition.length) {
 			frm.add_custom_button(__('Preview Invoice'),
 				function() { 
@@ -211,7 +216,6 @@ frappe.ui.form.on('Expense Claim',{
 							fieldtype:"HTML",
 							fieldname:"preview_html",
 						},
-
 					],
 					primary_action_label: __("Make Expense Claim"),
 					primary_action: function() {

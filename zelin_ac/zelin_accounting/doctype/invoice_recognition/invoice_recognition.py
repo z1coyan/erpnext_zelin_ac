@@ -9,6 +9,7 @@ from frappe.model.document import Document
 from zelin_ac.baidu_api import get_invoice_info
 from frappe.desk.reportview import get_match_cond
 from frappe.utils import today
+from zelin_ac.utils import extract_amount
 
 
 class InvoiceRecognition(Document):
@@ -91,12 +92,30 @@ class InvoiceRecognition(Document):
 		suffix = self.attach[-4:].lower()
 		if suffix not in ['.pdf','.jpg','.png']:
 			frappe.throw("只支持识别.pdf,.jpg,.png后缀的文件")
-
 			return
-		if re_recognize or not self.is_same_file_recognized():
-			return self.recognize_invoice()	
 
-	def recognize_invoice(self):
+		if re_recognize or not self.is_same_file_recognized():
+			data = get_invoice_info(self.attach)
+
+			if not data:
+				return
+
+			self.data = data
+			if isinstance(data, str):
+				data_dict = frappe.parse_json(data)
+			results = frappe.parse_json(data_dict.get('words_result',"[]"))
+			if results:
+				self.items = []
+				self.grand_total = 0
+
+			for result in results:
+				info = result.get('result')
+				if info and isinstance(info, dict):			
+					self.recognize_invoice(frappe._dict(info))
+
+			self.set_status()
+
+	def recognize_invoice(self, info={}):
 
 		def get_field_value(field_name, index=0, default=None):  
 			"""从给定数据中获取指定字段名和索引的值，如果索引错误则返回默认值。"""  
@@ -105,17 +124,6 @@ class InvoiceRecognition(Document):
 				return field_data[index].get('word', default) if field_data else default  
 			except IndexError:  
 				return default
-		
-		data = get_invoice_info(self.attach)
-		#if frappe.get_conf().developer_mode ==1:
-		#	frappe.log_error(title='发票验证结果',message=data)
-		if not data:
-			return
-
-		self.data = data
-		if isinstance(data, str):
-			data_dict = frappe.parse_json(data)
-		info = frappe.parse_json(data_dict.words_result[0].get('result'))
 
 		header_field_mapping = {  
 			'company': 'PurchaserName',  
@@ -165,7 +173,7 @@ class InvoiceRecognition(Document):
 			'tax_rate': 'CommodityTaxRate',  
 			'tax_amount': 'CommodityTax'  
 		}
-		self.items = []		
+				
 		if info.CommodityName:
 			row_cnt = len(info.CommodityName)
 			for idx in range(0, row_cnt):
@@ -181,7 +189,13 @@ class InvoiceRecognition(Document):
 
 		elif info.TotalFare:
 			# 出租车发票
-			self.grand_total = info.TotalFare[0].get('word')
+			amount = extract_amount(get_field_value("TotalFare", default=0))
+			self.append("items", {
+				'amount': amount,
+				'item_name': "出租车发票"
+			})
+			self.grand_total = (self.grand_total or 0) + amount
+		
 			if info.InvoiceCode:
 				self.invoice_code = info.InvoiceCode[0].get('word')
 			self.invoice_num = info.InvoiceNum[0].get('word')
@@ -194,14 +208,24 @@ class InvoiceRecognition(Document):
 				self.company = frappe.get_value('Employee', self.employee, 'company')
 		elif info.ticket_rates:
 			# 火车票
-			self.grand_total =  re.search(r'\d+(\.\d+)?', info.ticket_rates[0].get('word')).group()
-			if info.date:
-				self.invoice_date = info.date[0].get('word')
-			if info.serial_number:
-				self.invoice_num = info.serial_number[0].get('word')
-			if not info.PurchaserName:
-				self.company = frappe.get_value('Employee', self.employee, 'company')
-
+			amount = extract_amount(get_field_value("ticket_rates", default=0))
+			#employee_name = get_field_value("name", default=0)
+			self.append("items", {
+				'amount': amount,
+				'model_type': get_field_value('seat_category'),
+				'item_name': f"{get_field_value('starting_station')} {get_field_value('destination_station')}"
+			})
+			self.grand_total = (self.grand_total or 0) + amount
+			#self.grand_total =  re.search(r'\d+(\.\d+)?', info.ticket_rates[0].get('word')).group()
+			
+			self.invoice_date = get_field_value('date')
+			invoice_num = get_field_value('serial_number')
+			if self.invoice_num:
+				self.invoice_num = f"{self.invoice_num} {invoice_num}"[140:]
+			else:
+				self.invoice_num = invoice_num
+			# if not info.PurchaserName:
+			# 	self.company = frappe.get_value('Employee', self.employee, 'company')
 		if not self.grand_total or self.grand_total == 0:
 			# 仍未提取出来信息，检查是否为定额发票
 			if info.invoice_rate_in_figure:
@@ -214,12 +238,10 @@ class InvoiceRecognition(Document):
 		# 如果同时有发票代码和发票号码，则同时提取
 		if info.invoice_code and info.invoice_number:
 			self.invoice_code = info.invoice_code[0].get('word')
-			self.invoice_num = info.invoice_number[0].get('word')
-
-		self.set_status()
+			self.invoice_num = info.invoice_number[0].get('word')		
 
 	def validate_invoice_number(self, throw=True):
-		error_message = None
+		error_message = ""
 
 		if self.company and not frappe.db.exists('Company', self.company):
 			self.error_message = "非本系统现有公司发票"
@@ -249,10 +271,10 @@ class InvoiceRecognition(Document):
 							
 			if not self.grand_total:
 				error_message = "未解析出金额，无效发票"
-			
+
+		self.error_message = error_message	
 		if error_message:
-			self.set_status('Recognize Failed')
-			self.error_message = error_message
+			self.set_status('Recognize Failed')			
 			if throw:
 				frappe.throw(error_message)
 
@@ -372,6 +394,8 @@ def make_expense_claim(args):
 					"expense_type": doc.expense_type,
 					"amount": doc.grand_total,
 					"invoice_recognition": doc.name,
+					"invoice_num": doc.invoice_num or doc.invoice_code,
+                    "tax_amount": doc.tax_amount if doc.invoice_type_org == "电子发票(专用发票)" else 0,
 					"cost_center": default_cost_center,
 					"default_account":account,
 				},
@@ -422,6 +446,8 @@ def make_expense_claim(args):
 						"expense_type": ir.get('expense_type'),
 						"amount": ir.get('grand_total'),
 						"invoice_recognition": ir.get('name'),
+                    	"invoice_num": ir.get('invoice_num') or ir.get('invoice_code'),
+                    	"tax_amount": ir.get('tax_amount') if ir.get('invoice_type_org') == "电子发票(专用发票)" else 0,
 						"cost_center": default_cost_center,
 						"default_account":account,
 					}
@@ -445,18 +471,29 @@ def validate_ir_list(name_list):
 		frappe.throw('发票归属于不同员工，无法批量创建报销单')
 
 @frappe.whitelist()
-def get_invoice_recognition(company,employee,project=None):
-	filters = {
-		'company': company,
-		'employee': employee, 
-		'status': 'Recognized'
-	}
+def get_invoice_recognition(company, employee, project=None):
+	inv_rec = frappe.qb.DocType('Invoice Recognition')
+	detail = frappe.qb.DocType('Expense Claim Detail')
+
+	query = frappe.qb.from_(inv_rec
+	).left_join(detail
+	).on(
+		(detail.invoice_recognition == inv_rec.name) &
+		(detail.docstatus<2)
+	).select(inv_rec.name, inv_rec.invoice_date, inv_rec.party, inv_rec.expense_type,
+		inv_rec.invoice_type_org, inv_rec.invoice_code, inv_rec.invoice_num, inv_rec.total_tax,
+		inv_rec.grand_total, inv_rec.attach, inv_rec.project, inv_rec.company, inv_rec.employee
+	).where(
+		(inv_rec.company == company) &
+		(inv_rec.employee == employee) & 
+		(inv_rec.docstatus == 1) &
+		(inv_rec.status == 'Recognized') &
+		(detail.name.isnull())
+	)
 	if project:
-		filters['project'] = project
-
-	fields = ('name','invoice_date','party','expense_type','invoice_type_org','invoice_code','invoice_num','total_tax','grand_total','attach','project','company','employee')
-	ir_list = frappe.get_list('Invoice Recognition', filters=filters,fields=fields)
-
+		query = query.where(inv_rec.project == project)
+	ir_list = query.run(as_dict=1)
+	
 	return ir_list
 
 @frappe.whitelist()

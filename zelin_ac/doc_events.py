@@ -314,7 +314,7 @@ def set_manufacture_production_cost_account(doc):
                     row.expense_account = production_input_account
 
 def expense_claim_before_submit(doc, method=None):
-    invoices = [r.invoice_recognition for r in doc.expenses if r.invoice_recognition]
+    invoices = [r.invoice_recognition for r in doc.expenses if hasattr(r, 'invoice_recognition') and r.invoice_recognition]
     if invoices:
         used_invoices = frappe.get_all('Invoice Recognition',
             filters={
@@ -330,12 +330,12 @@ def expense_claim_before_submit(doc, method=None):
 def validate_invoice_status(doc, method=None):
     if doc.docstatus == 1:
         for d in doc.expenses:
-            if d.invoice_recognition:
+            if hasattr(d, 'invoice_recognition') and d.invoice_recognition:
                 ir = frappe.get_doc('Invoice Recognition', d.invoice_recognition)
                 ir.db_set('status','Used')
     elif doc.docstatus == 2:
         for d in doc.expenses:
-            if d.invoice_recognition:
+            if hasattr(d, 'invoice_recognition') and d.invoice_recognition:
                 ir = frappe.get_doc('Invoice Recognition', d.invoice_recognition)
                 ir.db_set('status','Recognized')
     else:

@@ -15,7 +15,9 @@ fixtures = [
     }
 ]
 
-after_install = "zelin_ac.install.make_custom_fields"
+#after_install = "zelin_ac.install.make_custom_fields"
+#会出现本app单据类型尚未创建就执行了after_install代码，引用未创建的单据出错
+#改用fixtures/custom_field.json机制
 before_uninstall = "zelin_ac.install.delete_custom_fields"
 
 doctype_list_js = {

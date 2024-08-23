@@ -85,5 +85,87 @@
     "label": "Actual Tax Amount",
     "modified": "2023-12-30 22:18:02.049025",
     "name": "Sales Taxes and Charges-actual_tax_amount"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim Detail",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim Detail-file_url",            
+      "fieldname": "file_url",
+      "fieldtype": "Data",
+      "label": "File URL",
+      "read_only":1,
+      "allow_on_submit":1,
+      "insert_after": "project"
+   },					
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim Detail",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim Detail-invoice_recognition",      
+      "fieldname": "invoice_recognition",
+      "fieldtype": "Link",
+      "label": "Invoice Recognition",
+      "options":"Invoice Recognition",
+      "read_only":1,
+      "allow_on_submit":1,
+      "in_list_view":1,
+      "insert_after": "file_url"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim Detail",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim Detail-invoice_num",      
+      "fieldname": "invoice_num",
+      "fieldtype": "Data",
+      "label": "Invoice Num",
+      "read_only":1,
+      "insert_after": "invoice_recognition"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim Detail",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim Detail-tax_amount",      
+      "fieldname": "tax_amount",
+      "fieldtype": "Float",
+      "label": "Tax Amount(Refundable)",
+      "read_only":1,						
+      "insert_after": "invoice_num"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim-default_expense_type",      
+      "fieldname": "default_expense_type",
+      "fieldtype": "Link",
+      "label": "Default Expense Type",
+      "options":"Expense Claim Type",						
+      "insert_after": "approval_status"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim-recognize_invoice",        
+      "fieldname": "recognize_invoice",
+      "fieldtype": "Button",
+      "label": "Recognize Invoice",
+      "depends_on": "eval:(!doc.__islocal && (!doc.expenses || doc.expenses.length===0))",					
+      "insert_after": "expense_details"
+   },					
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim",
+      "modified": "2024-08-23 22:18:02.049025",
+      "name": "Expense Claim-total_recognized_amount",        
+      "fieldname": "total_recognized_amount",
+      "fieldtype": "Float",
+      "label": "Total Recognized Amount",
+      "depends_on": "eval:doc.total_recognized_amount",
+      "read_only": 1,						
+      "insert_after": "grand_total"
    }
 ]

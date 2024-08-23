@@ -1,0 +1,12 @@
+[
+   {
+      "doc_type": "Expense Claim",
+      "doctype": "Property Setter",
+      "doctype_or_field": "DocField",
+      "field_name": "expenses",
+      "modified": "2024-08-23 19:42:46.943779",
+      "name": "Expense Claim-expenses-reqd",
+      "property": "reqd",
+      "value": 0
+   }
+]

@@ -35,9 +35,7 @@ def vat_invoice_verification(doc):
 		print (response.json())
 
 @frappe.whitelist()
-def get_invoice_info(file_url):
-	from cloud_storage.cloud_storage.overrides.file import get_file_stream
-
+def get_invoice_info(file_url):	
 	file_type = mimetypes.guess_type(file_url)[0]
 
 	if file_type == 'application/pdf':
@@ -56,8 +54,10 @@ def get_invoice_info(file_url):
 	
 	url = "https://aip.baidubce.com/rest/2.0/ocr/v1/multiple_invoice?access_token=" + access_token
 
-	#将了cloud_storage后，file_url长这样 /api/method/retrieve?key=erpnext/Item/A/上传.pdf	
+	#装了cloud_storage后，file_url长这样 /api/method/retrieve?key=erpnext/Item/A/上传.pdf	
 	if file_url[:5] == '/api/':
+		from cloud_storage.cloud_storage.overrides.file import get_file_stream
+
 		headers = {
 			'Content-Type': 'application/x-www-form-urlencoded',
 			'Accept': 'application/json'

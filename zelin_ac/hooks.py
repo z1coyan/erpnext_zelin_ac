@@ -64,13 +64,13 @@ doc_events = {
 
 	},
 	"Expense Claim": {
-		"on_submit": [
-			"zelin_ac.doc_events.validate_invoice_status",
-			],
-		"on_cancel": [
-			"zelin_ac.doc_events.validate_invoice_status",
-			],
-		"before_submit":"zelin_ac.doc_events.expense_claim_before_submit",
+		"validate": "zelin_ac.doc_events.expense_claim_validate",
+		#"on_submit": "zelin_ac.doc_events.expense_claim_submit_cancel",	
+		"on_cancel": "zelin_ac.doc_events.expense_claim_submit_cancel"		 	
+	},
+	"Payment Entry": {		
+	 	"on_submit": "zelin_ac.doc_events.payment_entry_submit_cancel",	
+		"on_cancel": "zelin_ac.doc_events.payment_entry_submit_cancel"	
 	},
 }
 
@@ -90,6 +90,7 @@ override_whitelisted_methods = {
 
 permission_query_conditions = {
 	"Print Log": "zelin_ac.zelin_accounting.doctype.print_log.print_log.get_permission_query_conditions",
+	"My Invoice": "zelin_ac.permission.my_invoice_query_conditions"
 }
 
 has_permission = {

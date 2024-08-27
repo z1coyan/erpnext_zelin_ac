@@ -152,7 +152,6 @@ def file_after_insert(doc, method):
         
 
 def file_on_trash(doc, method):
-
     doctype, docname = doc.attached_to_doctype, doc.attached_to_name
     if doctype and docname and frappe.db.get_value(doctype, docname, 'docstatus') == 1:
         frappe.throw("不允许删除已提交单据的附件")
@@ -340,3 +339,64 @@ def validate_invoice_status(doc, method=None):
                 ir.db_set('status','Recognized')
     else:
         frappe.log_error('发票状态不详')
+
+def expense_claim_validate(doc, method=None):
+    if doc.amended_from:
+        for row in doc.expenses:
+            if row.my_invoice_before_amend:                
+                invoices = row.my_invoice_before_amend.split(',')
+                can_use_invoices = frappe.get_all('My Invoice', filters = {
+                        'name':('in', invoices),
+                        'status': '未使用'
+                    }, pluck='name'
+                )
+                cannot_use_invoices = set(invoices or []) - set(can_use_invoices or [])
+                if cannot_use_invoices:
+                    row.tax_amount = 0
+                    row.my_invoice_amount = 0
+                    row.invoice_code = ""
+                    error_invoices = ','.join(inv for inv in cannot_use_invoices)
+                    frappe.msgprint(
+                        f'发票： {error_invoices} 在报销单取消与修订之间被其它报销单使用等原因不可被使用了，请重新关联发票'
+                    )
+                else:
+                    for invoice in (can_use_invoices or []):
+                        frappe.db.set_value('My Invoice', invoice, 
+                            {
+                                'expense_claim': doc.name,
+                                'expense_claim_item': row.name,
+                                'status': '已使用'
+                            }
+                        )
+                row.my_invoice_before_amend = ""   #避免后面重复被触发
+
+    total_my_invoice_amount = 0
+    for row in doc.expenses:
+        if not row.my_invoice and row.my_invoice_amount:
+            row.my_invoice_amount = 0
+        total_my_invoice_amount += (row.my_invoice_amount or 0)
+    doc.total_my_invoice_amount = total_my_invoice_amount
+
+def expense_claim_submit_cancel(doc, method=None):
+    """
+    1. 保存取消前关联的发票信息，备修订时韩国恢复
+    2. 恢复发票使用状态
+    """
+
+    if method == 'on_cancel':
+        my_invoice_list = frappe.get_all('My Invoice', filters={'expense_claim': doc.name},
+            fields =['expense_claim_item', 'name as invoice_name'])
+        if my_invoice_list:
+            for row in doc.expenses:
+                my_invoices = [r for r in my_invoice_list if r.expense_claim_item ==row.name]
+                if my_invoices:
+                    row.my_invoice_before_amend = ','.join(r.invoice_name for r in my_invoices)
+
+            frappe.db.set_value('My Invoice', {'expense_claim': doc.name},
+                {'status':'未使用', 'expense_claim': "", 'expense_claim_item':""})
+        
+def payment_entry_submit_cancel(doc, method=None):
+    expenses = [r.reference_name for r in doc.references if r.reference_doctype == "Expense Claim"]
+    if expenses:
+        paid_time = today() if method == 'on_submit' else '1900-01-01'
+        frappe.db.set_value('Expense Claim', {'name': ('in', expenses)}, 'paid_time', paid_time)

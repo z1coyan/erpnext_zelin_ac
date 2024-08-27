@@ -137,3 +137,14 @@ Recognize Invoice,发票识别/校验/填单
 Default Expense Type,默认报销类型
 Recognize Failed,识别异常
 Tax Amount(Refundable),专票税额
+Is Special VAT,是专票
+My Invoice,我的发票
+Invoice Reconciliation,核销发票
+My Invoice Type,发票类型
+Total My Invoice Amount,总发票金额
+My Invoice Amount,发票金额
+Invoice Reconciliation,发票核销
+Invoice Reconciliation Item,发票核销明细
+Invoice Type Setting,发票类型匹配规则
+Invoice Type Setting Item,发票类型匹配规则明细
+Baidu Settings,百度接口设置

@@ -5,7 +5,6 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "appid",
   "api_key",
   "secret_key",
   "column_break_mvkv",
@@ -18,12 +17,7 @@
  ],
  "fields": [
   {
-   "description": "\u767e\u5ea6\u667a\u80fd\u4e91-\u6587\u5b57\u8bc6\u522b-\u667a\u80fd\u8d22\u52a1\u7968\u636e\u8bc6\u522b",
-   "fieldname": "appid",
-   "fieldtype": "Data",
-   "label": "AppID"
-  },
-  {
+   "description": "\u9700\u5230\u767e\u5ea6\u667a\u80fd\u4e91\u521b\u5efaapp, \u542f\u7528api-\u901a\u7528\u6587\u5b57(\u9ad8\u7cbe\u5ea6\u7248\uff09https://aip.baidubce.com/rest/2.0/ocr/v1/accurate_basic",
    "fieldname": "api_key",
    "fieldtype": "Data",
    "label": "API Key"
@@ -77,7 +71,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2024-08-16 11:56:54.157864",
+ "modified": "2024-08-25 21:10:21.455135",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "Baidu Settings",

@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "creation": "2019-07-11 16:01:22.832885",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_type",
+  "keyword"
+ ],
+ "fields": [
+  {
+   "columns": 2,
+   "fieldname": "invoice_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u53d1\u7968\u7c7b\u578b",
+   "options": "My Invoice Type"
+  },
+  {
+   "columns": 8,
+   "description": "\u9017\u53f7\u4e0e\u5206\u53f7\u5206\u9694\u7684\u5173\u952e\u5b57\u5339\u914d\u5b57\u7b26\u4e32\uff0c\u4f8b\u5982\uff0c\u5ea7,1;\u9000\u79681;\u53d1\u7968,0\uff0c\u6bcf\u4e2a\u5206\u53f7\u5206\u9694\u7684\u5b57\u7b26\u4e32\u5185\u90e8\u7531\u9017\u53f7\u5206\u9694\uff0c\u524d\u9762\u662f\u5173\u952e\u5b57\uff0c\u540e\u97620\uff0c1\u5206\u522b\u8868\u793a\u8bc6\u522b\u51fa\u7684\u6587\u672c\u4e2d\u987b\u51fa\u73b0\uff0c\u4e0d\u80fd\u51fa\u73b0\uff0c\u6848\u4f8b\u8868\u4e2d\u89e3\u6790\u6587\u672c\u6709\u5ea7\u548c\u9000\u6b3e\u4e24\u4e2a\u5b57\u7b26\u4e32\uff0c\u6ca1\u6709\u53d1\u7968\u5b57\u6837\uff0c\u5219\u53ef\u5339\u914d\u4e3a\u8be5\u884c\u5bf9\u5e94\u7684\u53d1\u7968\u7c7b\u578b\u3002",
+   "fieldname": "keyword",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u5173\u952e\u5b57"
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-08-26 18:23:42.266879",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Invoice Type Setting Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

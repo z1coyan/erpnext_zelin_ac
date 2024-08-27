@@ -1,0 +1,100 @@
+{
+ "actions": [],
+ "autoname": "naming_series:",
+ "creation": "2023-07-11 16:03:13.681045",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "reconciliation_date",
+  "company",
+  "section_break_1",
+  "items",
+  "section_break_2",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "default": "IRC-.YY.-.MM.-",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "IRC-.YY.-.MM.-",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "fieldname": "reconciliation_date",
+   "fieldtype": "Date",
+   "in_list_view": 1,
+   "label": "\u6838\u9500\u65e5\u671f",
+   "reqd": 1
+  },
+  {
+   "default": "\u5357\u4eac\u5de5\u5927\u6570\u63a7\u79d1\u6280\u6709\u9650\u516c\u53f8",
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "\u62a5\u9500\u53d1\u7968",
+   "options": "Invoice Reconciliation Item"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "\u4fee\u6539\u81ea\u7248\u672c",
+   "no_copy": 1,
+   "options": "Invoice Reconciliation",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1,
+   "search_index": 1
+  }
+ ],
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-08-26 06:40:47.934672",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Invoice Reconciliation",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "amend": 1,
+   "cancel": 1,
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

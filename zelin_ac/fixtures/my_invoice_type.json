@@ -1,0 +1,68 @@
+[
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "住宿费",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "住宿费"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "火车票",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "火车票"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "汽车票",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "汽车票"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "飞机票",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "飞机票"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "通讯费",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "通讯费"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "客运服务",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "客运服务"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "乘车服务",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "乘车服务"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "通行费",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "通行费"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "招待费",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "招待费"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "打车费",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "打车费"
+    },
+    {
+        "doctype": "My Invoice Type",
+        "invoice_type": "其他",
+        "modified": "2024-08-26 22:15:02.049023",
+        "name": "其他"
+    }
+]

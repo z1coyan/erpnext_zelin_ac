@@ -1,0 +1,202 @@
+{
+ "actions": [],
+ "creation": "2019-07-11 16:01:22.832885",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "invoice_name",
+  "invoice_type",
+  "column_break_1",
+  "net_amount",
+  "column_break_2",
+  "tax_amount",
+  "column_break_3",
+  "amount",
+  "section_break_1",
+  "description",
+  "column_break_4",
+  "invoice_code",
+  "section_break_2",
+  "files",
+  "section_break_3",
+  "view_image",
+  "section_break_4",
+  "expense_claim",
+  "expense_claim_item",
+  "owner_user"
+ ],
+ "fields": [
+  {
+   "columns": 1,
+   "fieldname": "invoice_name",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u6211\u7684\u53d1\u7968\u53f7",
+   "no_copy": 1,
+   "options": "My Invoice",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1,
+   "reqd": 1
+  },
+  {
+   "columns": 1,
+   "default": "\u5176\u4ed6",
+   "fieldname": "invoice_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u7c7b\u578b",
+   "no_copy": 1,
+   "options": "\n\u4f4f\u5bbf\u8d39\n\u706b\u8f66\u7968\n\u6c7d\u8f66\u7968\n\u98de\u673a\u7968\n\u901a\u8baf\u8d39\n\u5ba2\u8fd0\u670d\u52a1\n\u4e58\u8f66\u670d\u52a1\n\u901a\u884c\u8d39\n\u62db\u5f85\u8d39\n\u6253\u8f66\u8d39\n\u5176\u4ed6",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "net_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u672a\u7a0e\u91d1\u989d",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u4ef7\u7a0e\u5408\u8ba1",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "columns": 2,
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u5907\u6ce8",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "invoice_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u7f16\u53f7",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "files",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u6587\u4ef6\u76ee\u5f55",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.files",
+   "fieldname": "view_image",
+   "fieldtype": "Image",
+   "options": "files",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "columns": 1,
+   "fieldname": "expense_claim",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u8d39\u7528\u62a5\u9500\u5355",
+   "no_copy": 1,
+   "options": "Expense Claim",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "expense_claim_item",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "\u8d39\u7528\u62a5\u9500\u660e\u7ec6",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "\u6240\u5c5e\u4eba",
+   "no_copy": 1,
+   "options": "User",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1,
+   "reqd": 1
+  },
+  {
+   "columns": 1,
+   "fieldname": "tax_amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "\u7a0e\u989d",
+   "no_copy": 1,
+   "read_only": 1
+  }
+ ],
+ "istable": 1,
+ "links": [],
+ "modified": "2024-08-27 13:22:36.221038",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "Invoice Reconciliation Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "quick_entry": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

@@ -1,6 +1,6 @@
 {
  "charts": [],
- "content": "[{\"id\":\"bmuFRLOujE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>\u5feb\u6377\u65b9\u5f0f</b></span>\",\"col\":12}},{\"id\":\"iwalCCeDwJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Invoice Recognition\",\"col\":3}},{\"id\":\"DWp8EGe_KL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Import OFD\",\"col\":3}},{\"id\":\"xc4AQjjzJL\",\"type\":\"header\",\"data\":{\"text\":\"<b>\u4e3b\u6570\u636e\u3001\u4e1a\u52a1\u4ea4\u6613\u3001\u62a5\u8868</b><br>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}},{\"id\":\"kU2hbVZnEf\",\"type\":\"card\",\"data\":{\"card_name\":\"\u6708\u7ed3\",\"col\":4}}]",
+ "content": "[{\"id\":\"bmuFRLOujE\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>\u5feb\u6377\u65b9\u5f0f</b></span>\",\"col\":12}},{\"id\":\"iwalCCeDwJ\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"My Invoice\",\"col\":3}},{\"id\":\"DWp8EGe_KL\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Import OFD\",\"col\":3}},{\"id\":\"xc4AQjjzJL\",\"type\":\"header\",\"data\":{\"text\":\"<b>\u4e3b\u6570\u636e\u3001\u4e1a\u52a1\u4ea4\u6613\u3001\u62a5\u8868</b><br>\",\"col\":12}},{\"id\":\"pq69Iywr6X\",\"type\":\"card\",\"data\":{\"card_name\":\"\u62a5\u8868\",\"col\":4}},{\"id\":\"mlkknfg8cR\",\"type\":\"card\",\"data\":{\"card_name\":\"\u8bbe\u7f6e\",\"col\":4}},{\"id\":\"kU2hbVZnEf\",\"type\":\"card\",\"data\":{\"card_name\":\"\u6708\u7ed3\",\"col\":4}}]",
  "creation": "2023-12-08 10:37:07.389424",
  "custom_blocks": [],
  "docstatus": 0,
@@ -184,7 +184,7 @@
    "hidden": 0,
    "is_query_report": 0,
    "label": "\u6708\u7ed3",
-   "link_count": 2,
+   "link_count": 3,
    "link_type": "DocType",
    "onboard": 0,
    "type": "Card Break"
@@ -208,9 +208,19 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Invoice Reconciliation",
+   "link_count": 0,
+   "link_to": "Invoice Reconciliation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2024-08-15 14:28:45.248155",
+ "modified": "2024-08-26 06:42:56.933458",
  "modified_by": "fisher@abc.com",
  "module": "Zelin Accounting",
  "name": "Zelin Accounting",
@@ -225,8 +235,8 @@
   {
    "color": "Grey",
    "doc_view": "List",
-   "label": "Invoice Recognition",
-   "link_to": "Invoice Recognition",
+   "label": "My Invoice",
+   "link_to": "My Invoice",
    "stats_filter": "[]",
    "type": "DocType"
   },

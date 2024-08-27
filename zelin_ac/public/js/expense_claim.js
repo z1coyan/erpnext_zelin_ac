@@ -1,301 +1,407 @@
-frappe.ui.form.on('Expense Claim',{
-	refresh : function(frm) {
-		if (frm.doc.docstatus === 1){
-			$(".form-attachments .attachment-row .remove-btn").hide();
-		}
-		
-		frm.set_query("invoice_recognition","expenses", function(doc, cdt, cdn) {
-			let d = locals[cdt][cdn];
+frappe.ui.form.on('Expense Claim', {
+    refresh(frm) {
+        if (!frm.is_new() && !frm.is_dirty()) {
+            frm.add_custom_button(__('关联发票'), () => frm.trigger('select_my_invoice'));
+        }
+    },
+    select_my_invoice: (frm) => {
+        if (frm.is_dirty()) {
+            frappe.throw("请先保存单据后再关联发票！")
+        }
+        let expenses_data = frm.doc.expenses.map(expense => {
+                const desc = expense.description? "|费用说明：" + expense.description:"";
+                return expense.name + "|" + expense.idx + "|费用类型：" + expense.expense_type + "|金额：" + expense.amount + desc;
+        });
+        if (frm.doc.docstatus === 0){
+            expenses_data.unshift('选择发票生成报销明细')   //添加第一个选项
+        }
+        let d = new frappe.ui.Dialog({
+            title: '关联报销项对应发票',
+            fields: [
+                {
+                    label: '关联的报销项',
+                    fieldname: 'expenses',
+                    fieldtype: 'Select',
+                    options : expenses_data,
+                    description:"选择\n由发票自动生成报销明细\n创建并选择报销明细后绑定发票",
+                    reqd: 1,
+                    onchange: function(values) {
+                        if (event.type && event.type === 'change') {
+                            get_my_invoice(frm, d);
+                        }
+                    }
+                },
+                {
+                    label: '我的关联发票',
+                    fieldname: 'my_used_invoice',
+                    fieldtype: 'Table',
+                    cannot_add_rows: true,
+                    // cannot_delete_rows: true,
+                    read_only: 0,
+                    fields: [
+                        {
+                            label: '预览发票',
+                            fieldname: 'view_open',
+                            fieldtype: 'Button',
+                            in_list_view: 1,
+                            read_only: 0,
+                            columns: 1,
+                            click: function(row_values) {
+                                var row_index = $(event.target).closest('.grid-row').data('idx');
+                                var files = d.fields_dict.my_used_invoice.df.data[row_index - 1].files;
+                                d.set_value('view_image','<img src="' + files + '" alt="Image">');
+                                const hidden = d.get_field('view_image').df.hidden;
+                                d.set_df_property("view_image", "hidden", !hidden);  //改为切换显示或隐藏
+                            },
+                        },
+                        {
+                            label: '编号',
+                            fieldname: 'name',
+                            fieldtype: 'Link',
+                            options : "My Invoice",
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票类型',
+                            fieldname: 'invoice_type',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票号',
+                            fieldname: 'invoice_code',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 2,
+                        },
+                        {
+                            label: '未税金额',
+                            fieldname: 'net_amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '税额',
+                            fieldname: 'tax_amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '价税合计',
+                            fieldname: 'amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票说明',
+                            fieldname: 'description',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票文件',
+                            fieldname: 'files',
+                            fieldtype: 'Data',
+                            in_list_view: 0,
+                            read_only: 1,
+                            hidden: 1
+                        },
+                        {
+                            label: '剔除关联',
+                            fieldname: 'action_remove',
+                            fieldtype: 'Button',
+                            in_list_view: 1,
+   			                columns: 1,
+                            click: function() {
+                                if (frm.doc.approval_status == "Draft" || frm.doc.approval_status == "Pending"){
+                                    var row_index = $(event.target).closest('.grid-row').data('idx');
+                                    frappe.call({
+                                        method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.expense_remove_invoice',
+                                        args: {
+                                            row_values: d.fields_dict.my_used_invoice.df.data[row_index - 1],
+                                            docname: frm.doc.name,
+                                        },
+                                        callback: function (r) {
+                                            get_my_invoice(frm,d)
+                                            frm.reload_doc();
+                                            frm.dirty();
+                                        }
+                                    });
+                                }else(
+                                     frappe.msgprint({
+                                        title: __('警告'),
+                                        message: __('非草稿及审批过程中单据无法修改关联属性！'),
+                                    })
+                                )
+                            }
+                        },
+                    ]
+                },
+                {
+                    label: '我的未使用发票',
+                    fieldname: 'my_invoice',
+                    fieldtype: 'Table',
+                    cannot_add_rows: true,
+                    cannot_delete_rows: true,
+                    read_only: 0,
+                    fields: [
+                        {
+                            label: '预览发票',
+                            fieldname: 'view_open',
+                            fieldtype: 'Button',
+                            in_list_view: 1,
+                            read_only: 0,
+                            columns: 1,
+                            click: function(row_values) {
+                                var row_index = $(event.target).closest('.grid-row').data('idx');
+                                var files = d.fields_dict.my_invoice.df.data[row_index - 1].files;
+                                d.set_value('view_image','<img src="' + files + '" alt="Image">');
+                                const hidden = d.get_field('view_image').df.hidden;
+                                d.set_df_property("view_image", "hidden", !hidden);  //改为切换显示或隐藏
+                            },
+                        },
+                        {
+                            label: '编号',
+                            fieldname: 'name',
+                            fieldtype: 'Link',
+                            options : "My Invoice",
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票类型',
+                            fieldname: 'invoice_type',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票号',
+                            fieldname: 'invoice_code',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 2
+                        },
+                        {
+                            label: '未税金额',
+                            fieldname: 'net_amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '税额',
+                            fieldname: 'tax_amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '价税合计',
+                            fieldname: 'amount',
+                            fieldtype: 'Float',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 1
+                        },
+                        {
+                            label: '发票说明',
+                            fieldname: 'description',
+                            fieldtype: 'Data',
+                            in_list_view: 1,
+                            read_only: 1,
+                            columns: 2
+                        },
+                        {
+                            label: '发票文件',
+                            fieldname: 'files',
+                            fieldtype: 'Data',
+                            in_list_view: 0,
+                            read_only: 1,
+                            hidden: 1
+                        },
+                    ]
+                },
+                {
+                    label: '预览发票',
+                    fieldname: 'view_image',
+                    fieldtype: 'HTML',
+                    read_only: 1,
+                    hidden: 1,
+                },
+            ],
+            size: 'extra-large', //extra-large
+            primary_action_label: '关联',
+            primary_action(values) {
+                var expenses = d.get_field("expenses").get_value();
+                var expense_claim_item = expenses.split("|")[0].trim();
+                var data = {items: d.fields_dict.my_invoice.grid.get_selected_children()};
+                if (!data.items.length){
+                    frappe.msgprint('请先勾选我的未使用发票后再点关联按钮')
+                } else {
+                    frappe.call({
+                        method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.expense_select_invoice',
+                        args: {
+                            docname: frm.doc.name,
+                            expense_claim_item: expense_claim_item,
+                            items: data,
+                        },
+                        callback: function (r) {
+                            if (expense_claim_item==="选择发票生成报销明细"){
+                                d.hide();                                
+                            } else {
+                                get_my_invoice(frm,d)
+                            }
+                            frm.reload_doc();
+                            frm.dirty();
+                        }
+                    });
+                }
+                // d.hide();
+            },
+            secondary_action_label: '关闭弹窗',
+            secondary_action(values) {
+                d.hide();
+            }
+        });
+        d.fields_dict.my_invoice.grid.grid_pagination.page_length = 5
+        d.fields_dict.my_used_invoice.grid.grid_pagination.page_length = 5
+        //if (frm.doc.approval_status == "Not Paid" || frm.doc.approval_status == "Paid"){
+        if (frm.doc.docstatus > 0){         //提交或取消后隐藏分派我的发票明细表
+            d.$wrapper.find('.standard-actions').hide()
+            d.set_df_property("my_invoice", "hidden", 1);
+            //d.layout.primary_button?.hide();
+        }
+        d.show();
+    }
+});
 
-			return {
-				query: "zelin_ac.zelin_accounting.doctype.invoice_recognition.invoice_recognition.invoice_recogniton_query",
-				filters: {
-					"company": frm.doc.company,
-					"grand_total": d.amount,
-					"docstatus": 1,
-					"employee": frm.doc.employee,
-					"expense_type": d.expense_type,
-				}
-			};
-		});
-
-		// 预览发票
-		const invoice_recognition = frm.doc.expenses.filter((row) => row.invoice_recognition && row.file_url)
-		if (!frm.doc.__islocal && invoice_recognition.length) {
-			frm.add_custom_button(__('Preview Invoice'),
-				function() { 
-					preview_all_invoice(frm)
-				 },);
-		}		
-	},
-
-	employee: function(frm) {
-		if (frm.doc.docstatus == 0 && frm.doc.company && frm.doc.employee) {
-			frm.trigger('add_ir_button');
-		}
-	},
-
-	add_ir_button: function(frm) {
-		frm.add_custom_button(__("Get Invoice Recognition"), function() {
-			frm.trigger('get_invoice_recognition');
-		}) 
-	},
-
-	onload_post_render(frm){
-		const btn_field = frm.get_field('recognize_invoice')
-		btn_field && btn_field.$input && btn_field.$input.addClass('btn-primary');		
-	},
-		
-	recognize_invoice: function(frm) {
-		frappe.call({
-			method: "zelin_ac.api.recognize_invoice",
-			freeze: true,
-			freeze_message: __("发票识别中..."),
-			args:{"doc": frm.doc},
-			callback: function(r) {
-				frappe.model.sync(r.message);
-				refresh_field("expenses");
-				refresh_field("total_recognized_amount");
-				frm.dirty();
-			}
-		})
-	},
-
-	get_invoice_recognition: function(frm) {
-		frappe.call({
-			method: "zelin_ac.zelin_accounting.doctype.invoice_recognition.invoice_recognition.get_invoice_recognition",
-			args:{
-				"company": frm.doc.company,
-				"employee": frm.doc.employee,
-			},
-			callback: function(r) {
-				let ir_list = r.message;
-				var d = new frappe.ui.Dialog({
-					title:__("Get Invoice Recognition"),
-					fields: [
-						{
-							label:__("Project"),
-							fieldtype:"Link",
-							fieldname:"project",
-							options:"Project",
-							reqd: 0,
-							description:'选择项目，用以筛选发票',
-							onchange: function(frm) {
-								ir_filtered = ir_list.filter(item => item.project ==  d.get_values()['project'])
-								let field = d.get_field("invoice_recognition");
-								field.df.data = ir_filtered;
-								field.refresh();
-							}
-						},
-						{
-							label: __("Invoice Recognition"),
-							fieldtype: 'Table',
-							fieldname: 'invoice_recognition',
-							cannot_add_rows:1,
-							"read_only": 1,
-							description: '已提交，还未使用或者报销单还没有完成审批的发票，点击蓝色按钮预览发票',
-							fields: [{
-								fieldtype: 'Button',
-								fieldname: 'name',
-								"read_only": 1,
-								label: __('Preview'),
-								in_list_view: 1,
-								columns:1,
-								click: function(row) {
-									var row_index = $(event.target).closest('.grid-row').data('idx');
-									console.log(row_index)
-									var file_url = d.fields_dict.invoice_recognition.df.data[row_index - 1].attach;
-									let preview_html = preview_invoice(file_url)
-									let field = d.get_field("preview_html");
-									field.df.options = field.html(preview_html);
-								},
-								formatter: function(value, row, column, data, default_formatter) {  
-									return `<span style = "padding: 5px;" class="btn-primary">${value}</span>`;  
-								}  
-							}, {
-								fieldtype: 'Link',
-								fieldname: 'project',
-								"read_only": 1,
-								label: __('Project'),
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldtype: 'Link',
-								fieldname: 'company',
-								"read_only": 1,
-								label: __('Company'),
-								in_list_view: 0,
-								columns:1
-							}, {
-								fieldname: "column_break_5",
-								fieldtype: "Column Break",
-							}, {
-								fieldtype: 'Link',
-								fieldname: 'employee',
-								"read_only": 1,
-								label: __('Employee'),
-								in_list_view: 0,
-								columns:1
-							}, {
-								fieldtype: 'Date',
-								fieldname: 'invoice_date',
-								label: __('Invoice Date'),
-								"read_only": 1,
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldtype: 'Link',
-								fieldname: 'expense_type',
-								options: 'Expense Claim Type',
-								"read_only": 1,
-								label: __('Expense Claim Type'),
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldname: "column_break_5",
-								fieldtype: "Column Break",
-							}, {
-								fieldtype: 'Currency',
-								fieldname: 'grand_total',
-								label: __('Grand Total'),
-								"read_only": 1,
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldtype: 'Currency',
-								fieldname: 'total_tax',
-								label: __('Total Tax'),
-								"read_only": 1,
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldtype: 'Data',
-								fieldname: 'invoice_type',
-								label: __('Invoice Type'),
-								"width": 1,
-								"read_only": 1,
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldname: "column_break_5",
-								fieldtype: "Column Break",
-							}, {
-								fieldtype: 'Data',
-								fieldname: 'party',
-								"read_only": 1,
-								label: __('Party'),
-								in_list_view: 1,
-								columns:1
-							}, {
-								fieldtype: 'Data',
-								fieldname: 'invoice_code',
-								"read_only": 1,
-								label: __('Invoice Code'),
-								in_list_view: 0,
-								columns:1
-							}, {
-								fieldtype: 'Data',
-								fieldname: 'invoice_num',
-								"read_only": 1,
-								label: __('Invoice Num'),
-								in_list_view: 1,
-								columns:1,
-							}, {
-								fieldtype: 'Link',
-								fieldname: 'attach',
-								"read_only": 1,
-								options: 'File',
-								label: __('Attach'),
-								in_list_view: 0,
-								columns:1
-						}],
-						data: ir_list,
-						},
-						{
-							label:__("Preview"),
-							fieldtype:"HTML",
-							fieldname:"preview_html",
-						},
-					],
-					primary_action_label: __("Make Expense Claim"),
-					primary_action: function() {
-						var ir_list = d.fields_dict.invoice_recognition.grid.get_selected_children();
-						if (ir_list.length == 0) {
-							frappe.throw('请勾选发票')
-						}
-						frappe.call({
-							method: "zelin_ac.zelin_accounting.doctype.invoice_recognition.invoice_recognition.make_expense_claim",
-							args: {
-								args: ir_list,
-							},
-							callback: function(res) {
-								if (res.message) {
-									frappe.set_route("Form", "Expense Claim", res.message.name);
-								}
-							}
-						});
-
-						d.hide()
-					},
-				})
-				d.show()
-				d.$wrapper.find('.modal-dialog').css("max-width", "90%");
-			}
-		})
-	},
+frappe.ui.form.on('Expense Claim Detail', {
+    expenses_remove(frm, cdt, cdn) {
+        var row = locals[cdt][cdn]
+        frappe.call({
+            method: "zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.get_my_used_invoice",
+            args: {
+                doc_name: frm.doc.name,
+                expense_claim_item: cdn
+            },
+            freeze: true,
+            callback: function (r) {
+                var my_used_invoice_data = r.message
+                if(my_used_invoice_data.length >= 1){
+                    frm.reload_doc();
+                    frappe.msgprint("无法删除已关联发票的报销项，请在关联发票中先剔除关联的发票再试！")
+                }
+            }
+        })
+    }
 })
 
-function preview_invoice  (url) {
-	let preview = "";
-	let file_extension = url.split('.').pop().toLowerCase();
 
-	if (frappe.utils.is_image_file(url)) {
-		preview = `<div class="img_preview" style="display: flex;justify-content: center;">
-			<img
-				class="img-responsive shortcut-widget-box"
-				src="${frappe.utils.escape_html(url)}"
-			/>
-		</div>`;
-	} else if (file_extension === "pdf") {
-		preview = `<div class="img_preview links-widget-box input">
-			<object style="background:#323639;" width="100%">
-				<embed
-					style="background:#323639;"
-					width="100%"
-					height="600"
-					src="${frappe.utils.escape_html(url)}" type="application/pdf"
-				>
-			</object>
-		</div>`;
-	} 
+function get_my_invoice(frm,d) {
+    remove_all_rows(d)
+    d.set_df_property("view_image", "hidden", 1);
+    var expenses = d.get_field("expenses").get_value();
+    var expense_claim_item = expenses.split("|")[0].trim();
+    frappe.call({
+        method: "frappe.client.get_list",
+        args: {
+            doctype: "My Invoice",
+            filters: { "employee":frm.doc.employee, "status":"未使用"},
+            fields: ['name', 'invoice_type', 'invoice_code', 'net_amount', 'tax_amount', 'amount', 'description', 'files'],
+            limit_page_length: 500
+        },
+        callback: function (r) {
+            var my_invoice_data = r.message
+            const my_invoice_list = my_invoice_data.map(data => {
+                return {
+                    name: data.name,
+                    invoice_type: data.invoice_type,
+                    invoice_code: data.invoice_code,
+                    net_amount: data.net_amount,
+                    tax_amount: data.tax_amount,
+                    amount: data.amount,
+                    description: data.description,
+                    files: data.files,
+                    view_image: data.files
+                };
+            });
+            // d.fields_dict.my_invoice.grid.refresh();
+            d.fields_dict.my_invoice.df.data = my_invoice_list;
+            d.fields_dict.my_invoice.grid.refresh();
+            // d.fields_dict.my_invoice.grid.wrapper.find('.row-check.sortable-handle.col').hide()
+            // d.wrapper.find('.first-page, .prev-page, .next-page, .last-page').on('click', function() {
+            //     d.fields_dict.my_invoice.grid.wrapper.find('.row-check.sortable-handle.col').hide()
+            // });
+        }
+    }), 
+    frappe.call({
+        method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.get_my_used_invoice',
+        args: {
+            doc_name: frm.doc.name,
+            expense_claim_item: expense_claim_item
+        },
+        callback: function (r) {
+            var my_used_invoice_data = r.message
+            const my_used_invoice_list = my_used_invoice_data.map(data => {
+                return {
+                    name: data[0],
+                    invoice_type: data[1],
+                    invoice_code: data[2],
+                    net_amount: data[3],
+                    tax_amount: data[4],
+                    amount: data[5],
+                    description: data[6],
+                    files: data[7]
+                };
+            });
+            // 计算合计值
+            const total = {
+                net_amount: my_used_invoice_list.reduce((acc, cur) => acc + parseFloat(cur.net_amount || 0), 0),
+                tax_amount: my_used_invoice_list.reduce((acc, cur) => acc + parseFloat(cur.tax_amount || 0), 0),
+                amount: my_used_invoice_list.reduce((acc, cur) => acc + parseFloat(cur.amount || 0), 0),
+                name: "小计："
+            };
 
-	return preview;
-};
+            // 添加合计行到列表末尾
+            my_used_invoice_list.push(total);
+            d.fields_dict.my_used_invoice.df.data = my_used_invoice_list;
+            d.fields_dict.my_used_invoice.grid.refresh();
+        }
+    })
+}
 
-function preview_all_invoice (frm) {
-	let preview = "";
-	frm.doc.expenses.forEach(item => {
-		if (item.invoice_recognition) {
-			preview += preview_invoice(item.file_url)
-		}
-	})
-
-	var d = new frappe.ui.Dialog({
-		title:__("Invoice Recognition"),
-		fields: [
-			{
-				label:__("Preview"),
-				fieldtype:"HTML",
-				fieldname:"preview_html",
-				options: preview,
-			}
-		],
-		primary_action_label: "关闭",
-		primary_action: function() {
-			d.hide()
-		}
-	})
-	
-	d.show();
-	d.$wrapper.find('.modal-dialog').css("max-width", "90%");
-};
+function remove_all_rows(d) {
+    var rows = d.fields_dict.my_used_invoice.grid.grid_rows;
+    var i = rows.length - 1;
+    while (i >= 0) {
+        rows[i].remove();
+        rows = d.fields_dict.my_used_invoice.grid.grid_rows; // 重新获取行的数量
+        i = rows.length - 1;
+    }
+    var rows = d.fields_dict.my_invoice.grid.grid_rows;
+    var i = rows.length - 1;
+    while (i >= 0) {
+        rows[i].remove();
+        rows = d.fields_dict.my_invoice.grid.grid_rows; // 重新获取行的数量
+        i = rows.length - 1;
+    }
+}

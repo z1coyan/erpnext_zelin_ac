@@ -1,0 +1,382 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "naming_series:",
+ "creation": "2023-11-15 16:03:13.681045",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "naming_series",
+  "section_break_lxke",
+  "cb_1",
+  "invoice_type",
+  "column_break_2",
+  "net_amount",
+  "column_break_3",
+  "tax_amount",
+  "cb_4",
+  "amount",
+  "section_break_1",
+  "cb_5",
+  "invoice_code",
+  "up_files",
+  "files",
+  "column_break_6",
+  "description",
+  "error_message",
+  "column_break_ftqj",
+  "company_code",
+  "is_special_vat",
+  "sb_rep_txt",
+  "cb_7",
+  "rep_txt",
+  "section_break_3",
+  "cb_8",
+  "view_image",
+  "section_break_4",
+  "cb_9",
+  "expense_claim",
+  "expense_claim_item",
+  "expense_invoice_item",
+  "owner_user",
+  "invoice_reconciliation",
+  "invoice_reconciliation_item",
+  "column_break_10",
+  "employee",
+  "status"
+ ],
+ "fields": [
+  {
+   "default": "IV-.YY.-.######",
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "IV-.YY.-.######",
+   "reqd": 1,
+   "set_only_once": 1
+  },
+  {
+   "default": "\u5176\u4ed6",
+   "fieldname": "invoice_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u7c7b\u578b",
+   "no_copy": 1,
+   "options": "My Invoice Type",
+   "reqd": 1
+  },
+  {
+   "fieldname": "net_amount",
+   "fieldtype": "Float",
+   "label": "\u672a\u7a0e\u91d1\u989d",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u4ef7\u7a0e\u5408\u8ba1",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_1",
+   "fieldtype": "Section Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "description",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u5907\u6ce8",
+   "no_copy": 1
+  },
+  {
+   "fieldname": "invoice_code",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u53d1\u7968\u7f16\u53f7",
+   "no_copy": 1,
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "description": "\u53ea\u652f\u6301\u5355\u5f20\u53d1\u7968\u4e0a\u4f20",
+   "fieldname": "up_files",
+   "fieldtype": "Button",
+   "label": "\u4e0a\u4f20\u53d1\u7968\u6587\u4ef6"
+  },
+  {
+   "fieldname": "files",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "\u6587\u4ef6\u76ee\u5f55",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "rep_txt",
+   "fieldtype": "Long Text",
+   "hidden": 1,
+   "label": "\u6a21\u578b\u8bc6\u522b",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_3",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval:doc.files",
+   "fieldname": "view_image",
+   "fieldtype": "Image",
+   "options": "files",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "expense_claim",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "\u8d39\u7528\u62a5\u9500\u5355",
+   "no_copy": 1,
+   "options": "Expense Claim",
+   "print_hide": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "expense_claim_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "\u8d39\u7528\u62a5\u9500\u660e\u7ec6",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "expense_invoice_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "\u8d39\u7528\u62a5\u9500\u53d1\u7968\u660e\u7ec6",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "owner_user",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "in_standard_filter": 1,
+   "label": "\u6240\u5c5e\u4eba",
+   "no_copy": 1,
+   "options": "User",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "default": "\u672a\u4f7f\u7528",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "no_copy": 1,
+   "options": "\u672a\u4f7f\u7528\n\u5df2\u4f7f\u7528\n\u5df2\u6838\u9500\n\u4e0d\u80fd\u4f7f\u7528",
+   "print_hide": 1,
+   "read_only": 1,
+   "reqd": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "invoice_reconciliation",
+   "fieldtype": "Link",
+   "label": "\u53d1\u7968\u5165\u8d26\u5355",
+   "no_copy": 1,
+   "options": "Invoice Reconciliation",
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "invoice_reconciliation_item",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "\u53d1\u7968\u5165\u8d26\u660e\u7ec6",
+   "no_copy": 1,
+   "print_hide": 1,
+   "read_only": 1,
+   "report_hide": 1
+  },
+  {
+   "fieldname": "cb_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_6",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_7",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_8",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "cb_9",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_10",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_ftqj",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_lxke",
+   "fieldtype": "Section Break"
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "sb_rep_txt",
+   "fieldtype": "Section Break",
+   "label": "\u8bc6\u522b\u51fa\u7684\u6587\u5b57"
+  },
+  {
+   "fieldname": "error_message",
+   "fieldtype": "Data",
+   "label": "Error Message"
+  },
+  {
+   "fieldname": "company_code",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Company",
+   "no_copy": 1,
+   "options": "Company",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "is_special_vat",
+   "fieldtype": "Check",
+   "in_standard_filter": 1,
+   "label": "Is Special VAT",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee",
+   "fieldtype": "Link",
+   "ignore_user_permissions": 1,
+   "label": "Employee",
+   "no_copy": 1,
+   "options": "Employee",
+   "permlevel": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "cb_4",
+   "fieldtype": "Column Break",
+   "no_copy": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "tax_amount",
+   "fieldtype": "Float",
+   "label": "\u7a0e\u989d",
+   "no_copy": 1
+  }
+ ],
+ "links": [],
+ "modified": "2024-08-27 11:41:52.101575",
+ "modified_by": "Administrator",
+ "module": "Zelin Accounting",
+ "name": "My Invoice",
+ "naming_rule": "By \"Naming Series\" field",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Accounts User",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Employee",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

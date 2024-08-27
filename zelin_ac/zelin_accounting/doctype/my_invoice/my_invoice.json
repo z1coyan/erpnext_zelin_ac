@@ -1,6 +1,6 @@
 {
  "actions": [],
- "allow_import": 1,
+ "allow_copy": 1,
  "autoname": "naming_series:",
  "creation": "2023-11-15 16:03:13.681045",
  "doctype": "DocType",
@@ -71,7 +71,8 @@
    "fieldname": "net_amount",
    "fieldtype": "Float",
    "label": "\u672a\u7a0e\u91d1\u989d",
-   "no_copy": 1
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "column_break_2",
@@ -115,6 +116,7 @@
    "label": "\u53d1\u7968\u7f16\u53f7",
    "no_copy": 1,
    "read_only": 1,
+   "read_only_depends_on": "eval:doc.status !== \"\u672a\u4f7f\u7528\"",
    "unique": 1
   },
   {
@@ -276,7 +278,9 @@
   {
    "fieldname": "error_message",
    "fieldtype": "Data",
-   "label": "Error Message"
+   "label": "Error Message",
+   "no_copy": 1,
+   "read_only": 1
   },
   {
    "fieldname": "company_code",
@@ -305,6 +309,7 @@
    "options": "Employee",
    "permlevel": 1,
    "read_only": 1,
+   "reqd": 1,
    "search_index": 1
   },
   {
@@ -317,11 +322,12 @@
    "fieldname": "tax_amount",
    "fieldtype": "Float",
    "label": "\u7a0e\u989d",
-   "no_copy": 1
+   "no_copy": 1,
+   "read_only": 1
   }
  ],
  "links": [],
- "modified": "2024-08-27 11:41:52.101575",
+ "modified": "2024-08-27 16:40:48.317024",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "My Invoice",
@@ -345,7 +351,6 @@
    "delete": 1,
    "email": 1,
    "export": 1,
-   "import": 1,
    "print": 1,
    "read": 1,
    "report": 1,

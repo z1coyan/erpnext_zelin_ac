@@ -390,7 +390,7 @@ def get_invoice_code(docname, doctype) :
     if not doc.amount:
         doc.status = '不能使用'
         doc.error_message = "未识别出发票金额，非发票文件?"
-    doc.in_special_vat = 1 if any(s in ["增值税专用发票"] for s in doc.rep_txt) else 0    
+    doc.in_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0    
     doc.save()
     return
 

@@ -8,7 +8,8 @@ requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
-    "opencv-python~=4.10.0.84" # Installed and managed by bench.
+    "opencv-python~=4.10.0.84",
+    "PyMuPDF~=1.23.3" # Installed and managed by bench.
 ]
 
 [build-system]

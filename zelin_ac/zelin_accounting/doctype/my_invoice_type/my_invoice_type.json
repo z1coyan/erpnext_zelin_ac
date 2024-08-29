@@ -8,7 +8,8 @@
  "engine": "InnoDB",
  "field_order": [
   "invoice_type",
-  "expense_type"
+  "expense_type",
+  "deductible_tax_rate"
  ],
  "fields": [
   {
@@ -28,11 +29,17 @@
    "in_standard_filter": 1,
    "label": "Expense Type",
    "options": "Expense Claim Type"
+  },
+  {
+   "description": "\u53ef\u62b5\u6263\u767e\u5206\u6bd4\uff0c9\u8868\u793a9%\u3002\u9002\u7528\u4e8e\u672c\u516c\u53f8\u5458\u5de5\u7684\u706b\u8f66\u7968\u3001\u98de\u673a\u7968\uff0c\u901a\u884c\u8d39",
+   "fieldname": "deductible_tax_rate",
+   "fieldtype": "Float",
+   "label": "Deductible Tax Rate(%)"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-26 22:19:39.168643",
+ "modified": "2024-08-29 15:17:47.764543",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "My Invoice Type",

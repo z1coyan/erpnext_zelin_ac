@@ -148,3 +148,7 @@ Invoice Reconciliation Item,发票核销明细
 Invoice Type Setting,发票类型匹配规则
 Invoice Type Setting Item,发票类型匹配规则明细
 Baidu Settings,百度接口设置
+Deductible Tax Rate,可抵扣税率
+Deductible Tax Rate(%),可抵扣税率(%)
+Deductible Tax Amount,可抵扣税额
+Is Employee,是员工

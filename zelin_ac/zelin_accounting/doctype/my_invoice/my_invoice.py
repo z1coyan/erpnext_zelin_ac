@@ -7,6 +7,7 @@ import base64
 import requests
 import os
 import fitz  # PyMuPDF库
+from PIL import Image    #用于多页pdf 合并png
 import json
 import shutil
 import re
@@ -26,10 +27,6 @@ class MyInvoice(Document):
             frappe.throw("不允许删除已经被使用的发票！")
             return
 
-        if self.rep_txt and not self.error_message and frappe.session.user != 'Administrator':
-            frappe.throw("非超级管理员不允许删除已经识别未使用发票！")
-            return
-
 @frappe.whitelist()
 def upload_invoices(filename , filedata):
     def parse_and_save_my_invoice(myinvoice):
@@ -38,7 +35,10 @@ def upload_invoices(filename , filedata):
         myinvoice.files = res_upload
         words_string = get_invoice_rep(res_upload)
         myinvoice.rep_txt = words_string
-        myinvoice.save()
+        if file_extension not in ['.PDF' , '.pdf'] and any(txt in words_string for txt in ['普通发票', '专用发票']):
+            frappe.msgprint('发票只支持pdf格式')
+        else:
+            myinvoice.save()
         if words_string:
             get_invoice_code(myinvoice.name, "My Invoice")
 
@@ -68,26 +68,71 @@ def upload_invoices(filename , filedata):
     if file_extension.lower() in ['.pdf'] :
         pdf_file_path = os.path.abspath(upload_path)
         pdf_document = fitz.open(pdf_file_path)
-        for page_number in range(pdf_document.page_count) :
-            myinvoice = get_new_myinvoice(user.name,filename)
-            docname= myinvoice.name
-            dpi = 150  # 200 DPI，可以根据需要调整
-            page = pdf_document.load_page(page_number)
-            pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72 , dpi / 72))
-            png_filename = f"{docname}.png"
-            save_path = os.path.join(save_dir , png_filename)
-            pix.save(save_path , "png")
-            parse_and_save_my_invoice(myinvoice)
+
+        if pdf_document.page_count > 1:
+            #多页pdf, 一个发票多页的情况
+            page_0_inv_num = get_inv_num_from_pdf_page(pdf_document, 0)
+            page_1_inv_num = get_inv_num_from_pdf_page(pdf_document, 1)
+            if page_0_inv_num and page_1_inv_num and page_0_inv_num == page_1_inv_num:
+                myinvoice = get_new_myinvoice(user.name,filename)
+                docname = myinvoice.name
+                png_filename = f"{docname}.png"
+                save_path = os.path.join(save_dir, png_filename)                                
+                multi_page_pdf_to_png(pdf_document, save_dir, docname)
+                parse_and_save_my_invoice(myinvoice)
+        else:   #多页pdf,每页一个发票
+            for page_number in range(pdf_document.page_count) :
+                myinvoice = get_new_myinvoice(user.name,filename)
+                docname= myinvoice.name
+                dpi = 150  # 200 DPI，可以根据需要调整
+                page = pdf_document.load_page(page_number)
+                pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72 , dpi / 72))
+                png_filename = f"{docname}.png"
+                save_path = os.path.join(save_dir , png_filename)
+                pix.save(save_path , "png")
+                parse_and_save_my_invoice(myinvoice)
     else:
         myinvoice = get_new_myinvoice(user.name,filename)
         docname = myinvoice.name
         png_filename = f"{docname}.{file_extension}"
-        save_path = os.path.join(save_dir , png_filename)
+        save_path = os.path.join(save_dir, png_filename)
         shutil.copy(upload_path , save_path)
         parse_and_save_my_invoice(myinvoice)
 
+def multi_page_pdf_to_png(pdf_document, save_dir, docname, dpi=150):
+    images = []  # List to store individual PNG images
+    for page_number in range(pdf_document.page_count):
+        page = pdf_document.load_page(page_number)
+        pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
+        file_path = os.path.join(save_dir, f"{docname}_{page_number}.png") 
+        pix.save(file_path, "png")     
+        images.append(Image.open(file_path))  # Load PNG into PIL Image
+        if os.path.exists(file_path):
+            os.remove(file_path)
+    # Combine PNG images vertically (top to bottom)
+    first_image = images[0]
+    combined_image = Image.new(first_image.mode, (first_image.width, sum(image.height for image in images)))
+    y_offset = 0
+    for image in images:
+        combined_image.paste(image, (0, y_offset))
+        y_offset += image.height
+    file_path = os.path.join(save_dir, f"{docname}.png")    
+    combined_image.save(file_path, "png")
 
-def get_new_myinvoice(user_name,description) :
+def get_inv_num_from_pdf_page(pdf_document, page_number):
+    page = pdf_document.load_page(page_number)
+    text = page.get_text("words")  # 获取页面文本内容
+    left, top, right, bottom = 0, 0, 0, 0
+    for row in text:
+        if '发票号码：' == row[4]:
+            left, top, right, bottom = row[:4]
+            break
+    if top and right and bottom:
+        for row in text:
+            if row[0] > right and row[2] < (right + 100) and top < (row[1] + row[3])/2 < bottom:
+                return row[4]
+
+def get_new_myinvoice(user_name, description) :
     myinvoice = frappe.new_doc("My Invoice")
     myinvoice.update(
         {
@@ -309,6 +354,10 @@ def get_invoice_code(docname, doctype) :
             if filtered_list :
                 invoice_code = filtered_list[0]
 
+    # 优先根据关键字定位而不是只获取像金额的数字，通过比大小来识别                
+    if any(txt in words_string for txt in ['普通发票', '专用发票']):
+        set_amount(doc)
+
     amount_list = []
     if net_amount == 0 :
         if 'CNY' in words_string and float(net_amount) == 0:
@@ -386,13 +435,61 @@ def get_invoice_code(docname, doctype) :
     doc.tax_amount = tax_amount
     doc.amount = net_amount + tax_amount
     doc.invoice_code = invoice_code
+    if invoice_type in ['火车票', '飞机票', '通行费']:
+        set_ticket_owner(doc)
+    set_invoice_date(doc)
+    tax_rate_map = frappe._dict(frappe.get_all('My Invoice Type', fields=['name','deductible_tax_rate'], as_list=1))
+    set_deductible_tax_amount(doc, tax_rate_map)
     set_company(doc)
     if not doc.amount:
         doc.status = '不能使用'
         doc.error_message = "未识别出发票金额，非发票文件?"
-    doc.in_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0    
+    doc.is_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0    
     doc.save()
     return
+
+def set_amount(doc):
+    text = doc.rep_txt
+    pattern = r'\(小写\),\s*(?:￥\s*)?(\d+(\.\d+)?)'  #类似这种 (小写), ￥49910.60, 
+    match = re.search(pattern, text)  
+    if match:  
+        number = match.group(1)  # 提取并打印数字部分  
+        doc.amount = number
+
+    pattern = r'计[\s,]*￥(\d+(\.\d+)?)[\s,]*￥(\d+(\.\d+)?)[\s,]*价'  
+    match = re.search(pattern, text)  
+    if match:  
+        if len(match.groups()) > 3:
+            doc.net_amount = match.group(1)
+            doc.tax_amount = match.group(3)
+
+def set_ticket_owner(doc):
+    name_match = re.search(r'\*\*(\d{4})\s*?(.*?)(,|$)', doc.rep_txt)  
+    if name_match:  
+        doc.ticket_owner = name_match.group(2).strip()
+        employee = frappe.db.get_value('Employee', {'first_name': doc.ticket_owner})
+        if employee:
+            doc.employee = employee
+            doc.is_employee = 1
+
+def set_invoice_date(doc):
+    patterns =[r'开票日期：(\d{4}年\d{2}月\d{2}日)', r'(\d{4}年\d{2}月\d{2}日)']
+    for pattern in patterns:
+        match = re.search(pattern, doc.rep_txt)    
+        if match:  
+            date_str = match.group(1).replace('年', '').replace('月', '').replace('日', '')  
+            date_yyyymmdd = date_str.replace(' ', '')  
+            doc.invoice_date = date_yyyymmdd
+            return
+
+def set_deductible_tax_amount(doc, tax_rate_map):
+    if doc.is_special_vat and doc.tax_amount:
+        doc.deductible_tax_amount = doc.tax_amount
+    elif doc.is_employee:
+        tax_rate = tax_rate_map.get(doc.invoice_type, 0) / 100
+        if tax_rate:
+            # 计算公式：火车票可抵扣进项税 = 票面金额 ÷ (1 + 9%) × 9%。
+            doc.deductible_tax_amount = doc.amount / (1 + tax_rate) * tax_rate
 
 def set_company(doc):
     #“购买方, 纳税人识别号：”和紧接着的逗号之间的文本串
@@ -568,6 +665,7 @@ def get_my_used_invoice(doc_name,expense_claim_item) :
         where expense_claim=%s and expense_claim_item = %s""",
         (doc_name,expense_claim_item),
         )
+
 
 @frappe.whitelist()
 def get_all_used_invoice(doc_name) :

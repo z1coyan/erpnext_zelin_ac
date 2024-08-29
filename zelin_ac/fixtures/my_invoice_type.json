@@ -8,6 +8,7 @@
     {
         "doctype": "My Invoice Type",
         "invoice_type": "火车票",
+        "deductible_tax_rate": 9,
         "modified": "2024-08-26 22:15:02.049023",
         "name": "火车票"
     },
@@ -20,6 +21,7 @@
     {
         "doctype": "My Invoice Type",
         "invoice_type": "飞机票",
+        "deductible_tax_rate": 9,
         "modified": "2024-08-26 22:15:02.049023",
         "name": "飞机票"
     },

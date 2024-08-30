@@ -6,7 +6,7 @@
             {"invoice_type":"住宿费","keyword":"房费,1;普通,1"},
             {"invoice_type":"住宿费","keyword":"住宿,1;专用,1"},
             {"invoice_type":"客运服务","keyword":"客运服务,1;电,1;普通,1"},
-            {"invoice_type":"通行费","keyword":"通行赛1;电,1"},
+            {"invoice_type":"通行费","keyword":"通行费,1;电,1"},
             {"invoice_type":"飞机票","keyword":"代订机票,1;普通,1"},
             {"invoice_type":"通讯费","keyword":"通信服务,1"},
             {"invoice_type":"其他","keyword":"里程,1;上车,1;行程单,0;滴滴出行,0;票据汇总单,1"},

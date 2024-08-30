@@ -26,21 +26,33 @@ class MyInvoice(Document):
         if self.status == "已使用":
             frappe.throw("不允许删除已经被使用的发票！")
             return
+        if self.files:    
+            base_dir = frappe.get_site_path()
+            file_path = os.path.join(base_dir, 'public' + self.files)
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
 @frappe.whitelist()
-def upload_invoices(filename , filedata):
+def upload_invoices(filename, filedata):
     def parse_and_save_my_invoice(myinvoice):
-        res_uploadfilename = os.path.relpath(save_path , base_path)
+        res_uploadfilename = os.path.relpath(save_path, base_path)
         res_upload = '/' + res_uploadfilename
         myinvoice.files = res_upload
         words_string = get_invoice_rep(res_upload)
-        myinvoice.rep_txt = words_string
+        myinvoice.rep_txt = words_string        
         if file_extension not in ['.PDF' , '.pdf'] and any(txt in words_string for txt in ['普通发票', '专用发票']):
-            frappe.msgprint('发票只支持pdf格式')
+            frappe.msgprint(f'未能上传 {filename}，发票只支持pdf格式')
+            myinvoice.delete(ignore_permissions=1, force=1)
+        elif words_string.count('仅供') > 1:
+            frappe.msgprint(f"未能上传 {filename}，系统只支持一个文件一张火车票")
+            os.remove(save_path)
+            myinvoice.delete(ignore_permissions=1, force=1)
         else:
             myinvoice.save()
-        if words_string:
-            get_invoice_code(myinvoice.name, "My Invoice")
+            created_invoices.append(myinvoice.name)
+            if words_string:
+                get_invoice_code(myinvoice.name, "My Invoice")
+            return True
 
     doctype= "My Invoice"
     base_dir = frappe.get_site_path()
@@ -48,22 +60,23 @@ def upload_invoices(filename , filedata):
     upload_dir = os.path.join(base_dir , 'public/files/My Invoice/all_upload')
     user = frappe.get_user()
     username = frappe.db.get_value('User', user.name, 'first_name')
-    save_dir = os.path.join(base_dir , 'public/files/' + doctype , username)
+    save_dir = os.path.join(base_dir , 'public/files/' + doctype, username)
     if not os.path.exists(upload_dir) :
         os.makedirs(upload_dir)
     if not os.path.exists(save_dir) :
         os.makedirs(save_dir)
         # 分割文件名和扩展名
-    file_name , file_extension = os.path.splitext(filename)
-    if file_extension not in ['.PDF' , '.pdf' , '.PNG' , '.png' , '.JPG' , '.jpg'] :
-        frappe.throw("仅支持PDF、PNG、JPG三种格式的文件上传！")
+    file_name, file_extension = os.path.splitext(filename)
+    if file_extension not in ['.PDF', '.pdf', '.PNG', '.png', '.JPG', '.jpg'] :
+        frappe.msgprint(f"未能上传 {filename}，系统只支持PDF、PNG、JPG三种格式的文件上传！")
 
+    created_invoices = []
     upload_path = os.path.join(upload_dir , filename)
     base_path = base_dir + "/public"
     res_uploadfilename = os.path.relpath(upload_path , base_path)
     res_upload = '/' + res_uploadfilename
     filedata = base64.b64decode(filedata.split('base64,')[1])
-    with open(upload_path , 'wb') as f :
+    with open(upload_path, 'wb') as f :
         f.write(filedata)
     if file_extension.lower() in ['.pdf'] :
         pdf_file_path = os.path.abspath(upload_path)
@@ -76,9 +89,9 @@ def upload_invoices(filename , filedata):
             if page_0_inv_num and page_1_inv_num and page_0_inv_num == page_1_inv_num:
                 myinvoice = get_new_myinvoice(user.name,filename)
                 docname = myinvoice.name
-                png_filename = f"{docname}.png"
+                png_filename = f"{docname}-{frappe.utils.random_string(6)}.png"
                 save_path = os.path.join(save_dir, png_filename)                                
-                multi_page_pdf_to_png(pdf_document, save_dir, docname)
+                multi_page_pdf_to_png(pdf_document, save_dir, png_filename)
                 parse_and_save_my_invoice(myinvoice)
         else:   #多页pdf,每页一个发票
             for page_number in range(pdf_document.page_count) :
@@ -87,24 +100,26 @@ def upload_invoices(filename , filedata):
                 dpi = 150  # 200 DPI，可以根据需要调整
                 page = pdf_document.load_page(page_number)
                 pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72 , dpi / 72))
-                png_filename = f"{docname}.png"
-                save_path = os.path.join(save_dir , png_filename)
-                pix.save(save_path , "png")
+                png_filename = f"{docname}-{frappe.utils.random_string(6)}.png"
+                save_path = os.path.join(save_dir, png_filename)
+                pix.save(save_path, "png")
                 parse_and_save_my_invoice(myinvoice)
     else:
         myinvoice = get_new_myinvoice(user.name,filename)
         docname = myinvoice.name
-        png_filename = f"{docname}.{file_extension}"
+        png_filename = f"{docname}-{frappe.utils.random_string(6)}{file_extension}"
         save_path = os.path.join(save_dir, png_filename)
-        shutil.copy(upload_path , save_path)
+        shutil.copy(upload_path, save_path) 
         parse_and_save_my_invoice(myinvoice)
 
-def multi_page_pdf_to_png(pdf_document, save_dir, docname, dpi=150):
+    return created_invoices
+
+def multi_page_pdf_to_png(pdf_document, save_dir, png_filename, dpi=150):
     images = []  # List to store individual PNG images
     for page_number in range(pdf_document.page_count):
         page = pdf_document.load_page(page_number)
         pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72, dpi / 72))
-        file_path = os.path.join(save_dir, f"{docname}_{page_number}.png") 
+        file_path = os.path.join(save_dir, f"{png_filename}_{page_number}.png") 
         pix.save(file_path, "png")     
         images.append(Image.open(file_path))  # Load PNG into PIL Image
         if os.path.exists(file_path):
@@ -116,7 +131,7 @@ def multi_page_pdf_to_png(pdf_document, save_dir, docname, dpi=150):
     for image in images:
         combined_image.paste(image, (0, y_offset))
         y_offset += image.height
-    file_path = os.path.join(save_dir, f"{docname}.png")    
+    file_path = os.path.join(save_dir, png_filename)    
     combined_image.save(file_path, "png")
 
 def get_inv_num_from_pdf_page(pdf_document, page_number):
@@ -136,9 +151,9 @@ def get_new_myinvoice(user_name, description) :
     myinvoice = frappe.new_doc("My Invoice")
     myinvoice.update(
         {
-            "invoice_type" : "其他" ,
+            "invoice_type" : "其他",
             "description": description,
-            "owner_user" : user_name ,
+            "owner_user" : user_name,
         }
     )
     myinvoice.save()
@@ -190,47 +205,14 @@ def upload_file(docname , doctype , filename , filedata) :
     doc.save()
     get_invoice_code(doc.name,doctype)
 
-def move_invoice_file(docname,doctype):
-    base_dir = frappe.get_site_path()
-    doc = frappe.get_doc(doctype , docname)
-    file_name , file_extension = os.path.splitext(doc.files)
-    old_files = doc.files
-    username = frappe.db.get_value('User', doc.owner_user, 'first_name')
-    upload_dir = os.path.join(base_dir , 'public/files/' + doctype , username)
-    if not os.path.exists(upload_dir) :
-        os.makedirs(upload_dir)
-    input_image_path = upload_dir + '/' + docname + file_extension
-    output_image_path = os.path.join(base_dir , 'public' + doc.files)
-    files = '/files/' + doctype + '/' + username + '/' + docname + file_extension
-    # frappe.throw(files)
-    if "invoice_upload" in doc.files:
-        if not os.path.exists(output_image_path) :
-            return
-        shutil.copy(output_image_path , input_image_path)
-        timeout = 10  # 设置超时时间为10秒
-        start_time = time.time()
-        while not os.path.exists(input_image_path) :
-            if time.time() - start_time > timeout :
-                frappe.throw("超时还未复制完成！")
-                break
-            time.sleep(0.2)
-        # if os.path.exists(input_image_path) :
-        #     frappe.throw(input_image_path)
-
-        frappe.db.sql("""UPDATE `tabMy Invoice` SET files = %s,description= %s WHERE name = %s""" , (files ,old_files , docname) , )
-        if doc.expense_claim_item:
-            frappe.db.sql("""UPDATE `tabInvoice Upload` SET invoice_upload = %s,my_invoice = %s WHERE name = %s""" , (files ,docname , doc.expense_claim_item) , )
-
-
 @frappe.whitelist()
 def get_invoice_code(docname, doctype) :
     doc = frappe.get_doc(doctype , docname)
     if not doc.files:
         return
-    # move_invoice_file(docname , doctype)
+
     doc.reload()
     res_upload = doc.files
-    # frappe.throw(res_upload)
     if not doc.rep_txt:
         words_string = get_invoice_rep(res_upload)
         doc.rep_txt = words_string
@@ -243,7 +225,6 @@ def get_invoice_code(docname, doctype) :
     setting = frappe.get_doc("Invoice Type Setting")
     invoice_type = "其他"
     # 遍历InvoiceTypeSetting中的每个关键字项
-    # frappe.throw(str(invoice_type))
     for item in setting.keywords:
         # 解析关键字定义
         keyword_definitions = item.keyword.split(';')
@@ -264,11 +245,9 @@ def get_invoice_code(docname, doctype) :
     tax_amount = 0
     inco_f = ""
     inco_b = ""
-    # frappe.msgprint(str(invoice_type))
+
     if '纳税人识别号' in words_string or '发票号码' in words_string or '发票代码' in words_string or '票据' in words_string or ('发票' in words_string and '代码' in words_string) or '税收完税证明' in words_string:
-        # frappe.msgprint("00099900")
         if ('发票代码' in words_string and '发票号码' in words_string) or ('发票代码' not in words_string and '发票号码' not in words_string and '票据' not in words_string and '税收完税证明' not in words_string):
-            # frappe.msgprint("111111")
             for word in words_list:
                 word_daw = re.sub(r'[发票代号码：]', '', word)
                 if '发票代码' in word and not inco_f:
@@ -284,7 +263,7 @@ def get_invoice_code(docname, doctype) :
             if inco_f and inco_b :
                 invoice_code = inco_f + "_" + inco_b
         elif '发票代码' not in words_string and '发票号码' in words_string and '纳税人识别号' in words_string:
-            # frappe.msgprint("2222222")
+
             for word in words_list :
                 word_daw = re.sub(r'[数电发票代号码：]', '', word)
                 if '发票号码' in word and not inco_f :
@@ -294,7 +273,7 @@ def get_invoice_code(docname, doctype) :
                     inco_f = word_daw
                 invoice_code = inco_f
         elif '票据' in words_string :
-            # frappe.msgprint("333333")
+
             for word in words_list:
                 word_daw = re.sub(r'[票据代号码：]', '', word)
                 if '票据号码' in word and not inco_f:
@@ -310,7 +289,6 @@ def get_invoice_code(docname, doctype) :
             if inco_f and inco_b :
                 invoice_code = inco_f + "_" + inco_b
         elif "税收完税证明" in words_string:
-            # frappe.msgprint("112121212")
             for word in words_list:
                 word_daw = word.replace('No.','')
                 if 'No.' in word and not inco_f:
@@ -318,7 +296,6 @@ def get_invoice_code(docname, doctype) :
             if inco_f :
                 invoice_code = inco_f
         else:
-            # frappe.msgprint("444444")
             for word in words_list :
                 word_daw = re.sub(r'[发票代号码：]', '', word)
                 if '发票代码' in word and not inco_f :
@@ -344,12 +321,10 @@ def get_invoice_code(docname, doctype) :
             if filtered_list :
                 invoice_code = filtered_list[0]
         elif invoice_type == '火车票' :
-            # frappe.throw(str(words_list))
             filtered_list = [word for word in words_list if len(word) >= 6 and len(word) <= 12 and (word.isalnum()  and word.isupper() or word.isdigit()) and not re.search(r'[\u4e00-\u9fa5]', word)]
             if filtered_list :
                 invoice_code = filtered_list[0]
         elif invoice_type == '其他' :
-            # frappe.msgprint("7777777")
             filtered_list = [word for word in words_list if len(word) >= 6 and len(word) <= 12 and (word.isalnum()  and word.isupper() or word.isdigit()) and not re.search(r'[\u4e00-\u9fa5]', word)]
             if filtered_list :
                 invoice_code = filtered_list[0]
@@ -359,27 +334,22 @@ def get_invoice_code(docname, doctype) :
         set_amount(doc)
 
     amount_list = []
-    if net_amount == 0 :
+    if not (doc.amount and doc.net_amount):
         if 'CNY' in words_string and float(net_amount) == 0:
-            # frappe.throw("000000")
             for amount in words_list:
                 if re.search(r'^[^.]*\.\d{1,2}(?:[^.]*\.\d{1,2})?$', amount) and not re.search(r'\..*?\..+', amount):
-                    # frappe.throw(amount)
                     amount_value = re.sub(r'[^0-9.]', '', amount)
                     if float(amount_value) > 0 and float(amount_value) < 100000:
                         amount_list.append(float(amount_value))
                 elif re.search( r'^CNY(?:[CNY\d]*\.\d+|\d+(?:\.\d+)?)[CNY\d]*$', amount) and not re.search(r'\..*?\..+', amount):
 
                     amount_value = re.sub(r'[^0-9.]' , '' , amount)
-                    # frappe.throw(str(amount_value))
                     if float(amount_value) > 0 and float(amount_value) < 100000:
                         amount_list.append(float(amount_value))
             sorted_amounts = sorted(amount_list,reverse=True)
-            # frappe.throw(str(sorted_amounts))
             if len(sorted_amounts) >= 1 :
                 net_amount = sorted_amounts[0]
         if '￥' in words_string and float(net_amount) == 0:
-            # frappe.throw("11111111")
             for amount in words_list:
                 if '￥' in amount and re.search(r'\d+(\.\d+)?', amount) and not re.search(r'\..*?\..+', amount):
                     amount_value = re.sub(r'[^0-9.]', '', amount)
@@ -393,15 +363,12 @@ def get_invoice_code(docname, doctype) :
             elif len(sorted_amounts) == 1 :
                 net_amount = sorted_amounts[0]
         if '元' in words_string and float(net_amount) == 0:
-            # frappe.throw("2222222")
             for amount in words_list:
                 if '元' in amount and re.search(r'\d+(\.\d+)?', amount) and '/' not in amount and not re.search(r'\..*?\..+', amount):
-                    # frappe.throw("444444")
                     amount_value = re.sub(r'[^0-9.]', '', amount)
                     if float(amount_value) > 0 and float(amount_value) < 100000:
                         amount_list.append(float(amount_value))
             sorted_amounts = sorted(amount_list)
-            # frappe.throw(str(sorted_amounts))
             if len(sorted_amounts) > 1 :
                 net_amount = sorted_amounts[1]
                 if sorted_amounts[0] < 0.2*net_amount:
@@ -409,7 +376,6 @@ def get_invoice_code(docname, doctype) :
             elif len(sorted_amounts) == 1 :
                 net_amount = sorted_amounts[0]
         if float(net_amount) == 0:
-            # frappe.throw("33333333")
             for amount in words_list:
                 if re.fullmatch(r'^\d+(,\d+)*(\.\d{1,2})$' , amount) and not re.search(r'\..*?\..+', amount):
                     amount_value = re.sub(r'[^0-9.]' , '' , amount)
@@ -422,35 +388,34 @@ def get_invoice_code(docname, doctype) :
                     tax_amount = sorted_amounts[0]
             elif len(sorted_amounts) == 1 :
                 net_amount = sorted_amounts[0]
-    # frappe.throw(str(invoice_type))
     if invoice_code:
         parent_value = get_db_invoice(docname, invoice_code)
         if parent_value:
             frappe.msgprint(f"{invoice_code}: 此发票已经在单据 {parent_value} 中存在,已经使用的发票无法再次上传，已经剔除本次重复发票！")
-            frappe.delete_doc(doctype, docname, ignore_on_trash=True, force = 1)
+            frappe.delete_doc(doctype, docname, ignore_permissions = True, force = 1)
             return
-    # frappe.throw(str(invoice_type)+"|" + str(net_amount) + "|" + str(tax)+"|" + str(invoice_code))
+
     doc.invoice_type = invoice_type
-    doc.net_amount = net_amount
-    doc.tax_amount = tax_amount
-    doc.amount = net_amount + tax_amount
+    if not (doc.amount and doc.net_amount) and net_amount:
+        doc.net_amount = net_amount
+        doc.tax_amount = tax_amount
+        doc.amount = net_amount + tax_amount
     doc.invoice_code = invoice_code
     if invoice_type in ['火车票', '飞机票', '通行费']:
         set_ticket_owner(doc)
     set_invoice_date(doc)
     tax_rate_map = frappe._dict(frappe.get_all('My Invoice Type', fields=['name','deductible_tax_rate'], as_list=1))
+    doc.is_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0  
     set_deductible_tax_amount(doc, tax_rate_map)
     set_company(doc)
     if not doc.amount:
         doc.status = '不能使用'
-        doc.error_message = "未识别出发票金额，非发票文件?"
-    doc.is_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0    
+        doc.error_message = "未识别出发票金额，非发票文件?"      
     doc.save()
-    return
 
 def set_amount(doc):
     text = doc.rep_txt
-    pattern = r'\(小写\),\s*(?:￥\s*)?(\d+(\.\d+)?)'  #类似这种 (小写), ￥49910.60, 
+    pattern = r'[（\(]小写[）\)]\s*(?:[，,]?\s*￥\s*)?(\d+(\.\d+)?)'  #类似这种 (小写), ￥49910.60, 
     match = re.search(pattern, text)  
     if match:  
         number = match.group(1)  # 提取并打印数字部分  
@@ -510,7 +475,6 @@ def set_company(doc):
 def get_invoice_codes(docnames) :
     docnames = json.loads(frappe.form_dict['docnames'])
     for name in docnames :
-        # frappe.throw(str(name))
         get_invoice_code(name,"My Invoice")
     frappe.msgprint("获取 %s 发票" % len(docnames))
 
@@ -543,7 +507,7 @@ def expense_select_invoice(docname, expense_claim_item, items):
         ).select(
             my_inv.name.as_('my_invoice'),
             my_inv_type.expense_type,
-            my_inv.tax_amount,
+            my_inv.deductible_tax_amount,
             my_inv.amount,
             my_inv.amount.as_('my_invoice_amount'),
             my_inv.amount.as_('sanctioned_amount'),
@@ -554,8 +518,6 @@ def expense_select_invoice(docname, expense_claim_item, items):
         
         expense_claim_doc = frappe.get_doc('Expense Claim', docname)
         for d in data:
-            if not d.is_special_vat and d.tax_amount:
-                d.tax_amount = 0
             if not d.expense_type and expense_claim_doc.default_expense_type:
                 d.expense_type = expense_claim_doc.default_expense_type    
             d.expense_date = frappe.utils.getdate()  
@@ -600,7 +562,7 @@ def expense_remove_invoice(row_values, docname) :
 def update_expense_item_my_invoice_amount(docname):
     doc = frappe.get_doc('Expense Claim', docname)
     item_wise_amt = frappe.get_all('My Invoice', filters={'expense_claim': doc.name},
-        fields=['expense_claim_item', 'sum(tax_amount) as tax_amount', 'sum(amount) as my_invoice_amount'],
+        fields=['expense_claim_item', 'sum(deductible_tax_amount) as deductible_tax_amount', 'sum(amount) as my_invoice_amount'],
         group_by ='expense_claim_item'
     )
     item_wise_amt_map = {r.expense_claim_item:r for r in item_wise_amt}
@@ -613,7 +575,7 @@ def update_expense_item_my_invoice_amount(docname):
             amt_dict.sanctioned_amount = amt_dict.amount
             frappe.db.set_value(row.doctype, row.name, amt_dict)
         else:
-            frappe.db.set_value(row.doctype, row.name, {'tax_amount':0, 'my_invoice_amount':0, 'invoice_code':""})            
+            frappe.db.set_value(row.doctype, row.name, {'deductible_tax_amount':0, 'my_invoice_amount':0, 'invoice_code':""})            
 
 @frappe.whitelist()
 def get_invoice_summary(doc_name) :

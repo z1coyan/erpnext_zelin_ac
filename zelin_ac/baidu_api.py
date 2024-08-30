@@ -111,10 +111,10 @@ def get_invoice_rep(invoice_upload):
         input_image_path = base_dir + "/public" + invoice_upload
     else:
         input_image_path = invoice_upload
-    #图片预处理至小于4M
+
     base_file_path = os.path.basename(input_image_path)
     output_image_path = base_dir + "/public/files/reget/" + base_file_path
-    max_file_size = 6 * 1024 * 1024  # 3MB
+    max_file_size = 5 * 1024 * 1024  # 5MB
     if(os.path.getsize(input_image_path) > max_file_size):
        scale_factor = 0.8  # 缩放因子
        # 打开输入图像

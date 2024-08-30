@@ -26,8 +26,7 @@ frappe.listview_settings['My Invoice'] = {
 
 						reader.onload = function(e) {
 							var contents = e.target.result;
-							console.log('up_files: ' + file.name);
-
+							//console.log('up_files: ' + file.name);
 							frappe.call({
 								method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.upload_invoices',
 								args: {
@@ -36,10 +35,11 @@ frappe.listview_settings['My Invoice'] = {
 								},
 								freeze: true,
 								freeze_message: __("请等待上传完成后网页自动刷新..."),
-								callback: function(response) {
-									console.log(response.message);
-									frappe.show_alert(__(file.name + '上传成功！'));
-									resolve(response.message);
+								callback: function(response) {									
+									if (response.message && response.message.length){
+										frappe.show_alert(__(file.name + '上传成功！'));
+										resolve(response.message);
+									}
 
 								}
 							});

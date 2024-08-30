@@ -111,11 +111,11 @@
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-26 22:18:02.049025",
-      "name": "Expense Claim Detail-tax_amount",      
-      "fieldname": "tax_amount",
+      "modified": "2024-08-30 22:18:02.049025",
+      "name": "Expense Claim Detail-deductible_tax_amount",      
+      "fieldname": "deductible_tax_amount",
       "fieldtype": "Float",
-      "label": "Tax Amount(Refundable)",
+      "label": "Deductible Tax Amount",
       "read_only":1,
       "no_copy": 1,						
       "insert_after": "invoice_code"
@@ -123,24 +123,24 @@
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-26 22:18:02.049025",
+      "modified": "2024-08-30 22:18:02.049026",
       "name": "Expense Claim Detail-my_invoice_amount",      
       "fieldname": "my_invoice_amount",
       "fieldtype": "Float",
       "label": "My Invoice Amount",
       "read_only":1,
       "no_copy": 1,						
-      "insert_after": "tax_amount"
+      "insert_after": "deductible_tax_amount"
    },
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-26 22:18:02.049025",
+      "modified": "2024-08-30 22:18:02.049027",
       "name": "Expense Claim Detail-my_invoice",      
       "fieldname": "my_invoice",
       "fieldtype": "Data",
       "label": "My Invoice",
-      "read_only":1,
+      "read_only": 1,
       "no_copy": 1,
       "hidden": 1,						
       "insert_after": "my_invoice_amount"
@@ -148,13 +148,13 @@
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-26 22:18:02.049025",
+      "modified": "2024-08-30 22:18:02.049028",
       "name": "Expense Claim Detail-my_invoice_before_amend",      
       "fieldname": "my_invoice_before_amend",
       "fieldtype": "Text",
       "description": "用于保存取消前关联的发票以便修订时重新恢复",
       "label": "my_invoice_before_amend",
-      "read_only":1,
+      "read_only": 1,
       "no_copy": 1,
       "hidden": 1,						
       "insert_after": "my_invoice_amount"

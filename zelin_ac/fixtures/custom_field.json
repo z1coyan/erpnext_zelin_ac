@@ -137,20 +137,32 @@
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-30 22:18:02.049027",
+      "modified": "2024-08-31 22:18:02.049027",
       "name": "Expense Claim Detail-my_invoice",      
       "fieldname": "my_invoice",
       "fieldtype": "Data",
       "label": "My Invoice",
       "read_only": 1,
-      "no_copy": 1,
-      "hidden": 1,						
+      "no_copy": 1,						
       "insert_after": "my_invoice_amount"
    },
    {
       "doctype": "Custom Field",
       "dt": "Expense Claim Detail",
-      "modified": "2024-08-30 22:18:02.049028",
+      "modified": "2024-08-31 22:18:02.049025",
+      "name": "Expense Claim Detail-invoice_date",      
+      "fieldname": "invoice_date",
+      "depends_on":"eval:doc.my_invoice",
+      "fieldtype": "Date",
+      "label": "Invoice Date",
+      "read_only":1,
+      "no_copy": 1,
+      "insert_after": "my_invoice"
+   },
+   {
+      "doctype": "Custom Field",
+      "dt": "Expense Claim Detail",
+      "modified": "2024-08-31 22:18:02.049028",
       "name": "Expense Claim Detail-my_invoice_before_amend",      
       "fieldname": "my_invoice_before_amend",
       "fieldtype": "Text",
@@ -159,7 +171,7 @@
       "read_only": 1,
       "no_copy": 1,
       "hidden": 1,						
-      "insert_after": "my_invoice_amount"
+      "insert_after": "invoice_date"
    },
    {
       "doctype": "Custom Field",

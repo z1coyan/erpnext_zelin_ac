@@ -49,7 +49,7 @@
         "doctype": "My Invoice Type",
         "invoice_type": "通行费",
         "modified": "2024-08-30 22:15:02.049023",
-        "deductible_tax_rate": 9,
+        "deductible_tax_rate": 3,
         "name": "通行费"
     },
     {

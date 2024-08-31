@@ -26,6 +26,8 @@ e_invoice_types =[
 class MyInvoice(Document):
     def validate(self):
         self.set_employee()
+        if not self.is_new() and self.has_value_changed('invoice_type'):
+            set_deductible_tax_amount(self)
 
     def set_employee(self):
         if not self.employee:
@@ -412,10 +414,9 @@ def get_invoice_code(docname, doctype) :
     doc.invoice_code = invoice_code
     if invoice_type in ['火车票', '飞机票', '通行费']:
         set_ticket_owner(doc)
-    set_invoice_date(doc)
-    tax_rate_map = frappe._dict(frappe.get_all('My Invoice Type', fields=['name','deductible_tax_rate'], as_list=1))
+    set_invoice_date(doc)    
     doc.is_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0  
-    set_deductible_tax_amount(doc, tax_rate_map)
+    set_deductible_tax_amount(doc)
     set_company(doc)
     if not doc.amount:
         doc.status = '不能使用'
@@ -456,27 +457,29 @@ def set_invoice_date(doc):
             doc.invoice_date = date_yyyymmdd
             return
 
-def set_deductible_tax_amount(doc, tax_rate_map):
+def set_deductible_tax_amount(doc):
     if doc.is_special_vat and doc.tax_amount:
         doc.deductible_tax_amount = flt(doc.tax_amount)
         if doc.net_amount and doc.tax_amount:
-            doc.tax_rate = flt(doc.tax_amount / flt(doc.net_amount) * 100, 0)            
+            doc.tax_rate = flt(flt(doc.tax_amount) / flt(doc.net_amount) * 100, 0)            
     elif not doc.ticket_owner or (doc.ticket_owner and doc.is_employee):
         # 国内机票扣除代收不征税项外，可9% 抵扣
         base_amount = flt(doc.amount)
-        tax_rate = tax_rate_map.get(doc.invoice_type, 0) / 100
+        tax_rate = frappe.db.get_value('My Invoice Type', {'name': doc.invoice_type}, 'deductible_tax_rate') or 0
+        tax_rate = tax_rate / 100
         text = doc.rep_txt
-        if "国内机票款" in text:
+        if all(key in text for key in ["机票款", "经纪代理"]):
+            tax_rate = 0
+        elif "国内机票款" in text:
             pattern = r'(\d+(?:\.\d+)?)(?=,\s*不征税)'
             match = re.search(pattern, text)
             if match:
                 untaxed_amt = match.group(1)
                 base_amount -= flt(untaxed_amt)
                 tax_rate = 0.09
-        if tax_rate:
-            doc.tax_rate = tax_rate * 100
-            # 计算公式：火车票可抵扣进项税 = 票面金额 ÷ (1 + 9%) × 9%。
-            doc.deductible_tax_amount = base_amount / (1 + tax_rate) * tax_rate
+        doc.tax_rate = tax_rate * 100
+        # 计算公式：火车票可抵扣进项税 = 票面金额 ÷ (1 + 9%) × 9%。
+        doc.deductible_tax_amount = base_amount / (1 + tax_rate) * tax_rate
     
 
 def set_company(doc):
@@ -536,7 +539,8 @@ def expense_select_invoice(docname, expense_claim_item, items):
             my_inv.amount.as_('sanctioned_amount'),
             my_inv.is_special_vat,
             my_inv.description,
-            my_inv.invoice_code
+            my_inv.invoice_code,
+            my_inv.invoice_date
         ).run(as_dict=1)
         
         expense_claim_doc = frappe.get_doc('Expense Claim', docname)

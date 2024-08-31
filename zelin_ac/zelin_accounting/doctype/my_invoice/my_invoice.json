@@ -343,8 +343,8 @@
    "fieldtype": "Float",
    "label": "Deductible Tax Amount",
    "no_copy": 1,
-   "precision": "2",
-   "read_only": 1
+   "permlevel": 1,
+   "precision": "2"
   },
   {
    "fieldname": "ticket_owner",
@@ -367,12 +367,12 @@
    "fieldtype": "Float",
    "label": "Deductible Tax Rate(%)",
    "no_copy": 1,
-   "precision": "0",
-   "read_only": 1
+   "permlevel": 1,
+   "precision": "0"
   }
  ],
  "links": [],
- "modified": "2024-08-30 22:14:19.474644",
+ "modified": "2024-08-31 11:29:37.874014",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "My Invoice",

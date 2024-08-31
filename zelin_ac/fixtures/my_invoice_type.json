@@ -34,19 +34,22 @@
     {
         "doctype": "My Invoice Type",
         "invoice_type": "客运服务",
-        "modified": "2024-08-26 22:15:02.049023",
+        "deductible_tax_rate": 9,
+        "modified": "2024-08-30 22:15:02.049023",
         "name": "客运服务"
     },
     {
         "doctype": "My Invoice Type",
         "invoice_type": "乘车服务",
-        "modified": "2024-08-26 22:15:02.049023",
+        "modified": "2024-08-30 22:15:02.049023",
+        "deductible_tax_rate": 9,
         "name": "乘车服务"
     },
     {
         "doctype": "My Invoice Type",
         "invoice_type": "通行费",
-        "modified": "2024-08-26 22:15:02.049023",
+        "modified": "2024-08-30 22:15:02.049023",
+        "deductible_tax_rate": 9,
         "name": "通行费"
     },
     {
@@ -58,7 +61,8 @@
     {
         "doctype": "My Invoice Type",
         "invoice_type": "打车费",
-        "modified": "2024-08-26 22:15:02.049023",
+        "modified": "2024-08-30 22:15:02.049023",
+        "deductible_tax_rate": 9,
         "name": "打车费"
     },
     {

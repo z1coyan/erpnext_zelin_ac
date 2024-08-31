@@ -3,6 +3,7 @@
 import frappe
 from frappe.model.document import Document
 import frappe
+from frappe.utils import flt, random_string
 import base64
 import requests
 import os
@@ -13,6 +14,14 @@ import shutil
 import re
 import time
 from zelin_ac.baidu_api import get_invoice_rep
+
+e_invoice_types =[
+    '电子发票',
+    '电子普通发票',
+    '电子专用发票',
+    '电子票据‌',
+    '全电发票'
+]
 
 class MyInvoice(Document):
     def validate(self):
@@ -40,8 +49,8 @@ def upload_invoices(filename, filedata):
         myinvoice.files = res_upload
         words_string = get_invoice_rep(res_upload)
         myinvoice.rep_txt = words_string        
-        if file_extension not in ['.PDF' , '.pdf'] and any(txt in words_string for txt in ['普通发票', '专用发票']):
-            frappe.msgprint(f'未能上传 {filename}，发票只支持pdf格式')
+        if file_extension not in ['.PDF' , '.pdf'] and any(txt in words_string for txt in e_invoice_types):
+            frappe.msgprint(f'未能上传 {filename}，电子发票只支持pdf格式')
             myinvoice.delete(ignore_permissions=1, force=1)
         elif words_string.count('仅供') > 1:
             frappe.msgprint(f"未能上传 {filename}，系统只支持一个文件一张火车票")
@@ -68,10 +77,10 @@ def upload_invoices(filename, filedata):
         # 分割文件名和扩展名
     file_name, file_extension = os.path.splitext(filename)
     if file_extension not in ['.PDF', '.pdf', '.PNG', '.png', '.JPG', '.jpg'] :
-        frappe.msgprint(f"未能上传 {filename}，系统只支持PDF、PNG、JPG三种格式的文件上传！")
+        frappe.throw(f"未能上传 {filename}，系统只支持PDF、PNG、JPG三种格式的文件上传！")
 
     created_invoices = []
-    upload_path = os.path.join(upload_dir , filename)
+    upload_path = os.path.join(upload_dir, f"{file_name}-{random_string(6)}{file_extension}")
     base_path = base_dir + "/public"
     res_uploadfilename = os.path.relpath(upload_path , base_path)
     res_upload = '/' + res_uploadfilename
@@ -89,7 +98,7 @@ def upload_invoices(filename, filedata):
             if page_0_inv_num and page_1_inv_num and page_0_inv_num == page_1_inv_num:
                 myinvoice = get_new_myinvoice(user.name,filename)
                 docname = myinvoice.name
-                png_filename = f"{docname}-{frappe.utils.random_string(6)}.png"
+                png_filename = f"{docname}-{random_string(6)}.png"
                 save_path = os.path.join(save_dir, png_filename)                                
                 multi_page_pdf_to_png(pdf_document, save_dir, png_filename)
                 parse_and_save_my_invoice(myinvoice)
@@ -100,14 +109,14 @@ def upload_invoices(filename, filedata):
                 dpi = 150  # 200 DPI，可以根据需要调整
                 page = pdf_document.load_page(page_number)
                 pix = page.get_pixmap(matrix=fitz.Matrix(dpi / 72 , dpi / 72))
-                png_filename = f"{docname}-{frappe.utils.random_string(6)}.png"
+                png_filename = f"{docname}-{random_string(6)}.png"
                 save_path = os.path.join(save_dir, png_filename)
                 pix.save(save_path, "png")
                 parse_and_save_my_invoice(myinvoice)
     else:
         myinvoice = get_new_myinvoice(user.name,filename)
         docname = myinvoice.name
-        png_filename = f"{docname}-{frappe.utils.random_string(6)}{file_extension}"
+        png_filename = f"{docname}-{random_string(6)}{file_extension}"
         save_path = os.path.join(save_dir, png_filename)
         shutil.copy(upload_path, save_path) 
         parse_and_save_my_invoice(myinvoice)
@@ -449,12 +458,26 @@ def set_invoice_date(doc):
 
 def set_deductible_tax_amount(doc, tax_rate_map):
     if doc.is_special_vat and doc.tax_amount:
-        doc.deductible_tax_amount = doc.tax_amount
-    elif doc.is_employee:
+        doc.deductible_tax_amount = flt(doc.tax_amount)
+        if doc.net_amount and doc.tax_amount:
+            doc.tax_rate = flt(doc.tax_amount / flt(doc.net_amount) * 100, 0)            
+    elif not doc.ticket_owner or (doc.ticket_owner and doc.is_employee):
+        # 国内机票扣除代收不征税项外，可9% 抵扣
+        base_amount = flt(doc.amount)
         tax_rate = tax_rate_map.get(doc.invoice_type, 0) / 100
+        text = doc.rep_txt
+        if "国内机票款" in text:
+            pattern = r'(\d+(?:\.\d+)?)(?=,\s*不征税)'
+            match = re.search(pattern, text)
+            if match:
+                untaxed_amt = match.group(1)
+                base_amount -= flt(untaxed_amt)
+                tax_rate = 0.09
         if tax_rate:
+            doc.tax_rate = tax_rate * 100
             # 计算公式：火车票可抵扣进项税 = 票面金额 ÷ (1 + 9%) × 9%。
-            doc.deductible_tax_amount = doc.amount / (1 + tax_rate) * tax_rate
+            doc.deductible_tax_amount = base_amount / (1 + tax_rate) * tax_rate
+    
 
 def set_company(doc):
     #“购买方, 纳税人识别号：”和紧接着的逗号之间的文本串
@@ -522,7 +545,12 @@ def expense_select_invoice(docname, expense_claim_item, items):
                 d.expense_type = expense_claim_doc.default_expense_type    
             d.expense_date = frappe.utils.getdate()  
             expense_claim_doc.append('expenses', d)                
-        expense_claim_doc.flags.ignore_links = 1
+
+        if (any(row for row in expense_claim_doc.expenses if not row.expense_type) and
+            not expense_claim_doc.default_expense_type):
+            frappe.throw("请先在发票类型中维护报销类型或在报销单上选择默认报销类型")
+            return
+
         expense_claim_doc.total_my_invoice_amount = sum(d.my_invoice_amount for d in data)
         expense_claim_doc.save(ignore_permissions=1)
 

@@ -3,6 +3,11 @@ frappe.ui.form.on('Expense Claim', {
         if (!frm.is_new() && !frm.is_dirty()) {
             frm.add_custom_button(__('关联发票'), () => frm.trigger('select_my_invoice'));
         }
+        // 预览全部发票
+		const my_invoice = frm.doc.expenses.filter((row) => row.my_invoice_amount)
+		if (!frm.doc.__islocal && my_invoice.length) {
+			frm.add_custom_button(__('Preview Invoice'), () => preview_all_invoice(frm));
+		}		
     },
     select_my_invoice: (frm) => {
         if (frm.is_dirty()) {
@@ -84,6 +89,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldname: 'net_amount',
                             fieldtype: 'Float',
                             in_list_view: 1,
+                            precision: 2,
                             read_only: 1,
                             columns: 1
                         },
@@ -92,6 +98,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldname: 'tax_amount',
                             fieldtype: 'Float',
                             in_list_view: 1,
+                            precision: 2,
                             read_only: 1,
                             columns: 1
                         },
@@ -100,6 +107,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldname: 'amount',
                             fieldtype: 'Float',
                             in_list_view: 1,
+                            precision: 2,
                             read_only: 1,
                             columns: 1
                         },
@@ -204,6 +212,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldtype: 'Float',
                             in_list_view: 1,
                             read_only: 1,
+                            precision: 2,
                             columns: 1
                         },
                         {
@@ -212,6 +221,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldtype: 'Float',
                             in_list_view: 1,
                             read_only: 1,
+                            precision: 2,
                             columns: 1
                         },
                         {
@@ -220,6 +230,7 @@ frappe.ui.form.on('Expense Claim', {
                             fieldtype: 'Float',
                             in_list_view: 1,
                             read_only: 1,
+                            precision: 2,
                             columns: 1
                         },
                         {
@@ -405,3 +416,63 @@ function remove_all_rows(d) {
         i = rows.length - 1;
     }
 }
+
+function preview_invoice  (url) {
+	let preview = "";
+	let file_extension = url.split('.').pop().toLowerCase();
+
+	if (frappe.utils.is_image_file(url)) {
+		preview = `<div class="img_preview" style="display: flex;justify-content: center;">
+			<img
+				class="img-responsive shortcut-widget-box"
+				src="${frappe.utils.escape_html(url)}"
+			/>
+		</div>`;
+	} else if (file_extension === "pdf") {
+		preview = `<div class="img_preview links-widget-box input">
+			<object style="background:#323639;" width="100%">
+				<embed
+					style="background:#323639;"
+					width="100%"
+					height="600"
+					src="${frappe.utils.escape_html(url)}" type="application/pdf"
+				>
+			</object>
+		</div>`;
+	} 
+
+	return preview;
+};
+
+function preview_all_invoice (frm) {
+	let preview = "";
+    frappe.db.get_list("My Invoice", {
+        filters: {expense_claim: frm.doc.name},
+        fields: ["files"]
+    })
+    .then((data) => {
+        if (data && data.length) {
+	        data.forEach(item => {		
+			    preview += preview_invoice(item.files)
+	        })
+        }    
+        var d = new frappe.ui.Dialog({
+            title:__("Invoice Recognition"),
+            fields: [
+                {
+                    label:__("Preview"),
+                    fieldtype:"HTML",
+                    fieldname:"preview_html",
+                    options: preview,
+                }
+            ],
+            primary_action_label: "关闭",
+            primary_action: function() {
+                d.hide()
+            }
+        })
+        
+        d.show();
+        d.$wrapper.find('.modal-dialog').css("max-width", "90%");
+    })
+};

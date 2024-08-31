@@ -27,7 +27,7 @@
    "fieldtype": "Link",
    "in_list_view": 1,
    "in_standard_filter": 1,
-   "label": "Expense Type",
+   "label": "Expense Claim Type",
    "options": "Expense Claim Type"
   },
   {
@@ -39,7 +39,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-08-29 15:17:47.764543",
+ "modified": "2024-08-31 08:37:12.840121",
  "modified_by": "Administrator",
  "module": "Zelin Accounting",
  "name": "My Invoice Type",

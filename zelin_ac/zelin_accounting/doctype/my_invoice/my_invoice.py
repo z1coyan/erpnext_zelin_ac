@@ -366,32 +366,24 @@ def get_invoice_code(docname, doctype) :
                     amount_value = re.sub(r'[^0-9.]', '', amount)
                     if float(amount_value) > 0 and float(amount_value) < 100000:
                         amount_list.append(float(amount_value))
-            sorted_amounts = sorted(amount_list)
-            if len(sorted_amounts) > 1 :
-                net_amount = sorted_amounts[1]
-                if sorted_amounts[0] < 0.2*net_amount:
-                    tax_amount = sorted_amounts[0]
-            elif len(sorted_amounts) == 1 :
-                net_amount = sorted_amounts[0]
         if '元' in words_string and float(net_amount) == 0:
-            for amount in words_list:
-                if '元' in amount and re.search(r'\d+(\.\d+)?', amount) and '/' not in amount and not re.search(r'\..*?\..+', amount):
+            for (idx, amount) in enumerate(words_list):
+                #globals().update(locals())
+                # 金额前面有价或费字样就不是可提取的金额
+                if ('元' in amount and idx and not any(word in words_list[idx-1] for word in ['价', '附加费'])
+                    and re.search(r'\d+(\.\d+)?', amount) and '/' not in amount and not re.search(r'\..*?\..+', amount)):
                     amount_value = re.sub(r'[^0-9.]', '', amount)
-                    if float(amount_value) > 0 and float(amount_value) < 100000:
+                    if (float(amount_value) > 0 and float(amount_value) < 100000):
                         amount_list.append(float(amount_value))
-            sorted_amounts = sorted(amount_list)
-            if len(sorted_amounts) > 1 :
-                net_amount = sorted_amounts[1]
-                if sorted_amounts[0] < 0.2*net_amount:
-                    tax_amount = sorted_amounts[0]
-            elif len(sorted_amounts) == 1 :
-                net_amount = sorted_amounts[0]
+            
         if float(net_amount) == 0:
             for amount in words_list:
                 if re.fullmatch(r'^\d+(,\d+)*(\.\d{1,2})$' , amount) and not re.search(r'\..*?\..+', amount):
                     amount_value = re.sub(r'[^0-9.]' , '' , amount)
                     if float(amount_value) > 0 and float(amount_value) < 100000:
                         amount_list.append(float(amount_value))
+
+        if not net_amount and amount_list:    
             sorted_amounts = sorted(amount_list)
             if len(sorted_amounts) > 1 :
                 net_amount = sorted_amounts[1]

@@ -524,6 +524,7 @@ def expense_select_invoice(docname, expense_claim_item, items):
         ).where(my_inv.name.isin(my_invoice_list)
         ).select(
             my_inv.name.as_('my_invoice'),
+            my_inv.invoice_type,
             my_inv_type.expense_type,
             my_inv.deductible_tax_amount,
             my_inv.amount,

@@ -448,7 +448,8 @@ function preview_all_invoice (frm) {
 	let preview = "";
     frappe.db.get_list("My Invoice", {
         filters: {expense_claim: frm.doc.name},
-        fields: ["files"]
+        fields: ["files"],
+        limit_page_length: 500
     })
     .then((data) => {
         if (data && data.length) {

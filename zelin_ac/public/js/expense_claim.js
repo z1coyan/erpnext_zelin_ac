@@ -134,7 +134,7 @@ frappe.ui.form.on('Expense Claim', {
                             in_list_view: 1,
    			                columns: 1,
                             click: function() {
-                                if (frm.doc.approval_status == "Draft" || frm.doc.approval_status == "Pending"){
+                                if (frm.doc.docstatus === 0){
                                     var row_index = $(event.target).closest('.grid-row').data('idx');
                                     frappe.call({
                                         method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.expense_remove_invoice',
@@ -151,7 +151,7 @@ frappe.ui.form.on('Expense Claim', {
                                 }else(
                                      frappe.msgprint({
                                         title: __('警告'),
-                                        message: __('非草稿及审批过程中单据无法修改关联属性！'),
+                                        message: __('不允许剔除已提交或取消费用报销单关联的发票！'),
                                     })
                                 )
                             }
@@ -338,7 +338,7 @@ function get_my_invoice(frm,d) {
             doctype: "My Invoice",
             filters: { "employee":frm.doc.employee, "status":"未使用"},
             fields: ['name', 'invoice_type', 'invoice_code', 'net_amount', 'tax_amount', 'amount', 'description', 'files'],
-            limit_page_length: 500
+            limit: 500
         },
         callback: function (r) {
             var my_invoice_data = r.message
@@ -449,7 +449,7 @@ function preview_all_invoice (frm) {
     frappe.db.get_list("My Invoice", {
         filters: {expense_claim: frm.doc.name},
         fields: ["files"],
-        limit_page_length: 500
+        limit: 500
     })
     .then((data) => {
         if (data && data.length) {

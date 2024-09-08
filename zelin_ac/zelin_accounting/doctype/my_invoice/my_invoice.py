@@ -423,7 +423,7 @@ def set_amount(doc):
         number = match.group(1)  # 提取并打印数字部分  
         doc.amount = number
 
-    pattern = r'计[\s,]*￥(\d+(\.\d+)?)[\s,]*￥(\d+(\.\d+)?)[\s,]*价'  
+    pattern = r'计[\s,]*￥(\d+(\.\d+)?)[\s,]*￥(\d+(\.\d+)?)'
     match = re.search(pattern, text)  
     if match:  
         if len(match.groups()) > 3:

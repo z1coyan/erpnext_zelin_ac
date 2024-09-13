@@ -153,7 +153,7 @@ def file_after_insert(doc, method):
 
 def file_on_trash(doc, method):
     doctype, docname = doc.attached_to_doctype, doc.attached_to_name
-    if doctype and docname and frappe.db.get_value(doctype, docname, 'docstatus') == 1:
+    if doctype and doctype not in ['Repost Item Valuation'] and docname and frappe.db.get_value(doctype, docname, 'docstatus') == 1:
         frappe.throw("不允许删除已提交单据的附件")
 
 def get_item_wh_qty_map(item_wh_tuple):

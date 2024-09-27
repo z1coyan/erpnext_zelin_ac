@@ -159,12 +159,61 @@ class OFDParser:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.cleanup()
 
+    def get_xml_string(self, file_path):
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        return content
+
+    def get_einvoice_xml(self, file_path_content, file_path_customtag):
+        xml_string = self.get_xml_string(file_path_content)
+        tree = ET.ElementTree(ET.fromstring(xml_string))
+        root = tree.getroot()
+        namespaces = self.get_all_namespaces(xml_string)
+        results = []
+        id_mapping = self.get_tag_id_mapping(file_path_customtag)
+        for text_object in root.findall('.//ofd:TextObject', namespaces):
+            text_id = text_object.get('ID')
+            text_id = id_mapping.get(text_id, text_id)
+            if text_id:
+                node = text_object.find('ofd:TextCode', namespaces)
+                text_content = node.text
+                results.append([text_id, text_content])
+        return {r[0]:r[1] for r in results}
+
+    def get_tag_id_mapping(self, file_path_customtag):
+        xml_string = self.get_xml_string(file_path_customtag)
+        tree = ET.ElementTree(ET.fromstring(xml_string))
+        root = tree.getroot()
+        namespaces = self.get_all_namespaces(xml_string)
+        mapping = {}
+        for elem in root.iter():  
+            # Check if the element has a child named 'ofd:ObjectRef'  
+            if elem.find('.//ofd:ObjectRef', namespaces) is not None:  
+                # Get the text of the 'ofd:ObjectRef' child  
+                tag_name = elem.tag.split('}')[-1]  
+                elements = elem.findall('.//ofd:ObjectRef', namespaces)
+                for sub_elem in elements:
+                    obj_ref_text = sub_elem.text
+                    # The tag name of the current element is the desired value # Note: elem.tag returns the fully qualified name including the namespace  
+                    # So we need to split it and take the last part # Store the mapping  
+                    mapping[obj_ref_text] = tag_name
+        return mapping        
+
+    def get_xml(self):
+        file_path_content = os.path.join(self.extracted_path, 'Doc_0', 'Pages', 'Page_0', 'Content.xml')
+        file_path_customtag = os.path.join(self.extracted_path, 'Doc_0', 'Tags', 'CustomTag.xml')
+        if os.path.isfile(file_path_content) and os.path.isfile(file_path_customtag):
+            xml_content = self.get_einvoice_xml(file_path_content, file_path_customtag)
+        else:
+            xml_content = self.get_first_xbrl_data_dict()
+        return xml_content
 
 def get_ofd_xml(file_url):
     file_doc = frappe.get_doc('File', {'file_url': file_url})
     path =f"{frappe.utils.get_bench_path()}/sites{file_doc.get_full_path()[1:]}"
+    
     with OFDParser(path) as parser:        
-        return parser.get_first_xbrl_data_dict()
+        return parser.get_xml()
 
   
 def move_file_to_sub_directory(directory_parts, file_doc):  

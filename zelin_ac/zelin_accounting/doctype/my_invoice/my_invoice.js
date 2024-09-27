@@ -21,8 +21,8 @@ frappe.ui.form.on("My Invoice", {
             frm.set_df_property("expense_claim", "hidden", 0);
             frm.set_df_property("owner_user", "hidden", 0);
             frm.set_df_property("files", "hidden", 0);
-            if (!frm.is_new() && (frm.doc.status=="未使用" || frm.doc.status=="已使用")) {
-                frm.add_custom_button(__('取发票号'), () => frm.trigger('get_invoice_code'), __('Actions'));
+            if (!frm.is_new() && (frm.doc.status=="未使用" || frm.doc.status=="不能使用")) {
+                frm.add_custom_button(__('重新识别'), () => frm.trigger('get_invoice_code'), __('Actions'));
             }
         }
     },

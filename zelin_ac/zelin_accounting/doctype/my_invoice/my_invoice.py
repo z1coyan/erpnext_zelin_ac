@@ -409,7 +409,7 @@ def get_invoice_code(docname, doctype) :
     set_invoice_date(doc)    
     doc.is_special_vat = 1 if any(s in doc.rep_txt for s in ["增值税专用发票"]) else 0  
     set_deductible_tax_amount(doc)
-    set_company(doc)
+    set_company(doc, words_list)
     if not doc.amount:
         doc.status = '不能使用'
         doc.error_message = "未识别出发票金额，非发票文件?"      
@@ -448,6 +448,11 @@ def set_invoice_date(doc):
             date_yyyymmdd = date_str.replace(' ', '')  
             doc.invoice_date = date_yyyymmdd
             return
+    #车票只有像这样的日期2024-09-29
+    pattern = r'(\d{4}-\d{2}-\d{2})(?:\s*\d{2}:\d{2}:\d{2})?'   
+    match = re.search(pattern, doc.rep_txt)  
+    if match:
+        doc.invoice_date = match.group(1)             
 
 def set_deductible_tax_amount(doc):
     if doc.is_special_vat and doc.tax_amount:
@@ -474,20 +479,29 @@ def set_deductible_tax_amount(doc):
         doc.deductible_tax_amount = base_amount / (1 + tax_rate) * tax_rate
     
 
-def set_company(doc):
+def set_company(doc, words_list):
     #“购买方, 纳税人识别号：”和紧接着的逗号之间的文本串
-    patterns = [r'购买方, 纳税人识别号：([^,]+)', r'统一社会信用代码/纳税人识别号：([^,]+)']
-    for pattern in patterns:
-        match = re.search(pattern, doc.rep_txt)    
-        if match:  
-            company_tax_id = match.group(1)                           
-            company = frappe.db.get_value('Company', {'tax_id': company_tax_id})
-            if company:
-                doc.company_code = company
-            else:
-                doc.status = '不能使用'
-                doc.error_message = f'非系统内公司税号: {company_tax_id}'
-            return   #如果匹配到了就返回 
+    buyer_key_found, tax_id_key_found = False, False
+    company_tax_id = ''
+    for v in words_list:
+        if not buyer_key_found and v and v.strip() == '购买方信息':
+            buyer_key_found = True
+        elif buyer_key_found and not tax_id_key_found and "纳税人识别号" in v:
+            splitted = v.split('：')    #baidy识别在识别号与税号之间没有逗号
+            if len(splitted) > 1:
+                company_tax_id = splitted[-1].strip()
+                break
+            tax_id_key_found = True
+        elif buyer_key_found and tax_id_key_found:
+            company_tax_id = v.strip()
+            break
+    if company_tax_id:                            
+        company = frappe.db.get_value('Company', {'tax_id': company_tax_id})
+        if company:
+            doc.company_code = company
+        else:
+            doc.status = '不能使用'
+            doc.error_message = f'非系统内公司税号: {company_tax_id}'
 
 @frappe.whitelist()
 def get_invoice_codes(docnames) :

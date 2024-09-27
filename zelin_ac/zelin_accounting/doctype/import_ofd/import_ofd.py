@@ -27,9 +27,16 @@ class ImportOFD(Document):
 		if self.attach and self.attach[-4:] == '.ofd':						
 			content = get_ofd_xml(self.attach)
 			self.contents = []
-			for (k,v) in content.items():
-				#返回的值是列表，取第1个值
-				self.append('contents', {'field_name': k, 'field_value': v[0] or ''})
+			if content and content.items:
+				for (k,v) in content.items():
+					#返回的值是列表，取第1个值
+					if 'Amount' in k and v == '¥': #金额字段的货币，还有一个实际金额的，
+						continue
+					if isinstance(v, list):
+						v = v[0]
+					self.append('contents', {'field_name': k, 'field_value': v or ''})
+			else:
+				frappe.msgprint(f'failed parsing ofd file' )
 		if not self.attach and self.journal_entry:
 			self.journal_entry = ''			
 

@@ -136,11 +136,14 @@ frappe.ui.form.on('Expense Claim', {
                             click: function() {
                                 if (frm.doc.docstatus === 0){
                                     var row_index = $(event.target).closest('.grid-row').data('idx');
+                                    var expenses = d.get_field("expenses").get_value();
+                                    var expense_claim_item = expenses.split("|")[0].trim();
                                     frappe.call({
                                         method: 'zelin_ac.zelin_accounting.doctype.my_invoice.my_invoice.expense_remove_invoice',
                                         args: {
                                             row_values: d.fields_dict.my_used_invoice.df.data[row_index - 1],
                                             docname: frm.doc.name,
+                                            expense_claim_item: expense_claim_item,
                                         },
                                         callback: function (r) {
                                             get_my_invoice(frm,d)

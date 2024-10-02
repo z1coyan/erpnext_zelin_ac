@@ -543,7 +543,7 @@ def expense_select_invoice(docname, expense_claim_item, items):
             my_inv.deductible_tax_amount,
             my_inv.amount,
             my_inv.amount.as_('my_invoice_amount'),
-            my_inv.amount.as_('sanctioned_amount'),
+            (my_inv.amount - my_inv.deductible_tax_amount).as_('sanctioned_amount'),
             my_inv.is_special_vat,
             my_inv.description,
             my_inv.invoice_code,
@@ -584,10 +584,10 @@ def expense_select_invoice(docname, expense_claim_item, items):
                 WHERE name = %s
             """, (docname, expense_claim_item, "已使用", my_invoice))
 
-            update_expense_item_my_invoice_amount(docname)
+            update_expense_item_my_invoice_amount(docname, expense_claim_item)
 
 @frappe.whitelist()
-def expense_remove_invoice(row_values, docname) :
+def expense_remove_invoice(row_values, docname, expense_claim_item=None) :
     data_values = frappe.parse_json(row_values)
     my_invoice = data_values.get('name')
     frappe.db.sql("""
@@ -596,25 +596,32 @@ def expense_remove_invoice(row_values, docname) :
         WHERE name = %s
     """ , ("", "", "未使用", my_invoice))
 
-    update_expense_item_my_invoice_amount(docname)
+    update_expense_item_my_invoice_amount(docname, expense_claim_item)
 
-def update_expense_item_my_invoice_amount(docname):
+def update_expense_item_my_invoice_amount(docname, expense_claim_item=None):
     doc = frappe.get_doc('Expense Claim', docname)
-    item_wise_amt = frappe.get_all('My Invoice', filters={'expense_claim': doc.name},
+    filters={'expense_claim': docname, 'status': '已使用'}
+    if expense_claim_item:
+        filters['expense_claim_item'] = expense_claim_item
+    item_wise_amt = frappe.get_all('My Invoice', filters= filters,
         fields=['expense_claim_item', 'sum(deductible_tax_amount) as deductible_tax_amount', 'sum(amount) as my_invoice_amount'],
         group_by ='expense_claim_item'
     )
     item_wise_amt_map = {r.expense_claim_item:r for r in item_wise_amt}
     for row in doc.expenses:
-        amt_dict = item_wise_amt_map.get(row.name)        
-        if amt_dict:
-            amt_dict.pop('expense_claim_item')
-            amt_dict.invoice_code = ""
-            amt_dict.amount = amt_dict.my_invoice_amount
-            amt_dict.sanctioned_amount = amt_dict.amount
-            frappe.db.set_value(row.doctype, row.name, amt_dict)
-        else:
-            frappe.db.set_value(row.doctype, row.name, {'deductible_tax_amount':0, 'my_invoice_amount':0, 'invoice_code':""})            
+        if not expense_claim_item or row.name == expense_claim_item:
+            amt_dict = item_wise_amt_map.get(row.name)        
+            if amt_dict:
+                amt_dict.pop('expense_claim_item')
+                amt_dict.invoice_code = ""
+                amt_dict.my_invoice = ""
+                amt_dict.amount = amt_dict.my_invoice_amount
+                amt_dict.sanctioned_amount = amt_dict.amount - amt_dict.deductible_tax_amount                
+            else:            
+                amt_dict = {'sanctioned_amount':0,'deductible_tax_amount':0, 'my_invoice_amount':0, 'invoice_code':"", 'my_invoice':""}
+            row.update(amt_dict)
+            #frappe.db.set_value(row.doctype, row.name, amt_dict)
+    doc.save()
 
 @frappe.whitelist()
 def get_invoice_summary(doc_name) :

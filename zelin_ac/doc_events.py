@@ -1,6 +1,6 @@
 import frappe
 from frappe import _
-from frappe.utils import today
+from frappe.utils import today, flt
 from zelin_ac.api import get_cached_value
 
 def stock_entry_validate(doc, method):
@@ -340,6 +340,14 @@ def validate_invoice_status(doc, method=None):
     else:
         frappe.log_error('发票状态不详')
 
+def expense_claim_after_save(doc, method=None):
+    # 删除已手工删除已引用发票的明细行，更新发票状态为未使用
+    frappe.db.sql("""
+        UPDATE `tabMy Invoice`
+        SET expense_claim = %s, expense_claim_item = %s, status = %s
+        WHERE expense_claim = %s and expense_claim_item not in (select name from `tabExpense Claim Detail`)
+    """ , ("", "", "未使用", doc.name))
+
 def expense_claim_validate(doc, method=None):
     if doc.amended_from:
         for row in doc.expenses:
@@ -370,16 +378,31 @@ def expense_claim_validate(doc, method=None):
                         )
                 row.my_invoice_before_amend = ""   #避免后面重复被触发
 
-    total_my_invoice_amount = 0
-    for row in doc.expenses:
-        if not row.my_invoice and row.my_invoice_amount:
-            row.my_invoice_amount = 0
-        total_my_invoice_amount += (row.my_invoice_amount or 0)
-    doc.total_my_invoice_amount = total_my_invoice_amount
+    doc.total_my_invoice_amount = sum(row.my_invoice_amount or 0 for row in doc.expenses)
+    tax_amount = sum(row.deductible_tax_amount or 0 for row in doc.expenses)
+    if tax_amount and tax_amount != sum(d.tax_amount for  d in doc.taxes):
+        tax_account, account_name = frappe.db.get_value('Account', {
+            'company': doc.company,
+            'account_number': '22210101'
+        },['name','account_name']) or ('','')
+        if tax_account:
+            doc.taxes = []
+            doc.append('taxes', {
+                'account_head': tax_account,
+                'tax_amount': tax_amount,
+                'description': account_name,
+                'total':doc.total_my_invoice_amount
+            })
+        doc.total_taxes_and_charges = tax_amount
+        doc.grand_total = (
+			flt(doc.total_sanctioned_amount)
+			+ flt(doc.total_taxes_and_charges)
+			- flt(doc.total_advance_amount)
+		)            
 
 def expense_claim_submit_cancel(doc, method=None):
     """
-    1. 保存取消前关联的发票信息，备修订时韩国恢复
+    1. 保存取消前关联的发票信息，备修订时恢复
     2. 恢复发票使用状态
     """
 
@@ -394,6 +417,10 @@ def expense_claim_submit_cancel(doc, method=None):
 
             frappe.db.set_value('My Invoice', {'expense_claim': doc.name},
                 {'status':'未使用', 'expense_claim': "", 'expense_claim_item':""})
+
+def expense_claim_on_trash(doc, method=None):
+    frappe.db.set_value('My Invoice', {'expense_claim': doc.name},
+        {'status':'未使用', 'expense_claim': "", 'expense_claim_item':""})
         
 def payment_entry_submit_cancel(doc, method=None):
     expenses = [r.reference_name for r in doc.references if r.reference_doctype == "Expense Claim"]

@@ -65,7 +65,6 @@ doc_events = {
 	},
 	"Expense Claim": {
 		"validate": "zelin_ac.doc_events.expense_claim_validate",
-		"after_save": "zelin_ac.doc_events.expense_claim_after_save",
 		"on_cancel": "zelin_ac.doc_events.expense_claim_submit_cancel",
 		"on_trash": "zelin_ac.doc_events.expense_claim_on_trash"		 			 	
 	},

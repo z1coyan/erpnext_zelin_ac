@@ -340,14 +340,6 @@ def validate_invoice_status(doc, method=None):
     else:
         frappe.log_error('发票状态不详')
 
-def expense_claim_after_save(doc, method=None):
-    # 删除已手工删除已引用发票的明细行，更新发票状态为未使用
-    frappe.db.sql("""
-        UPDATE `tabMy Invoice`
-        SET expense_claim = %s, expense_claim_item = %s, status = %s
-        WHERE expense_claim = %s and expense_claim_item not in (select name from `tabExpense Claim Detail`)
-    """ , ("", "", "未使用", doc.name))
-
 def expense_claim_validate(doc, method=None):
     if doc.amended_from:
         for row in doc.expenses:
@@ -399,6 +391,14 @@ def expense_claim_validate(doc, method=None):
 			+ flt(doc.total_taxes_and_charges)
 			- flt(doc.total_advance_amount)
 		)            
+
+    # 删除已手工删除已引用发票的明细行，更新发票状态为未使用
+    frappe.db.sql("""
+        UPDATE `tabMy Invoice`
+        SET expense_claim = '', expense_claim_item = '', status = '未使用'
+        WHERE expense_claim = %s and 
+        expense_claim_item not in (select name from `tabExpense Claim Detail` where parent = %s)
+    """ , (doc.name, doc.name))
 
 def expense_claim_submit_cancel(doc, method=None):
     """

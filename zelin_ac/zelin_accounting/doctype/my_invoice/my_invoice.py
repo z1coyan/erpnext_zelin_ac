@@ -423,12 +423,15 @@ def set_amount(doc):
         number = match.group(1)  # 提取并打印数字部分  
         doc.amount = number
 
-    pattern = r'计[\s,]*￥(\d+(\.\d+)?)[\s,]*￥(\d+(\.\d+)?)'
-    match = re.search(pattern, text)  
-    if match:  
-        if len(match.groups()) > 3:
-            doc.net_amount = match.group(1)
-            doc.tax_amount = match.group(3)
+    #两个模式区别是有无人民币符号
+    patterns = [r'计[\s,]*￥(\d+(\.\d+)?)[\s,]*￥(\d+(\.\d+)?)', r'合计[\s,]*(\d+(\.\d+)?)[\s,]*[,\s]*(\d+(\.\d+)?)']
+    for pattern in patterns:
+        match = re.search(pattern, text)  
+        if match:  
+            if len(match.groups()) > 3:
+                doc.net_amount = match.group(1)
+                doc.tax_amount = match.group(3)
+                break
 
 def set_ticket_owner(doc):
     name_match = re.search(r'\*\*(\d{4})\s*?(.*?)(,|$)', doc.rep_txt)  
